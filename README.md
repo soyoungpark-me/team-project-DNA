@@ -30,19 +30,19 @@
 
 ## 개발 일지
 
-#### 1) [2018.08.01 : ```JWT로 인증 서버 구현하기```](https://github.com/3457soso/project_DNA/blob/master/%EA%B0%9C%EB%B0%9C%20%EC%9D%BC%EC%A7%80/2018.08.01%20:%20JWT%EB%A1%9C%20%EC%9D%B8%EC%A6%9D%20%EC%84%9C%EB%B2%84%20%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0.md)
+#### 1) [2018.08.01 : ```JWT로 인증 서버 구현하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.01%20:%20JWT%EB%A1%9C%20%EC%9D%B8%EC%A6%9D%20%EC%84%9C%EB%B2%84%20%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0.md)
 
-#### 2) [2018.08.06 : ```Jenkins, Docker로 지속적 배포(CD) 도전하기```](https://github.com/3457soso/project_DNA/blob/master/%EA%B0%9C%EB%B0%9C%20%EC%9D%BC%EC%A7%80/2018.08.06%20:%20Jenkins%2C%20Docker%EB%A1%9C%20%EC%A7%80%EC%86%8D%EC%A0%81%20%EB%B0%B0%ED%8F%AC(CD)%20%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0.md)
+#### 2) [2018.08.06 : ```Jenkins, Docker로 지속적 배포(CD) 도전하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.06%20:%20Jenkins%2C%20Docker%EB%A1%9C%20%EC%A7%80%EC%86%8D%EC%A0%81%20%EB%B0%B0%ED%8F%AC(CD)%20%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0.md)
 
 #### 3) [2018.08.08 : ```MongoDB와 Mongoose를 이용한 위치 기반 서비스 개발```]()
 
-#### 4) [2018.08.09 : ```MongoDB에 ElasticSearch, Kibana 연동하기```](https://github.com/3457soso/project_DNA/blob/master/%EA%B0%9C%EB%B0%9C%20%EC%9D%BC%EC%A7%80/2018.08.09%20:%20MongoDB%EC%97%90%20ElasticSearch%2C%20Kibana%20%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0.md)
+#### 4) [2018.08.09 : ```MongoDB에 ElasticSearch, Kibana 연동하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.09%20:%20MongoDB%EC%97%90%20ElasticSearch%2C%20Kibana%20%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0.md)
 
-#### 5) [2018.08.11 : ```실시간 서비스를 위해 Socket.io 이용하기```](https://github.com/3457soso/project_DNA/blob/master/%EA%B0%9C%EB%B0%9C%20%EC%9D%BC%EC%A7%80/2018.08.11%20:%20%EC%8B%A4%EC%8B%9C%EA%B0%84%20%EC%84%9C%EB%B9%84%EC%8A%A4%EB%A5%BC%20%EC%9C%84%ED%95%B4%20Socket.io%20%EC%9D%B4%EC%9A%A9%ED%95%98%EA%B8%B0.md)
+#### 5) [2018.08.11 : ```실시간 서비스를 위해 Socket.io 이용하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.11%20:%20%EC%8B%A4%EC%8B%9C%EA%B0%84%20%EC%84%9C%EB%B9%84%EC%8A%A4%EB%A5%BC%20%EC%9C%84%ED%95%B4%20Socket.io%20%EC%9D%B4%EC%9A%A9%ED%95%98%EA%B8%B0.md)
 
 #### 6) [2018.08.12 : ```성능 이슈! 대용량 아키텍처에 대한 고민```]()
 
-#### 7) [2018.08.13 : ```https 환경 구축하기```](https://github.com/3457soso/project_DNA/blob/master/%EA%B0%9C%EB%B0%9C%20%EC%9D%BC%EC%A7%80/2018.08.13%20:%20SSL%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%B4%20https%20%ED%99%98%EA%B2%BD%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
+#### 7) [2018.08.13 : ```https 환경 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.13%20:%20SSL%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%B4%20https%20%ED%99%98%EA%B2%BD%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
 
 
 
