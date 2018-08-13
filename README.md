@@ -19,6 +19,12 @@
 - 현 위치를 기준으로 특정 반경 내에서 작성된 채팅만 보여주는 서비스로, 이 외에도 포스팅, 친구, DM 등 다양한 기능들이 기획되어 있습니다.
 
 
+***
+
+## 프로젝트 아키텍처 구조도
+
+![아키텍처 구조도](https://github.com/3457soso/project_DNA/blob/master/Resource/Arcitecture_Design.png)
+
 
 ***
 
