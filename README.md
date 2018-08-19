@@ -44,9 +44,9 @@
 
 #### 7) [2018.08.13 : ```https 환경 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.13%20:%20SSL%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%B4%20https%20%ED%99%98%EA%B2%BD%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
 
-#### 8) [2018.08.14 : ```라즈베리파이로 DB 서버 구축하기```]()
+#### 8) [2018.08.15 : ```라즈베리파이로 서버 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.15%20:%20%EB%9D%BC%EC%A6%88%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4%EB%A1%9C%20%EC%84%9C%EB%B2%84%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
 
-
+#### 9) [2018.08.20 : ```리액트 개발 ! 생명 주기와의 전쟁```]()
 
 ... 진행 중 ...
 
