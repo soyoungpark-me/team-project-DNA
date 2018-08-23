@@ -38,15 +38,16 @@
 
 #### 4) [2018.08.09 : ```MongoDB에 ElasticSearch, Kibana 연동하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.09%20:%20MongoDB%EC%97%90%20ElasticSearch%2C%20Kibana%20%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0.md)
 
-#### 5) [2018.08.11 : ```실시간 서비스를 위해 Socket.io 이용하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.11%20:%20%EC%8B%A4%EC%8B%9C%EA%B0%84%20%EC%84%9C%EB%B9%84%EC%8A%A4%EB%A5%BC%20%EC%9C%84%ED%95%B4%20Socket.io%20%EC%9D%B4%EC%9A%A9%ED%95%98%EA%B8%B0.md)
+#### 5) [2018.08.12 : ```성능 이슈! 대용량 아키텍처에 대한 고민```]()
 
-#### 6) [2018.08.12 : ```성능 이슈! 대용량 아키텍처에 대한 고민```]()
+#### 6) [2018.08.13 : ```https 환경 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.13%20:%20SSL%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%B4%20https%20%ED%99%98%EA%B2%BD%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
 
-#### 7) [2018.08.13 : ```https 환경 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.13%20:%20SSL%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%B4%20https%20%ED%99%98%EA%B2%BD%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
+#### 7) [2018.08.15 : ```라즈베리파이로 서버 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.15%20:%20%EB%9D%BC%EC%A6%88%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4%EB%A1%9C%20%EC%84%9C%EB%B2%84%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
 
-#### 8) [2018.08.15 : ```라즈베리파이로 서버 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.15%20:%20%EB%9D%BC%EC%A6%88%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4%EB%A1%9C%20%EC%84%9C%EB%B2%84%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
+#### 8) [2018.08.20 : ```리액트 개발 ! 생명 주기와의 전쟁```]()
 
-#### 9) [2018.08.20 : ```리액트 개발 ! 생명 주기와의 전쟁```]()
+#### 9) [2018.08.22 : ```실시간 서비스를 위해 Socket.io 이용하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.11%20:%20%EC%8B%A4%EC%8B%9C%EA%B0%84%20%EC%84%9C%EB%B9%84%EC%8A%A4%EB%A5%BC%20%EC%9C%84%ED%95%B4%20Socket.io%20%EC%9D%B4%EC%9A%A9%ED%95%98%EA%B8%B0.md)
+
 
 ... 진행 중 ...
 
