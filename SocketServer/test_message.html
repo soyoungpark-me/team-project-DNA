@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Socket.IO chat</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font: 13px Helvetica, Arial; }
+      form { background: #000; padding: 1%; position: fixed; bottom: 0; width: 100%; }
+      form label { color: white; padding: .5%; width: 6.9%; margin-right: .5%; margin-bottom: 1%; display: inline-block; }
+      form input { border: 0; padding: .5%; width: 85%; margin-right: .5%;  display: inline-block; }
+      form button { width: 6.9%; background: rgb(130, 224, 255); border: none; padding: 0.5%; }
+      #messages { list-style-type: none; margin: 0; padding: 0; }
+      #messages li { padding: 5px 10px; }
+      #messages li:nth-child(odd) { background: #eee; }
+    </style>
+  </head>
+  <body>
+    <h1>Test Message</h1>
+    <ul id="messages"></ul>
+    <form action=""> 
+      <div><label>token : </label><input id="token" autocomplete="on" value="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZHgiOjMsImlkIjoiMzQ1N3Nvc28iLCJuaWNrbmFtZSI6InNveW91bmciLCJhdmF0YXIiOm51bGwsImlhdCI6MTUzNDEzNzUyMiwiZXhwIjoxNTM0MTgwNzIyfQ.spx8P8uymnI0xraayUbGXJs1HMzHFMxqSWlZ_RnD_2s"/></div>
+      <div><label>lng : </label><input id="lng" autocomplete="on" value="127.097422"/></div>
+      <div><label>lat : </label><input id="lat" autocomplete="on" value="37.590531"/></div>
+      <div><label>contents : </label><input id="contents" autocomplete="on" /><button>Send</button></div>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>      
+      $(function () {
+        /*******************
+         * 소켓 연결
+        ********************/
+
+        // 1. 해당 포트로 소켓 생성
+        const socket = io('http://localhost:9014', {transports: ['websocket', 'flashsocket']});
+
+        // 2. 현재 정보 세팅
+        let info = {          
+          customId: 3,
+                    //parseInt(JSON.parse(localStorage.getItem('profile')).idx),
+                    // TODO 웹 앱 동시 접속 처리 방법 구상
+                    // 서버에서 클라를 구별하기 위한 현재 유저의 Idx입니다.
+                    // localStorage는 안드의 경우 로컬 DB로 대체하면 됩니다!
+          position: [0, 0],
+                    // 클라이언트의 현재 위치 정보입니다.([lng, lat] 순서)
+          radius  : 0
+                    // 반경 몇m의 채팅을 받을 것인지를 의미하는 반지름 값입니다.
+        }
+
+        // 3. 연결하면서 현재 정보 서버에 전송
+        socket.on('connect', function() {
+          socket.emit('store', info);
+        });
+
+        // 4. 서버로 ping 전송하기
+        socket.on('ping', () => {
+          info = {
+            position: [127.097422, 37.590531],
+            radius  : 50
+          }
+          // TODO 유저의 현재 상태를 업데이트해서 info로 전달
+          socket.emit('update', info);
+        });
+
+        // socket.on('pong', (latency) => {
+        // });
+
+
+        /*******************
+         * 메시지 전송
+        ********************/
+        $('form').submit(function(){
+          const token = $("#token").val();
+          const messageData = {
+            lng: $("#lng").val(),
+            lat: $("#lat").val(),
+            contents: $("#contents").val()
+          };
+
+          // 1. 메시지 저장 이벤트 서버로 보내기
+          socket.emit('save_msg', token, messageData);
+
+          $('#contents').val('');
+          return false;
+        });
+
+        // 5. 서버로부터 새 메시지 이벤트를 받았을 경우에 화면에 새로 렌더링해준다.
+        socket.on('new_msg', (response) => {
+          // if (response.data.user.idx) { // 내 현재 index 값과 메시지의 인덱스 값을 비교해 판별한다.
+
+          // }
+          $('#messages').append($('<li>')
+            .text(response.data.user.nickname + ": " + response.data.contents));
+        });      
+      });
+    </script>
+  </body>
+</html>

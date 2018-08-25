@@ -1,0 +1,150 @@
+.nav-bar-wrapper {
+  height: 50px !important;
+  background-color: #634C89;
+}
+
+.nav-bar {
+  position: relative;
+  padding: 6px !important;
+  padding-bottom: 5px !important;;
+  width: 1024px;
+  margin: 0 auto;
+}
+
+.nav-title {
+  display: inline-block !important;
+  width: auto !important;
+}
+
+.nav-logo {
+  width: 43px;
+  height: 43px;
+  margin-top: -4px;
+}
+
+.nav-logo-img {
+  width: 100%;
+  height: 100%;
+}
+
+.nav-search {
+  width: 400px !important;
+  position: absolute;
+  left: 55px;
+  top: 10px;
+  width: auto;
+}
+
+.nav-search > button {
+  background: none;
+  border: none;
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 30px;
+  font-size: 17px;
+  color: #787878;
+}
+
+.nav-search > button > span {
+  vertical-align: middle;
+  padding: 0 5px;
+}
+
+.search-input {
+  width: 100% !important;
+  height: 30px !important;
+  padding: 2px 10px !important;
+  font-size: 15px !important;
+  color: #454545 !important;
+}
+
+.search-input:focus, .search-input:active, .search-input:enabled {
+  border: none !important;
+}
+
+.vl {
+  display: block;
+  width: 2.5px;
+  background-color: rgba(255, 255, 255, 0.6);
+  position: absolute;
+  top: 4px;
+  bottom: 8px;
+  border-radius: 1px;
+  right: 57px;
+}
+
+.nav-link {
+  padding: 8px 13px !important;
+}
+
+.nav-main-item {
+  position: absolute;
+  top: 3px;
+  color: rgba(255,255,255, 0.85);
+  width: 100px !important;
+  font-size: 19px;
+  font-weight: 500;
+}
+
+.nav-main-item:hover {
+  color: white;
+}
+
+.nav-items {
+  position: absolute;
+  right: 0;
+}
+
+.nav-item-fa {
+  color: white;
+  font-size: 23px;
+}
+
+.nav-button {
+  border: 1px solid white;
+  color: white !important;
+  background-color: #634C89 !important;
+  width: 90px;
+  padding: 7px 12px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.nav-button:hover {
+  background-color: white !important;
+  color: #454545 !important;
+  text-decoration: none;
+}
+
+.navbar-collapse {
+  position: absolute;
+  right: 0;
+  top: 73px;
+  width: 150px;
+  padding: 5px 10px;
+  background-color: #F7F7F7;
+  border: 2px solid #E7E7E7;
+  border-radius: 5px;
+}
+
+.hr {
+  height: 2px;
+  background-color: #D7D7D7;
+  border-radius: 1px;
+  margin: 5px 0;
+}
+
+.navbar-collapse a {
+  color: #454545;
+}
+
+.navbar-collapse a:hover {
+  font-weight: bold;
+  color: #634C89;
+}
+
+
+.navbar-collapse .nav-link {
+  padding: 6px 10px !important;
+}

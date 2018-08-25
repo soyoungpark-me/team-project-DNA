@@ -1,0 +1,142 @@
+.user-list-wrapper {
+  position: relative;
+  vertical-align: top;
+  display: inline-block;
+  text-align: center;
+  background-color: #FDFDFC;
+  width: 25%;
+  height: 100%;
+}
+
+.user-list-wrapper > div {
+  vertical-align: middle;
+}
+
+.user-list-my-profile {
+  padding: 25px;
+  height: 170px;
+  background-color: #FDFDFC;
+  text-align: left;
+}
+
+.user-my-profile-text {
+  display: inline-block;
+  margin-left: 15px;
+  vertical-align: top;
+}
+
+.user-my-profile-nickname {
+  font-size: 22px;
+  font-weight: bold;
+  color: #232323;
+  margin: -2px 0 0 0;
+}
+
+.user-my-profile-id {
+  font-size: 15px;
+  font-weight: normal;
+  color: #454545;
+  margin: 0;
+}
+
+.user-my-profile-info {
+  font-size: 17px;
+  font-weight: normal;
+  color: #343434;
+  margin-top: 5px;
+  margin-bottom: 0px;
+}
+
+.avatar-wrapper {
+  display: inline-block;
+  width: 55px;
+  height: 55px;
+  overflow: hidden;
+  position: relative;
+  border-radius: 50%;
+}
+
+.avatar-image {
+  position: absolute;
+  left: -100%;
+  right: -100%;
+  top: -100%;
+  bottom: -100%;
+
+  display: inline;
+  margin: auto;
+  height: 100%;
+  width: auto;
+}
+
+.user-list-title {
+  font-size: 18px;
+  font-weight: bold;
+  padding: 6px;
+  background-color: #e0dcea;
+  margin: 0;
+  color: #232323;
+}
+
+.user-list-title > span {
+  margin-right: 7px;
+  vertical-align: middle;
+  color: #232323;
+}
+
+.user-list-contents {
+  display: block;
+  width: 100%;
+  height: calc(100% - 210px) !important;
+  overflow-y: scroll;
+}
+
+.user-list-item {
+  position: relative;
+  padding: 10px 25px;
+  height: 60px;
+  text-align: left;
+}
+
+.user-list-item:nth-of-type(2n) {
+  background-color: #F1F3F5;
+}
+
+.user-list-item .avatar-wrapper {
+  width: 40px;
+  height: 40px;
+}
+
+.user-list-item-nickname {
+  position: relative;
+  display: inline-block;
+  font-size: 20px;
+  line-height: 40px;
+  margin: 0 0 0 20px;
+  vertical-align: top;
+}
+
+.user-list-button {
+  background: none !important;
+  color: #787878;
+  font-size: 30px;
+  font-weight: normal;
+  border: none;
+  position: absolute;
+  margin-top: 10px !important;
+  right: 5px;
+  padding: 3px 10px;
+  border-radius: 5px;
+}
+
+.user-list-button:hover {
+  background-color: #ff8000;
+}
+
+.user-list-sign {
+  position: absolute;
+  right: 25px;
+  top: 25px;
+  color: #00A000;
+  font-size: 13px;
+}
