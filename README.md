@@ -30,23 +30,23 @@
 
 #### 1) [2018.08.01 : ```JWT로 인증 서버 구현하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.01%20:%20JWT%EB%A1%9C%20%EC%9D%B8%EC%A6%9D%20%EC%84%9C%EB%B2%84%20%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0.md)
 
-#### 2) [2018.08.06 : ```Jenkins, Docker로 지속적 배포(CD) 도전하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.06%20:%20Jenkins%2C%20Docker%EB%A1%9C%20%EC%A7%80%EC%86%8D%EC%A0%81%20%EB%B0%B0%ED%8F%AC(CD)%20%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0.md)
+#### 02) [2018.08.06 : ```Jenkins, Docker로 지속적 배포(CD) 도전하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.06%20:%20Jenkins%2C%20Docker%EB%A1%9C%20%EC%A7%80%EC%86%8D%EC%A0%81%20%EB%B0%B0%ED%8F%AC(CD)%20%EB%8F%84%EC%A0%84%ED%95%98%EA%B8%B0.md)
 
-#### 3) [2018.08.08 : ```MongoDB와 Mongoose를 이용한 위치 기반 서비스 개발```]()
+#### 03) [2018.08.08 : ```MongoDB와 Mongoose를 이용한 위치 기반 서비스 개발``` (작성중)](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.08%20:%20MongoDB%EC%99%80%20Mongoose%EB%A5%BC%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%EC%9C%84%EC%B9%98%20%EA%B8%B0%EB%B0%98%20%EC%84%9C%EB%B9%84%EC%8A%A4%20%EA%B0%9C%EB%B0%9C.md)
 
-#### 4) [2018.08.09 : ```MongoDB에 ElasticSearch, Kibana 연동하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.09%20:%20MongoDB%EC%97%90%20ElasticSearch%2C%20Kibana%20%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0.md)
+#### 04) [2018.08.09 : ```MongoDB에 ElasticSearch, Kibana 연동하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.09%20:%20MongoDB%EC%97%90%20ElasticSearch%2C%20Kibana%20%EC%97%B0%EB%8F%99%ED%95%98%EA%B8%B0.md)
 
-#### 5) [2018.08.13 : ```https 환경 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.13%20:%20SSL%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%B4%20https%20%ED%99%98%EA%B2%BD%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
+#### 05) [2018.08.13 : ```https 환경 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.13%20:%20SSL%EC%9D%84%20%EC%9D%B4%EC%9A%A9%ED%95%B4%20https%20%ED%99%98%EA%B2%BD%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
 
-#### 6) [2018.08.15 : ```라즈베리파이로 서버 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.15%20:%20%EB%9D%BC%EC%A6%88%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4%EB%A1%9C%20%EC%84%9C%EB%B2%84%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
+#### 06) [2018.08.15 : ```라즈베리파이로 서버 구축하기```](https://github.com/3457soso/project_DNA/blob/master/devLog/2018.08.15%20:%20%EB%9D%BC%EC%A6%88%EB%B2%A0%EB%A6%AC%ED%8C%8C%EC%9D%B4%EB%A1%9C%20%EC%84%9C%EB%B2%84%20%EA%B5%AC%EC%B6%95%ED%95%98%EA%B8%B0.md)
 
-#### 7) [2018.08.20 : ```리액트로 웹 프론트엔드 구현하기```](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.20%20:%20%EB%A6%AC%EC%95%A1%ED%8A%B8%EB%A1%9C%20%EC%9B%B9%20%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C%20%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0.md)
+#### 07) [2018.08.20 : ```리액트로 웹 프론트엔드 구현하기```](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.20%20:%20%EB%A6%AC%EC%95%A1%ED%8A%B8%EB%A1%9C%20%EC%9B%B9%20%ED%94%84%EB%A1%A0%ED%8A%B8%EC%97%94%EB%93%9C%20%EA%B5%AC%ED%98%84%ED%95%98%EA%B8%B0.md)
 
-#### 8) [2018.08.22 : ```실시간 서비스를 위해 Socket.io 이용하기```](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.22%20:%20%EC%8B%A4%EC%8B%9C%EA%B0%84%20%EC%84%9C%EB%B9%84%EC%8A%A4%EB%A5%BC%20%EC%9C%84%ED%95%B4%20Socket.io%20%EC%9D%B4%EC%9A%A9%ED%95%98%EA%B8%B0.md)
+#### 08) [2018.08.22 : ```실시간 서비스를 위해 Socket.io 이용하기``` (작성중)](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.22%20:%20%EC%8B%A4%EC%8B%9C%EA%B0%84%20%EC%84%9C%EB%B9%84%EC%8A%A4%EB%A5%BC%20%EC%9C%84%ED%95%B4%20Socket.io%20%EC%9D%B4%EC%9A%A9%ED%95%98%EA%B8%B0.md)
 
-#### 9) [2018.08.24 : ```Redis의 Geo API 사용하기```]()
+#### 09) [2018.08.24 : ```Redis의 Geo API 사용하기``` (작성중)](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.24%20:%20Redis%EC%9D%98%20Geo%20API%20%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0.md)
 
-#### 10) [2018.08.28 : ```배포와 함께 CORS 문제 극복하기```]()
+#### 10) [2018.08.28 : ```배포와 함께 CORS 문제 극복하기``` (작성중)](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.28%20:%20%EB%B0%B0%ED%8F%AC%EC%99%80%20%ED%95%A8%EA%BB%98%20CORS%20%EB%AC%B8%EC%A0%9C%20%EA%B7%B9%EB%B3%B5%ED%95%98%EA%B8%B0.md)
 
 
 
