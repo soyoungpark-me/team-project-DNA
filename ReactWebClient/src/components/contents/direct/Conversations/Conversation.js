@@ -1,10 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { NavLink } from 'react-router-dom';
-import Loader from 'react-loader-spinner'
 import Moment from 'react-moment';
 import Dotdotdot from 'react-dotdotdot';
-import axios from 'axios';
 
 import { fetchOtherProfile } from './../../../../actions/helper';
 
@@ -43,8 +40,8 @@ class Conversation extends Component {
   render(){
     if (this.state.otherProfile && this.state.otherProfile !== null) {
       return (
-        <NavLink to={`/dm/${this.props.conversation.idx}`}
-          className={`conversation-list-item ${(this.props.clicked) ? 'active' : ''}`}>
+        <div className={`conversation-list-item ${(this.props.flag) ? 'active' : ''}`}
+          onClick={() => this.props.onConversationClick(this.props.conversation.idx)}>
           <div className="conversation-list-left">
             <div className="avatar-wrapper">
               <img className="avatar-image"
@@ -65,9 +62,9 @@ class Conversation extends Component {
             <p className="conversation-list-icon"><span className="ion-arrow-right-b"></span></p>
           </div>
           <Dotdotdot clamp={2} className="conversation-list-last-message">
-            {this.props.conversation.last_message}
+            {this.props.conversation.last_type === "Image" ? "사진" : this.props.conversation.last_message}
           </Dotdotdot>
-        </NavLink>
+        </div>
       )
     } else {
       return (

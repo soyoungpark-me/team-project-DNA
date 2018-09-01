@@ -78,7 +78,6 @@
         // 5. 서버로부터 새 메시지 이벤트를 받았을 경우에 화면에 새로 렌더링해준다.
         socket.on('new_dm', (response) => {
           // if (response.data.user.idx) { // 내 현재 index 값과 메시지의 인덱스 값을 비교해 판별한다.
-            console.log(response);
           // }
           $('#messages').append($('<li>')
             .text(response.result.sender_idx + ": " + response.result.contents));

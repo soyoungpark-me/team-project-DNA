@@ -1,13 +1,10 @@
 import config from './../config';
 
 const checkError = (action) => {
-  console.log(action.payload);
-
   const USER_API = `${config.SERVER_HOST}:${config.USER_PORT}/api`;
   // 일단 에러가 참일 경우
   if (action.error && action.payload) {
     const response = action.payload.response;
-    console.log(action);
 
     // 네트워크 에러 (서버가 죽은 경우)
     if (!response) {

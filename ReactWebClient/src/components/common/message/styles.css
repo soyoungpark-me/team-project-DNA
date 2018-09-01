@@ -4,6 +4,7 @@
   vertical-align: top;
   display: inline-block;
   background-color: #FDFDFC;
+  border-right: 1px solid #E6E6E6;
   width: 50%;
   height: 100%;
 }
@@ -17,15 +18,122 @@
   text-align: center;
 }
 
+.best-chat-wrapper {
+  position: absolute;
+  top: 20px;
+  left: 25px;
+  width: calc(100% - 50px);
+  height: 70px;
+  border-radius: 10px;
+  background-color: #F1F3F5;
+  z-index: 3;
+  overflow: hidden;
+}
+
+.best-chat-fa {
+  vertical-align: top;
+  font-size: 40px;
+  margin: 13px 22px 0 22px;
+  color: #ffa700;
+}
+
+.best-chat-contents-wrapper {
+  display: inline-block;
+  width: calc(100% - 140px);
+}
+
+.best-chat-toggle {
+  vertical-align: top;
+  font-size: 40px;
+  margin: 15px 10px 0 20px;
+  text-align: right;
+  color: #454545;
+}
+
+.best-chat-contents-item {
+  display: block;
+  min-height: 58px;
+  margin: 13px 5px;
+  border-bottom: 1px solid #bdc6c9;
+}
+
+.best-chat-contents-item:last-of-type {
+  border: none;
+}
+
+.best-chat-contents-item .bubble-side-wrapper{
+  vertical-align: top !important;
+  min-width: 55px;
+  padding-right: 15px;
+  text-align: right;
+}
+
+.best-chat-contents-item .message-thumb-up {
+  position: relative;
+  display: inline;
+  border: none;
+  cursor: default;
+}
+
+.best-chat-contents-item .message-thumb-up:hover{
+  border: none;
+}
+
+.best-chat-rank { 
+  vertical-align: top;
+  font-size: 20px;
+  margin-top: -5px;
+  margin-bottom: 0;
+}
+
+.best-chat-contents-item .user-my-profile-top {
+  display: inline-block;
+  width: calc(100% - 150px);
+}
+
+.best-chat-contents-item .avatar-wrapper {
+  width: 45px;
+  height: 45px;
+}
+
+.best-chat-contents-item .user-my-profile-text {
+  width: calc(100% - 70px);
+}
+
+.best-chat-contents-item .user-my-profile-nickname {
+  font-size: 20px;
+  margin-top: -5px;
+}
+
+.best-chat-contents {
+  font-family: 'NanumSquare' !important;
+  font-size: 17px !important;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.best-chat-created-at {
+  position: absolute;
+  right: 80px;
+  display: inline-block;
+}
+
+.best-chat-created-at time {
+  display: block;
+  font-size: 14px;
+  margin: 2px 0 2px 0;
+  color: #454545;
+}
+
 .message-list-chat-wrapper{
   position: absolute;
-  top: 0;
+  top: 90px;
   left: 0;
-  height: calc(100% - 50px);
+  height: calc(100% - 140px);
   width: 100%;
   overflow-y: scroll;
   padding: 20px 35px 20px;
-  border: 1px solid #E6E6E6;
   text-align: center;
 }
 
@@ -54,15 +162,15 @@
   position: relative;
   display: block;
   width: 100%;
-  min-height: 30px;
-  margin-bottom: 6px;
+  min-height: 42px;
+  margin-bottom: 8px;
 }
 
 .bubble-wrapper:last-of-type {
   margin-bottom: 20px;
 }
 
-.bubble-wrapper:last-of-type {message-list-empty
+.bubble-wrapper:last-of-type {
   margin-bottom: 10px;
 }
 
@@ -112,21 +220,93 @@
   background-color: #FDFDFC;
 }
 
-.message-created-at {
-  font-size: 12px;
-  margin: 0px 8px;
+.bubble-side-wrapper{
+  position: relative;
+  display: inline-block;
+  min-width: 72px;
+  height: 42px;
   vertical-align: bottom !important;
+}
+
+.bubble-image {
+  max-width: 100%;
+  padding: 9px 0;
+}
+
+.message-created-at {
+  position: absolute;
+  font-size: 12px;
+  min-width: 72px;
+  bottom: -3px;
+  margin: 0px 8px;
+  padding-top: 2px;
+}
+
+.wrapper-me .message-created-at {  
+  right: 0;
+}
+
+.wrapper-you .message-created-at {  
+  left: 0;
+}
+
+.message-thumb-up {
+  position: absolute;
+  background-color: #FDFDFD;
+  border-radius: 5px;
+  border: 1px solid #e3e8ea;
+  -webkit-transition: border 0.5s;
+  transition: border 0.5s;
+  padding: 1px 8px;  
+  font-size: 14px;
+  top: 0px;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.message-thumb-up:hover {
+  border: 1.5px solid #4f8bef;
+  -webkit-transition: border 0.5s;
+  transition: border 0.5s;
+
+}
+
+.wrapper-me .message-thumb-up {
+  right: 8px;
+}
+
+.wrapper-you .message-thumb-up {
+  left: 8px;
+}
+
+.message-thumb-up-count {
+  margin-left: 5px;
+  color: #454545;
+}
+
+.message-thumb-up-fa {
+  color: #a6abad;
+}
+.i-liked-it .message-thumb-up-fa {
+  color: #0057e7;  
 }
 
 .bubble {
   font-size: 16px;
   position: relative;
   display: inline-block;
-  /*clear: both;*/
+  min-height: 42px;
   padding: 4px 16px;
   max-width: calc(100% - 140px);
   font-family: "NanumSquare", "Open Sans" !important;
   font-weight: 400 !important;
+  vertical-align: bottom;
+}
+
+.bubble-contents {
+  display: table-cell;
+  height: 34px;
+  vertical-align: middle;
 }
 
 .bubble-triangle {
@@ -161,7 +341,7 @@
 
 .bubble-speaker {
   position: relative;
-  margin-top: 30px;
+  margin-top: 5px;
   background-color: #d62d20 !important;
   padding: 25px 20px 20px 20px;
   color: white !important;
@@ -173,18 +353,18 @@
 
 .bubble-speaker img:nth-of-type(1) {
   position: absolute;
-  top: -18px;
-  width: 80px;
+  top: -7px;
+  width: 75px;
 }
 
 .bubble-me.bubble-speaker img:nth-of-type(1) {
-  left: -90px;
+  left: -85px;
   -webkit-transform: scaleX(-1);
   transform: scaleX(-1);
 }
 
 .bubble-you.bubble-speaker img:nth-of-type(1) {
-  right: -90px;
+  right: -85px;
 }
 
 .bubble-speaker img:nth-of-type(2) {
@@ -212,10 +392,6 @@
 .bubble-me {
   color: white;
   background-color: #6632b5;
-}
-
-.start-true {
-
 }
 
 /*여기서부터 폼*/
@@ -317,58 +493,37 @@
   right: 55px;
 }
 
+#file { width:0; height:0; }          
 
-/*여기서부터 설정*/
-.setting-wrapper {
-  position: relative;
-  height: 20%;
-  width: 100%;
-  padding: 15px 25px;
-  background-color: #F8F9FA;
+.react-confirm-alert-body {
+  text-align: center !important;
+}
+.react-confirm-alert-body h1 {
+  font-size: 24px !important;
+  font-family: "NanumSquare" !important;
+  font-weight: bold;
 }
 
-.setting-title span {
-  color: #7b68a1;
-  margin-right: 10px;
+.react-confirm-alert-body #text {
+  font-size: 22px;
+  font-family: "NanumSquare" !important;
 }
 
-.setting-title {
-  color: #7b68a1;
-  font-size: 30px;
-  margin: 0;
+.react-confirm-alert-button-group {
+  display: inline-block !important;
+  width: 150px !important;
+  text-align: center !important;
 }
 
-.setting-item {
-  margin-left: 41px;
-  margin-top: 3%;
+.react-confirm-alert-button-group button {
+  font-size: 15px !important;
+  font-weight: bold !important;
+  font-family: "NanumSquare" !important;
+  width: 70px !important;
+  margin: 0 !important;
 }
 
-.setting-name {
-  font-size: 18px;
-  color: #454545;
-}
-
-.setting-check {
-  margin-left: 10px;
-  display: inline-block;
-  width: auto;
-}
-
-.setting-input {
-  margin-left: 10px;
-  display: inline-block;
-  padding: 6px 8px !important;
-  width: calc(100% - 128px);
-}
-
-.setting-button {
-  position: absolute;
-  top: 20px;
-  right: 25px;
-  width: 100px;
-  height: 45px;
-  background-color: #7b68a1;
-  color: white;
-  border-radius: 10px;
-  font-size: 20px;
+.react-confirm-alert-button-group button:first-of-type {
+  background-color: #6632b5 !important;
+  margin-right: 10px !important;
 }

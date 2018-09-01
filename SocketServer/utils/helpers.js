@@ -1,4 +1,33 @@
+const fs = require('fs');
+
+const AWS = require('aws-sdk');
+const multer = require('multer');
+const multerS3 = require('multer-s3');
+
 const authModel = require('../models/AuthModel');
+
+/* Image Upload */
+AWS.config.accessKeyId = process.env.AWS_ACCESS_KEY;
+AWS.config.secretAccessKey = process.env.AWS_SECRET_KEY;
+AWS.config.region = process.env.AWS_REGION;
+
+const S3 = new AWS.S3();
+
+const upload = multer({
+  storage: multerS3({
+    s3: S3,
+    bucket: 'dna-edge/images',
+    acl: 'public-read',
+    key: function (req, file, callback) {
+      const fname = Date.now() + '_' + file.originalname;
+      callback(null, fname);
+    }
+  })
+});
+
+exports.upload = upload;
+// exports.uploadArray = multer({storage: storageS3}).array('image', 5);
+
 
 exports.getClientId = (customId) => {
   let result = -1;

@@ -29,8 +29,7 @@ class ConversationList extends Component {
 
     this.state = {
       position: null,
-      conversations: [],
-      conversationIdx: null
+      conversations: []      
     };
 
     this.handleInterval = this.handleInterval.bind(this);
@@ -118,10 +117,12 @@ class ConversationList extends Component {
       // .slice(0, 15 * this.state.page - 1)
       .map((conversation) => {
         return (
-          <Conversation
-            clicked={(this.state.conversationIdx === conversation.idx) ? true : false}
+          <Conversation          
+            clicked={(this.props.conversationIdx === conversation.idx) ? true : false}
+            flag={(this.props.conversationIdx === conversation.idx) ? 1 : 0}
             conversation={conversation}
-            key={conversation.idx} />
+            key={conversation.idx} 
+            onConversationClick={this.props.onConversationSelect}/>
         )
     });
   }

@@ -4,6 +4,8 @@ const helpers = require('../utils/helpers');
 
 const jwt = require('jsonwebtoken');
 
+
+
 /*******************
  *  Register
  *  @param: userData = { id, password, nickname, email, avatar, description }
@@ -177,6 +179,7 @@ exports.login = (userData) => {
 };            
         
 
+
 /****************
  *  salt 조회
  *  @param: userData = { id }
@@ -253,6 +256,7 @@ exports.passwordCheck = (userData) => {
 };
 
 
+
 /*******************
  *  Update
  *  @param: updateData = { idx, nickname, avatar, description, 
@@ -289,6 +293,7 @@ exports.update = (updateData, changePassword) => {
     });
   });
 }
+
 
 
 /*******************
@@ -361,6 +366,7 @@ exports.block = (userIdx, blockUserIdx) => {
 }
 
 
+
 /*******************
  *  SelectBlock
  *  @param: idx
@@ -382,6 +388,7 @@ exports.selectBlock = (idx) => {
 };
 
 
+
 /*******************
  *  addPoint
  *  @param
@@ -397,6 +404,65 @@ exports.addPoints = () => {
       } else {
         resolve(rows.affectedRows);
       }
+    });
+  });
+}
+
+
+
+/*******************
+ *  Report
+ *  @param: useridx, reportUserIdx
+ ********************/
+exports.report = (userIdx, reportUserIdx) => {
+  // 1. 해당 row가 존재하는지 먼저 확인
+  return new Promise((resolve, reject) => {
+    sql = `SELECT idx 
+             FROM reports
+            WHERE user_idx = ? AND report_idx = ?`;
+            
+    mysql.query(sql, [userIdx, reportUserIdx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (rows.length === 0) { // 존재하지 않을 경우에만 신고
+          resolve();
+        } else {
+          reject(28400);
+        }
+      }        
+    });
+  })
+  .then(() => {  
+    return new Promise((resolve, reject) => {
+      sql = `INSERT INTO reports (user_idx, report_idx)
+                      VALUES (?, ?)`;
+
+      mysql.query(sql, [userIdx, reportUserIdx], (err, rows) => {
+        if (err) {
+          reject(29400);
+        } else {
+          if(rows.affectedRows === 1) {      
+            resolve(rows);
+          }
+        }
+      });      
+    })
+  })
+  .then((result) => {
+    // 3. 결과 조회해 돌려주기
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT user_idx, report_idx, created_at
+                    FROM reports 
+                    WHERE idx = ?`;
+      
+      mysql.query(sql, result.insertId, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(rows);
+        }
+      });
     });
   });
 }

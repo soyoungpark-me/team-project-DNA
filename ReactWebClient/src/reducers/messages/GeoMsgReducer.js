@@ -1,12 +1,11 @@
-import { GET_MESSAGES, SEND_MESSAGE, SET_USER_LIST,
-  MESSAGE_MAKE_UPDATE, MESSAGE_MAKE_NOT_UPDATE }
-  from './../../actions/messages/GeoMsgAction';
+import { GET_MESSAGES, SET_USER_LIST, GET_BEST_MESSAGES } from './../../actions/messages/GeoMsgAction';
 
-import { FETCH_DATA_SUCCESS } from './../../actions/index';
+import { FETCH_DATA_SUCCESS, FETCH_BEST_SUCCESS } from './../../actions/index';
 import checkError from './../checkError';
 
 const INITIAL_STATE = {
   messages: null,
+  best: null,
   users: null
 }
 
@@ -14,17 +13,17 @@ export default function(state = INITIAL_STATE, action){
   checkError(action);
 
   switch(action.type) {
-    case FETCH_DATA_SUCCESS:// return data and set fetching = false
+    case FETCH_DATA_SUCCESS:
       return { ...state, messages: action.payload.result };
+
+    case FETCH_BEST_SUCCESS:
+      return { ...state, best: action.payload.result };
 
     case GET_MESSAGES:
       return { ...state, messages: action.payload.result };
 
-    case MESSAGE_MAKE_UPDATE:
-      return { ...state, update: true}
-
-    case MESSAGE_MAKE_NOT_UPDATE:
-      return { ...state, update: false}
+    case GET_BEST_MESSAGES:
+      return { ...state, best: action.payload.data.result };
 
     case SET_USER_LIST:
       return {...state, users: action.payload }

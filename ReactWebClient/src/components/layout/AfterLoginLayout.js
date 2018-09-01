@@ -1,14 +1,14 @@
 import React, { Component } from "react";
 import Notification from 'react-web-notification';
 import 'react-toastify/dist/ReactToastify.css';
-import { BrowserRouter, Switch, Route, Redirect, withRouter } from 'react-router-dom';
+import { BrowserRouter, Switch, Route, withRouter } from 'react-router-dom';
 
 import { connect } from 'react-redux';
 
-import { setGeoPosition, handlePermissionGranted,
+import { setGeoPosition, handlePermissionGranted, setSocketConnected, 
   handlePermissionDenied, handleNotSupported } from './../../actions/AppActions';
-import { setUserList } from './../../actions/messages/GeoMsgAction';
 import { getProfile } from './../../actions/user/UserAction';
+import { setUserList } from './../../actions/messages/GeoMsgAction';
 
 /* import Components */
 import { NavAfterComponent } from './nav/NavComponents';
@@ -42,28 +42,22 @@ class MyComponent extends Component {
     this.handleNotiOnShow = this.handleNotiOnShow.bind(this);
   }
 
-  componentWillMount() {
-    const path = this.props.location.pathname;
-
-    if (path === "/login") {
-      // 토큰이 있어 넘어왔음에도 login으로 라우팅을 시도할 경우
-      // 홈으로 보내버립니다.
+  async componentWillUpdate() {
+    if (!this.props.socket || this.props.socket === null) {
+      await this.props.setSocketConnected();
       this.props.history.push('/');
-      return;
-    } else if (path === '/logout') {
-      // 로그아웃으로 넘어왔을 땐 토큰을 모두 삭제하고
-      localStorage.removeItem("token");
-      // 홈으로 보내버립니다.
-      this.props.history.push('/login');
-      return;
     }
   };
 
   componentDidUpdate() {
+    if (!localStorage.getItem("token")) {
+      return;
+    }
+
     // 로그인 한 후에도 프로필을 가지고 있지 않다면
     // 서버에 요청해서 다시 저장합니다.
-    if (this.props.profile === null) {
-      this.props.getProfile(localStorage.getItem("index"));
+    if (!this.props.profile) {
+      this.props.getProfile(JSON.parse(localStorage.getItem("token")).idx);
     }
 
     // 소켓 설정하기 (로그인 된 상태에서만 설정해주기 위해 AfterLoginLayout에 위치합니다)
@@ -71,7 +65,7 @@ class MyComponent extends Component {
     const socket = this.props.socket;
     const path = this.props.location.pathname;
 
-    if (this.props.position !== null && this.props.profile !== null) {
+    if (this.props.position && this.props.profile && socket) {
       const position = this.props.position;
       const profile = this.props.profile;
 
@@ -121,10 +115,11 @@ class MyComponent extends Component {
           <div className="h100calc">
             <Switch>
               <Route exact path="/" component={MainComponent} />
-              <Route exact path="/dm/:idx?" component={DirectComponent} />
+              <Route path="/dm" component={DirectComponent} />
             </Switch>
           </div>
         </BrowserRouter>
+
         <Notification
           ignore={this.state.ignore && this.state.title !== ''}
           notSupported={this.props.handleNotSupported}
@@ -178,6 +173,6 @@ class MyComponent extends Component {
 };
 
 export default connect(mapStateToProps,
-  { setGeoPosition, setUserList, getProfile,
+  { setGeoPosition, getProfile, setSocketConnected,
     handlePermissionGranted, handlePermissionDenied,
-    handleNotSupported })(AfterLoginLayout);
+    handleNotSupported, setUserList })(AfterLoginLayout);

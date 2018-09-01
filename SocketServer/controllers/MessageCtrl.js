@@ -52,7 +52,7 @@ exports.save = (token, param) => {
         validationError.errors.lat = { message : "Latitude is required" };
       }
 
-      if (!contents || validator.isEmpty(contents)) {
+      if (!contents || contents === null || contents === undefined) {
         isValid = false;
         validationError.errors.contents = { message : "Contents is required" };
       }      
@@ -62,7 +62,7 @@ exports.save = (token, param) => {
 
       let response = '';
 
-      if (type === 'LoudSpeaker') { // 확성기일 경우 해당 유저의 잔여 point를 조회한다.
+      if (type === "LoudSpeaker") { // 확성기일 경우 해당 유저의 잔여 point를 조회한다.
         let points = 0;
 
         try {
@@ -80,6 +80,14 @@ exports.save = (token, param) => {
           };
           reject();
         }
+      } else if (type === "Image") {
+        console.log(contents);
+
+        // const response = helpers.uploadSingle(contents);
+        // console.log(response);
+        // contents = "이미지 도전중";
+
+        // 이미지일 경우에는 DB에 파일의 경로만 저장해야 합니다.
       }
 
       // 3. DB에 저장하기
@@ -132,7 +140,6 @@ exports.selectOne = async (req, res, next) => {
   }
 
   if (!isValid) {
-    console.log(validationError);
     reject();
   }
   /* 유효성 체크 끝 */
@@ -263,126 +270,105 @@ exports.selectCircle = async (req, res, next) => {
  *  like
  *  @param: messageIdx
  ********************/
-exports.like = async (req, res, next) => {
-  const userIdx = req.userData.idx;
-  const messageIdx = req.body.idx || req.params.idx;
+exports.like = (token, messageIdx) => {
+  // 1. 먼저 해당 jwt가 유효한지 확인 
+  return new Promise((resolve, reject) => {
+    authModel.auth(token, (err, userData) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(userData);
+      }
+    });
+  })
+  .then((userData) => {
+    return new Promise(async (resolve, reject) => {
+      const userIdx = userData.idx;
 
-   /* 1. 유효성 체크하기 */
-   let isValid = true;
+      /* 1. 유효성 체크하기 */
+      let isValid = true;
 
-   if (!messageIdx || validator.isEmpty(messageIdx)) {
-     isValid = false;
-     validationError.errors.messageIdx = { message : "Message idx is required" };
-   }
- 
-   if (!isValid) return res.status(400).json(validationError);
-   /* 유효성 체크 끝 */
+      if (messageIdx === null || messageIdx === undefined) {
+        isValid = false;
+        validationError.errors.messageIdx = { message : "Message idx is required" };
+      }
+    
+      if (!isValid) reject();
+      /* 유효성 체크 끝 */
 
-  // 2. DB에 저장하기
-  let result = '';
-  try {
-    result = await messageModel.like(userIdx, messageIdx);
-  } catch (error) {
-    // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-    return next(error);
-  }
+      // 2. DB에 저장하기
+      let result = '';
+      try {
+        result = await messageModel.like(userIdx, messageIdx);
+      } catch (err) {
+        // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
+        console.log(err);
+        reject(err);      
+      }
 
-  let message = '';
+      // 3. 저장 성공
+      const respond = {
+        status: 201,
+        result
+      };
 
-  if (result) {
-    message = "Like pushed Successfully";
-  } else {
-    message = "Like popped Successfully"
-  }
-  // 3. 저장 성공
-  const respond = {
-    status: 201,
-    message
-  };
-
-  return res.status(201).json(respond);
-}
+      resolve(respond);
+    });
+  });
+};
 
 
 
-exports.testsave = async (req, res, next) => {
+/*******************
+ *  Best
+ *  @param: lng, lat, radius
+ ********************/
+exports.best = async (req, res, next) => {
   /* PARAM */
   const idx = req.userData.idx;
-  const id = req.userData.id;
-  const nickname = req.userData.nickname;
-  const avatar = req.userData.avatar;
   const lng = req.body.lng || req.params.lng;
   const lat = req.body.lat || req.params.lat;
-  const type = req.body.type || req.params.type || "Message";
-  const contents = req.body.contents || req.params.contents;
+  const radius = req.body.radius || req.params.radius;
   
   /* 1. 유효성 체크하기 */
   let isValid = true;
 
-  if (!lng || validator.isEmpty(lng)) {
+  if (!lng || lng === '' || lng === undefined) {
     isValid = false;
     validationError.errors.lng = { message : "Longitude is required" };
   }
 
-  if (!lat || validator.isEmpty(lat)) {
+  if (!lat || lat === '' || lat === undefined) {
     isValid = false;
     validationError.errors.lat = { message : "Latitude is required" };
   }
 
-  if (!contents || validator.isEmpty(contents)) {
+  if (!radius || radius === '' || radius === undefined) {
     isValid = false;
-    validationError.errors.contents = { message : "Contents is required" };
+    validationError.errors.radius = { message : "Radius is required" };
   }
 
   if (!isValid) return res.status(400).json(validationError);
   /* 유효성 체크 끝 */
 
-  if (type == 'LoudSpeaker') { // 확성기일 경우 해당 유저의 잔여 point를 조회한다.
-    let points = 0;
-
-    try {
-      points = await userModel.selectPoints(idx);      
-    } catch (err) {
-      // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-      return next(err);
-    }
-
-    if (points < 100) { // 포인트가 100보다 모자랄 경우엔 보낼 수 없다.
-      return res.status(401).json({
-        status: 401,
-        message: "Not enough points",
-        result: { points }        
-      });
-    }
-  }
-
-  // 2. DB에 저장하기
+  // 2. DB에서 끌고 오기
   let result = '';
   try {
-    const messageData = {
-      idx, id, nickname, avatar, lng, lat, type, contents
-    };    
+    const conditions = {
+      lng, lat, radius
+    };
 
-    result = await messageModel.save(messageData);
+    result = await messageModel.best(conditions);
   } catch (error) {
     // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
     return next(error);
-  } finally {
-    if (type == 'LoudSpeaker') { // 확성기일 경우 포인트를 차감한다.
-      try {
-        await userModel.reducePoints(idx);      
-      } catch (err) {
-        // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-        return next(err);
-      }
-    }
   }
 
-  // 3. 저장 성공
+  // 3. 조회 성공
   const respond = {
-    status: 201,
-    message : "Create Message Successfully",
-    result 
+    status: 200,
+    message : "Select Messages Successfully",
+    result
   };
-  return res.status(201).json(respond);
-}
+  return res.status(200).json(respond);
+};

@@ -93,5 +93,6 @@
   font-size: 17px;
   color: #454545;
   white-space: nowrap;
+  overflow: hidden;
   margin-bottom: 0;
 }

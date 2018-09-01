@@ -73,3 +73,29 @@
   margin-left: 17px;
   font-weight: 600;
 }
+
+#file {
+  display: none;
+}
+
+.register-avatar {
+  height: auto;
+}
+
+.register-avatar-wrapper {
+  border: 1px solid #C8C8C8;
+  padding: 12px 15px;
+  border-radius: 5px;
+}
+
+.register-avatar-button {
+  border: 1px solid #C8C8C8;
+  padding: 4px 10px;
+  margin-right: 10px;
+}
+
+.register-avatar-filename {
+  color: #454545;
+  white-space: nowrap;
+  overflow: hidden;  
+}

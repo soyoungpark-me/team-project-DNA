@@ -3,25 +3,40 @@ import axios from 'axios';
 import config from './../../config.js';
 
 export const GET_MESSAGES = "GET_MESSAGES";
+export const GET_BEST_MESSAGES = "GET_BEST_MESSAGES";
 export const SEND_MESSAGE = "SEND_MESSAGE";
-export const NEW_MESSAGE = "NEW_MESSAGE";
 export const SET_USER_LIST = "SET_USER_LIST";
-export const MESSAGE_MAKE_UPDATE = "MESSAGE_MAKE_UPDATE";
-export const MESSAGE_MAKE_NOT_UPDATE = "MESSAGE_MAKE_NOT_UPDATE";
+export const APPLY_LIKE = "APPLY_LIKE";
 
 const ROOT_URL = `${config.SERVER_HOST}:${config.SOCKET_PORT}/api`;
 let token = '';
-if (localStorage.getItem("token")) {
-  token = JSON.parse(localStorage.getItem("token")).accessToken;
-}
 
 export function getMessages(coords, radius, page){
-  const request = axios.post(`${ROOT_URL}/message/${page}`,
+  if (localStorage.getItem("token")) {
+    token = JSON.parse(localStorage.getItem("token")).accessToken;
+  }
+
+  const request = axios.post(`${ROOT_URL}/messages/${page}`,
     { lng: coords.lng, lat: coords.lat, radius },
     { headers: { "token": token } });
 
   return {
     type: GET_MESSAGES,
+    payload: request
+  }
+}
+
+export function getBestMessages(coords, radius){
+  if (localStorage.getItem("token")) {
+    token = JSON.parse(localStorage.getItem("token")).accessToken;
+  }
+
+  const request = axios.post(`${ROOT_URL}/best`,
+    { lng: coords.lng, lat: coords.lat, radius },
+    { headers: { "token": token } });
+
+  return {
+    type: GET_BEST_MESSAGES,
     payload: request
   }
 }
@@ -47,10 +62,16 @@ export function sendMessage(values, type) {
   }
 }
 
-export function newMessage(value) {
-  return {
-    type: NEW_MESSAGE,
-    payload: value
+export function applyLike(idx) {
+  return (dispatch, getState) => {
+    const state = getState();
+
+    // axios로 직접 통신하지 않고 app에 직접 연결된 socket을 통해 send_message 이벤트를 발생시킨다.
+    state.app.socket.emit("like", token, idx);
+
+    dispatch({
+      type: APPLY_LIKE
+    });
   }
 }
 

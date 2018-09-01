@@ -4,6 +4,7 @@ import { FETCH_DATA_SUCCESS } from './../../actions/index';
 import checkError from './../checkError';
 
 const INITIAL_STATE = {
+  avatar: null,
   conversations: null,
   messages: null,
   friends: null
@@ -14,7 +15,7 @@ export default function(state = INITIAL_STATE, action){
 
   switch(action.type) {
     case FETCH_DATA_SUCCESS:// return data and set fetching = false
-      return { ...state, messages: action.payload.result };
+      return { ...state, messages: action.payload.result.DMs, avatar: action.payload.result.avatar };
 
     case GET_CONVERSATIONS:
       return { ...state, conversations: action.payload.data.result };

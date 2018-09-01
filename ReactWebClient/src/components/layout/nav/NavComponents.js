@@ -1,25 +1,18 @@
 import React, { Component } from "react";
-import { BrowserRouter as Router, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import FontAwesome from 'react-fontawesome';
-import CSSModules from 'react-css-modules';
 import {
   Button,
   Collapse,
   Navbar,
   NavbarToggler,
-  NavbarBrand,
   Nav,
   NavItem,
   NavLink,
-  UncontrolledDropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
   Input
 } from 'reactstrap';
 
 import styles from './styles.css';
-import faviconPath from '../../../../public/images/logo.png';
 import imagePath from '../../../../public/images/logo.png';
 
 const LoginButton = () => (

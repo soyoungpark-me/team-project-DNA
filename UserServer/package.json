@@ -3,8 +3,9 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node app.js",
-    "dev": "nodemon app.js"
+    "start": "NODE_ENV=development nodemon ./app",
+    "dev": "NODE_ENV=development node ./app",
+    "deploy": "NODE_ENV=production node ./app"
   },
   "dependencies": {
     "body-parser": "~1.18.2",

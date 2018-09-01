@@ -5,7 +5,6 @@ import FontAwesome from 'react-fontawesome';
 
 import { connect } from 'react-redux';
 
-import config from './../../../config';
 import styles from './styles.css';
 
 function mapStateToProps(state) {
@@ -15,10 +14,6 @@ function mapStateToProps(state) {
     profile: state.user.profile
   };
 }
-
-// const User = (info) => (
-//
-// );
 
 const Profile = (props) => (
   <div className="user-list-my-profile">
@@ -49,7 +44,7 @@ class UserList extends Component {
       .map((user) => {
         if(this.props.profile.idx !== parseInt(user.idx)) {
           return (
-            <div className="user-list-item">
+            <div className="user-list-item" key={user.idx}>
               <div className="avatar-wrapper">
                 <img className="avatar-image"
                   src={(user.avatar) !== null ?
@@ -57,11 +52,8 @@ class UserList extends Component {
                     "/../public/img/avatar.png"}/>
               </div>
               <p className="user-list-item-nickname">{user.nickname}</p>
-              <FontAwesome className="user-list-sign" name="circle" />
-              {/*<button className="user-list-button">
-                <span className="ti-angle-down"></span>
-              </button>
-              */}
+              <FontAwesome name="circle" 
+                className={`user-list-sign ${(user.inside ? "user-inside" : "user-outside")}`} />
             </div>
           )
         }

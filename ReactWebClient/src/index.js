@@ -2,6 +2,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Favicon from 'react-favicon';
+import { BrowserRouter } from 'react-router-dom';
 
 /* for Redux */
 import { Provider } from 'react-redux';
@@ -23,6 +24,8 @@ ReactDOM.render(
   <Provider store={createStoreWithMiddleware(reducers)}>
     <div id='under-root'>
       <Favicon url={faviconPath} />
-      <App />
+      <BrowserRouter>
+        <App />
+      </BrowserRouter>
     </div>
   </Provider>, document.getElementById('root'));

@@ -2,10 +2,11 @@ import axios from 'axios';
 import config from './../../config.js';
 
 export const GET_PROFILE = "GET_PROFILE";
+export const SET_USER_INDEX = "SET_USER_INDEX";
 
 const ROOT_URL = `${config.SERVER_HOST}:${config.USER_PORT}/api`;
 
-export function getProfile (index) {
+export function getProfile(index) {
   let token = '';
   if (localStorage.getItem("token")) {
     token = JSON.parse(localStorage.getItem("token")).accessToken;
@@ -17,5 +18,12 @@ export function getProfile (index) {
   return {
     type: GET_PROFILE,
     payload: request
+  }
+}
+
+export function setUserIndex(index) {
+  return {
+    type: SET_USER_INDEX,
+    payload: index
   }
 }

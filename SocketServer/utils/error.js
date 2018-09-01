@@ -104,5 +104,21 @@ exports.code =
       code: 27400,
       message: "Passwords do not match"
     }
+  },
+
+  // report
+  28400: {
+    status: 400,
+    contents: {
+      code: 28400,
+      message: "This user is already reported"
+    }
+  },
+  29400: {
+    status: 400,
+    contents: {
+      code: 29400,
+      message: "No such user exists (Foreign Key Error)"
+    }
   }
 };

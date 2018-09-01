@@ -140,3 +140,11 @@
   color: #00A000;
   font-size: 13px;
 }
+
+.user-inside {
+  color: #00A000;
+}
+
+.user-outside {
+  color: #d62d20;
+}

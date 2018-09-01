@@ -1,11 +1,13 @@
 import React, { Component } from 'react';
 import axios from 'axios';
-import { Button, Form, FormGroup, Label, Input, FormText } from 'reactstrap';
+import { Button, Form, FormGroup, Label, FormText } from 'reactstrap';
 import { Field, reduxForm } from 'redux-form'
-import { BrowserRouter, Route, Redirect } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 
 import config from './../../../config';
 import styles from './styles.css';
+
+import { imageFileUpload } from './../../../actions/helper';
 
 // validation용 필드
 const renderField = ({ input, label, placeholder, type }) => (
@@ -20,15 +22,18 @@ const renderField = ({ input, label, placeholder, type }) => (
 class RegisterForm extends Component {
   constructor(props) {
     super(props);
+    
+    this.state = {
+      navigate: false,
+      file: null,
+      isValid: true
+    }
+
+    this.onChange = this.onChange.bind(this);
   }
 
-  state = {
-    navigate: false,
-    isValid: true
-  }
 
-  // submit = function (values) {
-  onSubmit(props){
+  async onSubmit(props){
     // 초기화
     this.state.isValid = true;
 
@@ -72,6 +77,16 @@ class RegisterForm extends Component {
     if (this.state.isValid) {
       const API_URL = `${config.SERVER_HOST}:${config.USER_PORT}/api/users/register`;
 
+      if (this.state.file) {
+        const formData = new FormData();
+        formData.append('image', this.state.file);
+
+        const result = await imageFileUpload(formData);
+        console.log(result);
+        props.avatar = result.data;
+      }
+      console.log(props);
+
       axios.post(API_URL, props, {})
         .then(response => {
           alert('회원가입이 완료되었습니다!');
@@ -91,19 +106,39 @@ class RegisterForm extends Component {
     }
   }
 
+  onChange(e) {
+    this.setState({ file: e.target.files[0] });
+
+    const fileName = window.$("input:file").val().replace(/^.*[\\\/]/, '');
+    window.$(".register-avatar-filename").html(fileName);
+  }
+
+  selectFile(e) {
+    e.preventDefault();
+    window.$("input:file").click();
+    const ext = window.$("input:file").val().split(".").pop().toLowerCase();
+    if(ext.length > 0){
+      if(window.$.inArray(ext, ["gif","png","jpg","jpeg"]) == -1) { 
+        alert("gif,png,jpg 파일만 업로드 할수 있습니다.");
+        return false;  
+      }                  
+    }
+  }
+
   render() {
     const { handleSubmit, submitting } = this.props;
 
     if (this.state.navigate) {
       return (
         <BrowserRouter>
-          this.props.history.push('/login');
+          {this.props.history.push('/login')}
         </BrowserRouter>
       )
     }
 
     return (
-      <Form className='form-wrapper' onSubmit={handleSubmit(this.onSubmit.bind(this))}>
+      <Form className='form-wrapper' encType="multipart/form-data"
+        onSubmit={handleSubmit(this.onSubmit.bind(this))}>
         <h1 className='form-title'>Welcome to DNA!</h1>
         <hr />
         <div className='form-tab'>
@@ -142,7 +177,11 @@ class RegisterForm extends Component {
           </FormGroup>
           <FormGroup>
             <Label for="exampleFile">Avatar</Label>
-            <Field component="input" className='form-control' type="file" name="avatar" id="avatar" />
+            <input type="file" id="file" onChange={this.onChange} />
+            <div className="register-avatar-wrapper">
+              <button className="register-avatar-button" onClick={this.selectFile}>파일 선택</button>
+              <span className="register-avatar-filename">파일을 선택해주세요.</span>              
+            </div>
             <FormText color="muted">
               프로필 사진을 선택해주세요.
             </FormText>

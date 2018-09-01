@@ -38,6 +38,7 @@
     "react-addons-css-transition-group": "^15.6.2",
     "react-addons-transition-group": "^15.6.2",
     "react-bootstrap": "^0.32.1",
+    "react-confirm-alert": "^2.0.5",
     "react-css-modules": "^4.7.6",
     "react-dev-utils": "^5.0.1",
     "react-dom": "^16.4.2",

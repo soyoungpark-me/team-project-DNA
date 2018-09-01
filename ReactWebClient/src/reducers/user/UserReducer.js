@@ -1,8 +1,9 @@
-import { GET_PROFILE } from './../../actions/user/UserAction';
+import { GET_PROFILE, SET_USER_INDEX } from './../../actions/user/UserAction';
 import checkError from './../checkError';
 
 const INITIAL_STATE = {
   profile: null,
+  index: null,
   refresh: null
 }
 
@@ -12,6 +13,9 @@ export default function(state = INITIAL_STATE, action) {
   switch(action.type) {
     case GET_PROFILE:
       return { ...state, profile: action.payload.data.result }
+
+    case SET_USER_INDEX:
+      return { ...state, index: action.payload }
 
     default:
       return state;

@@ -21,12 +21,7 @@ module.exports = (router) => {
   router.route('/room/:idx/messages')       // All
     .get(authCtrl.auth, dmCtrl.selectAll);
   router.route('/room/:idx/messages/:page') // Paged
-    .get(authCtrl.auth, dmCtrl.selectAll);
-
-    
-  /* 메시지 생성 테스트용 */
-  router.route('/test/dm')
-    .post(authCtrl.auth, dmCtrl.testsave);
+    .get(authCtrl.auth, dmCtrl.selectAll);    
 
   return router;
 };

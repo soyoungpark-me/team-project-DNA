@@ -17,5 +17,8 @@ module.exports = (router) => {
   router.route('/users/block/:idx')
     .get(authCtrl.auth, userCtrl.block)        // 차단하기
 
+  router.route('/users/report/:idx')           // 신고하기
+    .get(authCtrl.auth, userCtrl.report);
+    
   return router;
 };

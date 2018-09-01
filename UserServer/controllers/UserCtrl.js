@@ -108,6 +108,7 @@ exports.login = async (req, res, next) => {
   /* PARAM */
   const id = req.body.id || req.params.id;
   const password = req.body.password || req.params.password;
+  console.log(req.body);
 
   /* 유효성 체크하기 */
   let isValid = true;
@@ -356,4 +357,52 @@ exports.selectBlock = async (req, res, next) => {
     result
   };
   return res.status(200).json(respond);  
+};
+
+
+
+/*******************
+ *  report
+ *  @param: reportUseridx
+ ********************/
+exports.report = async (req, res, next) => {
+  /* PARAM */
+  const userIdx = req.userData.idx;
+  const reportUseridx = req.body.idx || req.params.idx;
+
+  /* 유효성 체크하기 */
+  let isValid = true;
+
+  if (!reportUseridx) {
+    isValid = false;
+    validationError.errors.reportUseridx = 
+      { message : 'User (to Report) Index is required' };
+  }
+
+  if (parseInt(userIdx) === parseInt(reportUseridx)) {
+    isValid = false;
+    validationError.errors.reportUseridx = 
+      { message : 'Two indexes are identical and cannot be reported' };
+  }
+
+  if (!isValid) return res.status(400).json(validationError);
+  /* 유효성 체크 끝 */
+
+  let result = '';
+
+  try {
+    result = await userModel.report(userIdx, reportUseridx);
+  } catch (err) {
+    console.log(err);
+    return res.status(errorCode[err].status)
+              .json(errorCode[err].contents);
+  }
+
+  const respond = {
+    status: 201,
+    message : "Report Successfully",
+    result
+  };
+
+  return res.status(respond.status).json(respond);  
 };

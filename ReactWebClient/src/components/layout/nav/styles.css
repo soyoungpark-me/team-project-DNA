@@ -119,13 +119,14 @@
 
 .navbar-collapse {
   position: absolute;
-  right: 0;
-  top: 73px;
+  right: 13px;
+  top: 50px;
   width: 150px;
   padding: 5px 10px;
   background-color: #F7F7F7;
   border: 2px solid #E7E7E7;
   border-radius: 5px;
+  z-index: 10;
 }
 
 .hr {

@@ -7,25 +7,19 @@ module.exports = (router) => {
     .get(authCtrl.auth, messageCtrl.selectOne);
   
   /* 특정 반경 내의 메시지 리스트 조회 */
-  router.route('/message')                // All
+  router.route('/messages')                // All
     .post(authCtrl.auth, messageCtrl.selectCircle);
-  router.route('/message/:page')          // Paged
+  router.route('/messages/:page')          // Paged
     .post(authCtrl.auth, messageCtrl.selectCircle);
+
+  router.route('/best')
+    .post(authCtrl.auth, messageCtrl.best);
 
   /* 모든 메시지 리스트 조회 */
-  router.route('/messages')               // All
-    .get(authCtrl.auth, messageCtrl.selectAll);
-  router.route('/messages/:page')         // Paged
-    .get(authCtrl.auth, messageCtrl.selectAll);
-
-  /* 좋아요 추가 or 해제 */
-  router.route('/like/message/:idx')
-    .get(authCtrl.auth, messageCtrl.like);
-    
-    
-  /* 메시지 생성 테스트용 */
-  router.route('/test/message')
-    .post(authCtrl.auth, messageCtrl.testsave);
+  // router.route('/messages')               // All
+  //   .get(authCtrl.auth, messageCtrl.selectAll);
+  // router.route('/messages/:page')         // Paged
+  //   .get(authCtrl.auth, messageCtrl.selectAll);
 
   return router;
 };

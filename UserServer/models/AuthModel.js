@@ -56,7 +56,7 @@ exports.refresh = (token, done) => {
       redis.hgetall('refreshTokens', (err, object) => {
         if (object[token]) { // 해당 토큰이 존재할 경우
           const expiresIn = helpers.getAfterDate(); // 7일 후 삭제될 날짜
-          redis.hmset('refreshTokens', token.refreshToken, 
+          redis.hmset('refreshTokens', token, 
             JSON.stringify({ idx: userData.idx, id: userData.id, expiresIn })); // 갱신
           const result = {
             accessToken: jwt.sign(userData, process.env.JWT_CERT, {'expiresIn': "12h"})
