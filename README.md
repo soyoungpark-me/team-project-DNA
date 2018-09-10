@@ -1,4 +1,4 @@
-# project_DNA
+# DNA (Dear, Nearby Anyone)
 
 * 2018년 2학기의 졸업작품 프로젝트를 위한 저장소입니다.
 
@@ -58,6 +58,11 @@
 |  08  | 2018.08.22 | [**실시간 서비스를 위해 socket.io 이용하기**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.22%20:%20%EC%8B%A4%EC%8B%9C%EA%B0%84%20%EC%84%9C%EB%B9%84%EC%8A%A4%EB%A5%BC%20%EC%9C%84%ED%95%B4%20Socket.io%20%EC%9D%B4%EC%9A%A9%ED%95%98%EA%B8%B0.md) |
 |  09  | 2018.08.24 | [**Redis의 Geo API 사용하기 (작성중)**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.24%20:%20Redis%EC%9D%98%20Geo%20API%20%EC%82%AC%EC%9A%A9%ED%95%98%EA%B8%B0.md) |
 |  10  | 2018.08.28 | [**배포와 함께 CORS 문제 극복하기**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.28%20:%20%EB%B0%B0%ED%8F%AC%EC%99%80%20%ED%95%A8%EA%BB%98%20CORS%20%EB%AC%B8%EC%A0%9C%20%EA%B7%B9%EB%B3%B5%ED%95%98%EA%B8%B0.md) |
+|  11  | 2018.08.31 | [**주요 기능의 백엔드 개발을 끝마친 후기**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.08.31%20:%20%EC%A3%BC%EC%9A%94%20%EA%B8%B0%EB%8A%A5%EC%9D%98%20%EB%B0%B1%EC%97%94%EB%93%9C%20%EA%B0%9C%EB%B0%9C%EC%9D%84%20%EB%81%9D%EB%A7%88%EC%B9%9C%20%ED%9B%84%EA%B8%B0.md) |
+|  12  | 2018.09.01 | [**채팅 서버의 성능 개선을 위한 부하 테스트**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.09.01%20:%20%EC%B1%84%ED%8C%85%20%EC%84%9C%EB%B2%84%EC%9D%98%20%EC%84%B1%EB%8A%A5%20%EA%B0%9C%EC%84%A0%EC%9D%84%20%EC%9C%84%ED%95%9C%20%EB%B6%80%ED%95%98%20%ED%85%8C%EC%8A%A4%ED%8A%B8.md) |
+
+
+
 
 #### 
 
