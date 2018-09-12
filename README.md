@@ -33,12 +33,18 @@
 
 
 #### 2018.09.09 : AWS lambda 추가
-![아키텍처 구조1](https://github.com/3457soso/team-project-DNA/blob/master/Resource/Arcitecture_Design_0910.png)
+![아키텍처 구조1](https://github.com/3457soso/team-project-DNA/blob/master/Resource/Arcitecture_Design_0909.png)
 주요 기능은 모두 개발이 완료 된 상태의 구조도입니다.
 
 추후 성능 상의 개선점이 생겨 아키텍처가 변경되면 해당 내용도 추가해 다시 업로드할 예정입니다!
 
 
+
+#### 2018.09.11 : RabbitMQ 추가
+![아키텍처 구조2](https://github.com/3457soso/team-project-DNA/blob/master/Resource/Arcitecture_Design_0911.png)
+주요 기능은 모두 개발이 완료 된 상태의 구조도입니다.
+
+추후 성능 상의 개선점이 생겨 아키텍처가 변경되면 해당 내용도 추가해 다시 업로드할 예정입니다!
 
 ***
 
