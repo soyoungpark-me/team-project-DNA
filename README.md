@@ -44,6 +44,11 @@
 ![아키텍처 구조2](https://github.com/3457soso/team-project-DNA/blob/master/Resource/Arcitecture_Design_0911.png)
 주요 기능은 모두 개발이 완료 된 상태의 구조도입니다.
 
+
+#### 2018.09.17 : Socket Server Scale out
+![아키텍처 구조2](https://github.com/3457soso/team-project-DNA/blob/master/Resource/Arcitecture_Design_0916.png)
+주요 기능은 모두 개발이 완료 된 상태의 구조도입니다.
+
 추후 성능 상의 개선점이 생겨 아키텍처가 변경되면 해당 내용도 추가해 다시 업로드할 예정입니다!
 
 ***
@@ -72,7 +77,8 @@
 |  12  | 2018.09.05 | [**채팅 서버의 성능 개선을 위한 부하 테스트**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.09.05%20:%20%EC%B1%84%ED%8C%85%20%EC%84%9C%EB%B2%84%EC%9D%98%20%EC%84%B1%EB%8A%A5%20%EA%B0%9C%EC%84%A0%EC%9D%84%20%EC%9C%84%ED%95%9C%20%EB%B6%80%ED%95%98%20%ED%85%8C%EC%8A%A4%ED%8A%B8.md) |
 |  13  | 2018.09.09 | [**성능 개선 1) AWS Lambda를 이용한 서버리스 이미지 리사이징**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.09.09%20:%20%EC%84%B1%EB%8A%A5%20%EA%B0%9C%EC%84%A0%201\)%20AWS%20Lambda%EB%A5%BC%20%EC%9D%B4%EC%9A%A9%ED%95%9C%20%EC%9D%B4%EB%AF%B8%EC%A7%80%20%EB%A6%AC%EC%82%AC%EC%9D%B4%EC%A7%95.md) |
 |  14  | 2018.09.11 | [**성능 개선 2) RabbitMQ를 통해 소켓 서버 기능 분할하기**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.09.11%20:%20%EC%84%B1%EB%8A%A5%20%EA%B0%9C%EC%84%A0%202\)%20RabbitMQ%EB%A5%BC%20%ED%86%B5%ED%95%B4%20%EC%86%8C%EC%BC%93%20%EC%84%9C%EB%B2%84%20%EA%B8%B0%EB%8A%A5%20%EB%B6%84%ED%95%A0%ED%95%98%EA%B8%B0.md) |
-|  15  | 2018.09.14 | [**성능 개선 3) 타일 도입! Redis 내의 모든 세션을 끌고 오지 말자**]() |
+|  15  | 2018.09.14 | [**성능 개선 3) 타일 도입! Redis 내의 모든 세션을 끌고 오지 말자**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.09.14%20:%20%EC%84%B1%EB%8A%A5%20%EA%B0%9C%EC%84%A0%203)%20%ED%83%80%EC%9D%BC%20%EB%8F%84%EC%9E%85!%20Redis%20%EB%82%B4%EC%9D%98%20%EB%AA%A8%EB%93%A0%20%EC%84%B8%EC%85%98%EC%9D%84%20%EB%81%8C%EA%B3%A0%20%EC%98%A4%EC%A7%80%20%EB%A7%90%EC%9E%90.md) |
+|  16  | 2018.09.17 | [**성능 개선 4) HAProxy를 통한 SocketServer의 ScaleOut**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.09.17%20:%20%EC%84%B1%EB%8A%A5%20%EA%B0%9C%EC%84%A0%204)%20HAProxy%EB%A5%BC%20%ED%86%B5%ED%95%9C%20SocketServer%EC%9D%98%20ScaleOut.md) |
 
 
 #### 
