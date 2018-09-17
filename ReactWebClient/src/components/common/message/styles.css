@@ -26,7 +26,7 @@
   height: 70px;
   border-radius: 10px;
   background-color: #F1F3F5;
-  z-index: 3;
+  z-index: 100 !important;
   overflow: hidden;
 }
 
@@ -101,13 +101,13 @@
 }
 
 .best-chat-contents-item .user-my-profile-nickname {
-  font-size: 20px;
-  margin-top: -5px;
+  font-size: 18px;
+  margin-top: -3px;
 }
 
 .best-chat-contents {
   font-family: 'NanumSquare' !important;
-  font-size: 17px !important;
+  font-size: 15px !important;
   display: block;
   white-space: nowrap;
   overflow: hidden;
@@ -135,6 +135,11 @@
   overflow-y: scroll;
   padding: 20px 35px 20px;
   text-align: center;
+}
+
+.direct-message .message-list-chat-wrapper{
+  height: calc(100% - 50px);
+  top: 0px;
 }
 
 .message-list-wrapper svg {
@@ -172,6 +177,12 @@
 
 .bubble-wrapper:last-of-type {
   margin-bottom: 10px;
+}
+
+.bubble-wrapper.Image .bubble, .bubble-wrapper.Location .bubble {
+  padding: 0 !important;
+  background-color: rgba(0, 0, 0, 0);
+  border: 1px solid #bdc6c9;
 }
 
 .wrapper-me {
@@ -230,7 +241,38 @@
 
 .bubble-image {
   max-width: 100%;
-  padding: 9px 0;
+}
+
+.message-map {
+  min-width: 500px;
+  max-width: 100%;
+  height: 250px;
+}
+
+.message-address {
+  text-align: left;
+  color: #454545;
+  font-size: 15px;
+  margin: 8px;
+  vertical-align: bottom;
+}
+
+.ti-location-pin {
+  display: inline-block;
+  color: #6632b5;
+  padding-bottom: 4px;
+  margin-left: 2px;
+  font-size: 17px;
+}
+
+.message-address span {
+  vertical-align: bottom;
+}
+
+.message-address strong {
+  margin-left: 4px;
+  color: #6632b5 !important;
+  vertical-align: bottom;
 }
 
 .message-created-at {
@@ -254,7 +296,7 @@
   position: absolute;
   background-color: #FDFDFD;
   border-radius: 5px;
-  border: 1px solid #e3e8ea;
+  border: 1px solid #d3dbdf;
   -webkit-transition: border 0.5s;
   transition: border 0.5s;
   padding: 1px 8px;  
@@ -265,7 +307,7 @@
 }
 
 .message-thumb-up:hover {
-  border: 1.5px solid #4f8bef;
+  border: 1px solid #787878;
   -webkit-transition: border 0.5s;
   transition: border 0.5s;
 
@@ -281,14 +323,20 @@
 
 .message-thumb-up-count {
   margin-left: 5px;
-  color: #454545;
+  color: #696d70;
+  font-weight: bold;
 }
 
 .message-thumb-up-fa {
   color: #a6abad;
 }
-.i-liked-it .message-thumb-up-fa {
-  color: #0057e7;  
+
+.i-liked-it {
+  border: 1px solid #ffa700;
+}
+
+.i-liked-it span {
+  color: #ffa700;  
 }
 
 .bubble {
@@ -301,6 +349,7 @@
   font-family: "NanumSquare", "Open Sans" !important;
   font-weight: 400 !important;
   vertical-align: bottom;
+  overflow: hidden;
 }
 
 .bubble-contents {
@@ -400,9 +449,9 @@
   width: 100%;
   height: 50px;
   bottom: 0;
-  padding-left: 8px;
   background-color: #FDFDFC;
   border-radius: 5px;
+  border-top: 1px solid #d3dbdf;
 }
 
 .message-write:focus{
@@ -411,43 +460,71 @@
   box-shadow: none !important;
 }
 
-.message-text{
+.text-input-wrapper {
   position: relative;
-  display: block;
+  display: inline-block;
+  width: calc(100% - 220px);
+  height: 100% !important;
+  vertical-align: top;
+}
+
+.dm-form .text-input-wrapper {
+  width: calc(100% - 169px) !important;  
+}
+
+#message-text{
+  position: relative;
+  display: inline-block;
   font-size: 16px !important;
-  float: left;
-  width: 100% !important;
-  height: 48px !important;
-  padding: 10px 140px 10px 50px!important;
+  width: 100%;
+  height: 100%;
+  padding: 10px !important;
   color: #454545;
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
   margin: 0 !important;
-  border-right: 1px solid #F1F1F1 !important;
+}
+
+.dm-form #message-text {
+  padding-left: 20px !important;
 }
 
 .msg-form-button {
   border: none;
-  position: absolute !important;
+  position: relative;
   margin: 0 !important;
   padding: 0 !important;
-  right: 15px !important;
-  top: 0px !important;
   display: inline-block !important;
   background: none !important;
-  width: 30px !important;
+  width: 35px !important;
   box-shadow: none !important;
-  height: 100% !important;
+  height: 50px !important;
   text-align: center !important;
   cursor: pointer !important;
 }
 
+.msg-form-button:active, .msg-form-button:focus {
+  border: none;
+  outline: none;
+}
+
+.msg-submit-button {
+  margin-left: 18px !important;
+}
+
 .msg-form-button span {
   font-size: 24px;
-  font-weight: lighter;
   line-height: 1.4;
+  vertical-align: middle;
   color: #898989;
+}
+
+.msg-form-button i {
+  font-size: 21px;
+  line-height: 1.4;
+  vertical-align: middle;
+  color: #999999;
 }
 
 .message-write-fa {
@@ -455,17 +532,48 @@
   color: #bdc6c9;
 }
 
+.speaker-button-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
 .speaker-button {
   background: none;
   border: none;
-  position: absolute;
+  position: relative;
+  display: inline-block;
   left: 0px !important;
   height: 100%;
   padding-left: 15px !important;
 }
 
+.speaker-button span {
+  vertical-align: middle;
+}
+
+.cancel-button {
+  cursor: default !important;
+}
+
+.cancel-button span {
+  color: rgba(0, 0, 0, 0);
+}
+
+.cancel-button.active {
+  cursor: pointer !important;
+}
+
+.cancel-button.active span {
+  font-size: 18px;
+  color: #d62d20;
+}
+
+.image-button.active, .location-button.active i {
+  color: #454545;
+}
+
 .customeTheme {
-  background-color: rgba(255, 128, 0, 0.75) !important;
+  background-color: rgba(255, 128, 0) !important;
 }
 
 .customeTheme p {
@@ -475,22 +583,14 @@
   font-family: "NanumSquare", "Open Sans";
 }
 
-.location-button {
-  right: 65px !important;
-}
-
-.image-button {
-  right: 100px !important;
-}
-
 .message-vl {
-  display: block;
   width: 1px;
+  height: 30px;
   background-color: rgba(0, 0, 0, 0.2);
   position: absolute;
-  top: 9px;
-  bottom: 7px;
-  right: 55px;
+  display: block;
+  top: 10px;
+  right: 53px;
 }
 
 #file { width:0; height:0; }          
@@ -526,4 +626,23 @@
 .react-confirm-alert-button-group button:first-of-type {
   background-color: #6632b5 !important;
   margin-right: 10px !important;
+}
+
+.best-chat-contents-wrapper .ti-face-sad {
+  display: inline-block;
+  font-size: 25px;
+  color: #634C89 !important;
+  height: 70px;
+  line-height: 70px;
+}
+
+.best-chat-list-empty {
+  margin-left: 7px;
+  color: #634C89;
+  display: inline-block;
+  font-size: 20px;
+  margin-bottom: 0px;
+  height: 70px;
+  line-height: 70px;
+  vertical-align: top;
 }

@@ -30,14 +30,10 @@ export const NavBeforeComponent = () => (
     <div className='nav-bar-wrapper'>
       <Navbar className='nav-bar'>
         <a href='/' className='nav-logo'><img className='nav-logo-img' src={imagePath} /></a>
-        <NavLink className='nav-main-item' href="/features"
-          style={{left: '75px'}}>
-          Features</NavLink>
         <Nav className='nav-items'>
           <Route exact path="/" component={LoginButton} />
           <Route path="/signup" component={LoginButton} />
           <Route path="/login" component={SignupButton} />
-          <Route path="/features" component={LoginButton} />
         </Nav>
       </Navbar>
     </div>
@@ -63,7 +59,7 @@ export class NavAfterComponent extends Component {
     return (
       <div className='nav-bar-wrapper'>
         <Navbar className='nav-bar'>
-          <a href='/' className='nav-logo'><img className='nav-logo-img' src={imagePath} /></a>
+          <a href='/main' className='nav-logo'><img className='nav-logo-img' src={imagePath} /></a>
           <div className='nav-search'>
             <Input type="text" name="search" className="search-input"
                    placeholder="검색어를 입력해주세요." />

@@ -16,6 +16,7 @@ import styles from './styles.css';
 import config from './../../../config';
 
 import imagePath from './../../../../public/images/empty.png';
+import avatar from './../../../../public/images/avatar.png';
 
 function mapStateToProps(state) {
   return {
@@ -43,7 +44,6 @@ class MessageList extends Component {
     this.page = 1;          // 현재 페이지입니다. (메시지 페이지네이션)
     this.initial = true;    // 처음 렌더링 되었을 때를 나타냅니다.
     this.fetching = false;  // 현재 fetch 하고 있는 중인지를 나타냅니다.
-    this.updated = false;    // 베스트챗 갱신을 위한 플래그입니다.
 
     this.state = {
       position: null,
@@ -101,15 +101,17 @@ class MessageList extends Component {
       nextProps.messages.map((message) => {joined[message.idx] = i; i++});
       this.setState({ refs: joined });
     }
-  }
+  }  
 
-  componentDidUpdate(prevProps, prevState){
-    if (this.initial && this.state.messages !== undefined && this.state.messages !== []) {
+  componentDidUpdate(prevProps){
+    if (this.initial) {
+      window.$(".message-list-wrapper > div:first-of-type").hide();
+    }
+    if (this.initial && this.state.messages.length > 0) {
       this.objDiv = document.getElementsByClassName("message-list-chat-wrapper")[0];
       this.initial = false;
       this.scrollToBottom();
-      this.beforeHeight = this.objDiv.scrollHeight;
-      window.$(".message-list-wrapper > div:first-of-type").hide();
+      this.beforeHeight = this.objDiv.scrollHeight;      
     }
 
     if (!this.fetching && this.state.position !== null && this.state.position <= 0) {
@@ -139,17 +141,12 @@ class MessageList extends Component {
 
     // 현재 시간 (시, 분)을 구합니다.
     const now = new Date();
-    const hour = now.getHours();
     const minute = now.getMinutes();
+    const second = now.getSeconds();
 
     // 만약 현재 분이 0일 경우 베스트 챗 갱신을 요청합니다.
-    if (minute === 0) {
-      if (!this.updated) {
-        this.props.getBestMessages(this.props.position, this.props.profile.radius);
-        this.updated = true;
-      }
-    } else {
-      this.updated = false;
+    if (minute === 0 && second === 0) {
+      this.props.getBestMessages(this.props.position, this.props.profile.radius);
     }
   }
 
@@ -173,7 +170,6 @@ class MessageList extends Component {
   }
 
   scrollToBottom(){
-    console.log("bottom");
     if (this.objDiv) {
       this.objDiv.scrollTop = this.objDiv.scrollHeight - this.objDiv.clientHeight;
     }
@@ -202,7 +198,7 @@ class MessageList extends Component {
         beforeTime = message.created_at.split('T')[0];
 
         return (
-          <Message message={message} key={message.idx}
+          <Message message={message} key={"msg"+message.idx}
             sender={(currentUser === message.user.idx) ? "me" : "you"}
             idx={this.props.profile.idx}
             start={(tempIdx !== beforeIdx) ? true : false }
@@ -214,25 +210,32 @@ class MessageList extends Component {
   renderBestMessages(){
     return this.props.best
       .map((best, i) => {
+        let contents = '';
+
+        if (best.type === "Image") contents = "[사진]";
+        else if (best.type === "Location") contents = "[좌표]";
+        else contents = best.contents;
+
         return (
-          <div className="best-chat-contents-item" key={best.idx}>
+          <div className="best-chat-contents-item" key={"best"+best.idx}>
             <div className="bubble-side-wrapper">
               <p className="best-chat-rank">{i+1}위</p>
               <div className="message-thumb-up i-liked-it">
-                <FontAwesome className="message-thumb-up-fa" name="thumbs-up" />
+                <FontAwesome className="message-thumb-up-fa" name="star" />
                 <span className="message-thumb-up-count">{best.like_count}</span>
               </div>
             </div>
             <div className="user-my-profile-top">
               <div className="avatar-wrapper">
                 <img className="avatar-image"
-                  src={(best.user.avatar) !== null ?
-                    best.user.avatar :
-                    "/../public/img/avatar.png"}/>
+                  src={best.user.avatar !== null && best.user.avatar !== "null" ? 
+                  best.user.avatar : avatar} />
               </div>
               <div className="user-my-profile-text">
                 <p className="user-my-profile-nickname">{best.user.nickname}</p>
-                <span className="best-chat-contents">{best.contents}</span>
+                <span className="best-chat-contents">
+                  {contents}
+                </span>
               </div>
               <CreatedAt date={best.created_at} />   
             </div>   
@@ -272,7 +275,8 @@ class MessageList extends Component {
       if (this.props.best.length === 0) {
         bests = (
           <div className="best-chat-contents-wrapper">
-            <p>이 근방에서는 아직 작성된 베스트챗이 없습니다</p>
+            <span className="ti-face-sad" />
+            <p className="best-chat-list-empty">근처에 아직 작성된 베스트챗이 없습니다</p>
           </div>
         );
       } else {

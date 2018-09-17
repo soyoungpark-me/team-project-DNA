@@ -4,11 +4,12 @@ import config from './../config.js';
 
 const USER_API_URL = `${config.SERVER_HOST}:${config.USER_PORT}/api`;
 const SOCKET_API_URL = `${config.SOCKET_HOST}:${config.SOCKET_PORT}/api`;
+const AWS_LAMBDA_API_URL = "https://ynqleoac2k.execute-api.ap-northeast-2.amazonaws.com/dev/upload";
 
 let token;
 
-if (localStorage.getItem('token')) {
-  token = JSON.parse(localStorage.getItem('token')).accessToken;
+if (sessionStorage.getItem('token')) {
+  token = JSON.parse(sessionStorage.getItem('token')).accessToken;
 }
 
 export async function fetchOtherProfile(idx) {
@@ -21,11 +22,11 @@ export async function fetchOtherProfile(idx) {
   return result;
 };
 
-export async function imageFileUpload(file) {
+export async function imageFileUpload(formData, type) {
   let result = '';
-
-  await axios.post(`${SOCKET_API_URL}/upload`, file,
-    { headers: { 'content-type': 'multipart/form-data' }})
+  
+  await axios.post(`${AWS_LAMBDA_API_URL}?type=${type}`, formData,
+    { headers: { 'Content-Type': 'multipart/form-data' }})
     .then((response) => {result = response});
 
   return result;

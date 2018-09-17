@@ -25,52 +25,32 @@ exports.open = (roomData) => {
       }
     });
   })
-  .then(() => {
-    // 2. idx 최대값 구하기 
+  .then((count) => { 
+    // 3. model 생성하기
     return new Promise((resolve, reject) => {  
-      mongo.roomModel.count((err, result) => {
+      const room = new mongo.roomModel(
+        {
+          users: [{
+            idx: roomData.user1.idx,
+            nickname: roomData.user1.nickname,
+            avatar: roomData.user1.avatar
+          },{
+            idx: roomData.user2.idx,              
+            nickname: roomData.user2.nickname,
+            avatar: roomData.user2.avatar
+          }],
+          created_at: helpers.getCurrentDate(),
+          updated_at: helpers.getCurrentDate()
+        }
+      );
+
+      // 3. save로 저장
+      room.save((err) => {
         if (err) {
-          const customErr = new Error("Error occrred while Counting Rooms: " + err);
-          reject(customErr);        
+          reject(err);
         } else {
-          resolve(result);
+          resolve(room);
         }
-      });
-    })
-    .then((count) => { 
-      // 3. model 생성하기
-      return new Promise((resolve, reject) => {  
-        let idx = 0;
-        
-        if (count[0]) {
-          idx = count[0].idx + 1;
-        }
-
-        const room = new mongo.roomModel(
-          {
-            idx,
-            users: [{
-              idx: roomData.user1.idx,
-              nickname: roomData.user1.nickname,
-              avatar: roomData.user1.avatar
-            },{
-              idx: roomData.user2.idx,              
-              nickname: roomData.user2.nickname,
-              avatar: roomData.user2.avatar
-            }],
-            created_at: helpers.getCurrentDate(),
-            updated_at: helpers.getCurrentDate()
-          }
-        );
-
-        // 3. save로 저장
-        room.save((err) => {
-          if (err) {
-            reject(err);
-          } else {
-            resolve(room);
-          }
-        });
       });
     });
   });

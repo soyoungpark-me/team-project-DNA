@@ -16,72 +16,59 @@ const dbConfig = {
 
 let connection = mysql.createConnection(dbConfig);
 
-//- Establish a new connection
 connection.connect(function(err){
-  if(err) {
-      // mysqlErrorHandling(connection, err);
-      console.log("\n\t *** Cannot establish a connection with the database. ***");
-
+  if (err) {
+      console.log("[MYSQL] Cannot establish a connection with the database MySQL ... ");
       connection = reconnect(connection);
-  }else {
-      console.log("\n\t *** New connection established with the database. ***")
+  } else {
+      console.log("[MYSQL] *** New connection established with the database MySQL ...")
   }
 });
 
-//- Reconnection function
 function reconnect(connection){
-  console.log("\n New connection tentative...");
+  console.log("[MYSQL] New connection tentative ...");
 
-  //- Destroy the current connection variable
-  if(connection) connection.destroy();
+  if (connection) connection.destroy(); // 현재 커넥션이 존재한다면 끊고 새로 만든다.
+  connection = mysql.createConnection(dbConfig);
 
-  //- Create a new one
-  var connection = mysql.createConnection(dbConfig);
-
-  //- Try to reconnect
   connection.connect(function(err){
-      if(err) {
-          //- Try to connect every 2 seconds.
-          setTimeout(reconnect, 2000);
-      }else {
-          console.log("\n\t *** New connection established with the database. ***")
+      if (err) setTimeout(reconnect, 2000); // 2초마다 연결을 요청한다.
+      else {
+          console.log("[MYSQL] *** New connection established with the database ... ")
           return connection;
       }
   });
 }
 
-//- Error listener
+connection.on('disconnected', function(){
+  console.log("[MySQL]] Connection disconnected with the database MySQL ...");
+});
+
 connection.on('error', function(err) {
-
-  //- The server close the connection.
-  if(err.code === "PROTOCOL_CONNECTION_LOST"){    
-      console.log("/!\\ Cannot establish a connection with the database. /!\\ ("+err.code+")");
-      connection = reconnect(connection);
+  if(err.code === "PROTOCOL_CONNECTION_LOST"){ // 서버 측에서 연결을 끊은 경우
+    console.log("[MYSQL] !!! Cannot establish a connection with the database : ("+err.code+")");
+    connection = reconnect(connection);
   }
-
-  //- Connection in closing
-  else if(err.code === "PROTOCOL_ENQUEUE_AFTER_QUIT"){
-      console.log("/!\\ Cannot establish a connection with the database. /!\\ ("+err.code+")");
-      connection = reconnect(connection);
+  else if(err.code === "PROTOCOL_ENQUEUE_AFTER_QUIT"){ // 커넥션이 강제로 끊긴 경우
+    console.log("[MYSQL] !!! Cannot establish a connection with the database : ("+err.code+")");
+    connection = reconnect(connection);
   }
-
-  //- Fatal error : connection variable must be recreated
-  else if(err.code === "PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR"){
-      console.log("/!\\ Cannot establish a connection with the database. /!\\ ("+err.code+")");
-      connection = reconnect(connection);
+  else if(err.code === "PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR"){ // Fatal error 발생
+    console.log("[MYSQL] !!! Cannot establish a connection with the database : ("+err.code+")");
+    connection = reconnect(connection);
   }
-
-  //- Error because a connection is already being established
-  else if(err.code === "PROTOCOL_ENQUEUE_HANDSHAKE_TWICE"){
-      console.log("/!\\ Cannot establish a connection with the database. /!\\ ("+err.code+")");
+  else if(err.code === "PROTOCOL_ENQUEUE_HANDSHAKE_TWICE"){ // 이미 커넥션이 존재하는 경우
+    console.log("[MYSQL] !!! Cannot establish a connection with the database : ("+err.code+")");
   }
-
-  //- Anything else
-  else{
-      console.log("/!\\ Cannot establish a connection with the database. /!\\ ("+err.code+")");
-      connection = reconnect(connection);
+  else{ // etc
+    console.log("[MYSQL] !!! Cannot establish a connection with the database : ("+err.code+")");
+    connection = reconnect(connection);
   }
 });
+
+setInterval(function () {
+    connection.query('SELECT 1');
+}, 5000);
 
 module.exports.mysql = connection;
 module.exports.redis = redis;

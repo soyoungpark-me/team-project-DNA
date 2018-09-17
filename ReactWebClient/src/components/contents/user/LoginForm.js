@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import axios from 'axios';
 import { Button, Form, FormGroup } from 'reactstrap';
 import { Field, reduxForm } from 'redux-form'
-import { BrowserRouter, Redirect } from 'react-router-dom';
+import history from './../../../history';
 
 import { getProfile, setUserIndex } from './../../../actions/user/UserAction';
 
@@ -64,30 +64,33 @@ class LoginForm extends Component {
         this.submitted = true;
         
         const API_URL = `${config.SERVER_HOST}:${config.USER_PORT}/api/users/login`;
-        axios.post(API_URL, props)
+        axios.post(API_URL, props, {mode: "no-cors"})
         .then(async (response) => {
             const result = response.data.result;
             let token = result.token;
             token.idx = result.profile.idx;
-            localStorage.setItem("token", JSON.stringify(token));
+            sessionStorage.setItem("token", JSON.stringify(token));
 
             // 다음으로 프로필을 저장한다.
             await this.props.getProfile(result.profile.idx);
             await this.props.setUserIndex(result.profile.idx);
 
             // 그리고 메인으로 이동한다.
-            this.props.history.push('/');
+            history.push('/main');
+            window.location.reload();
           })
         .catch(error => {
             console.dir(error);
-            if (error.response.data.code === 23400) {
-              window.$('.field-ID').css("border", "red solid 1px");
-              window.$('.tag-ID').text('존재하지 않는 ID입니다.');
-              window.$('.tag-ID').show();
-            } else if (error.response.data.code === 24400) {
-              window.$('.field-Password').css("border", "red solid 1px");
-              window.$('.tag-Password').text('비밀번호가 일치하지 않습니다.');
-              window.$('.tag-Password').show();
+            if (error.response) {
+              if (error.response.data.code === 23400) {
+                window.$('.field-ID').css("border", "red solid 1px");
+                window.$('.tag-ID').text('존재하지 않는 ID입니다.');
+                window.$('.tag-ID').show();
+              } else if (error.response.data.code === 24400) {
+                window.$('.field-Password').css("border", "red solid 1px");
+                window.$('.tag-Password').text('비밀번호가 일치하지 않습니다.');
+                window.$('.tag-Password').show();
+              }
             }
         });
       // }
@@ -95,22 +98,13 @@ class LoginForm extends Component {
   }
 
   componentWillMount() {
-    if (localStorage.getItem("token")) {
-      (<Redirect to="/" push={ true } />)
+    if (sessionStorage.getItem("token")) {
+      history.push('/main');
     }
   }
 
   render() {
     const { handleSubmit, submitting } = this.props;
-    const { navigate } = this.state;
-
-    if (navigate) {
-      return (
-        <BrowserRouter>
-          this.props.history.push('/');
-        </BrowserRouter>
-      )
-    }
 
     return (
       <Form className='form-wrapper' onSubmit={handleSubmit(this.onSubmit.bind(this))}>

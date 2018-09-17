@@ -97,7 +97,7 @@ exports.selectAll = async (req, res, next) => {
   /* 1. 유효성 체크하기 */
   let isValid = true;
 
-  if (!roomIdx || validator.isEmpty(roomIdx)) {
+  if (roomIdx === undefined || roomIdx === null) {
     isValid = false;
     validationError.errors.roomIdx = { message : "Roomidx is required" };
   }

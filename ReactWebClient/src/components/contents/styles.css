@@ -16,3 +16,19 @@
   width: 75%;
   vertical-align: top;
 }
+
+.main-with-loader {
+  vertical-align: top;
+  width: 100%;
+  height: 100%;
+}
+
+.main-with-loader > div {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.main-with-loader > div > svg{
+  margin-top: 20%;
+}

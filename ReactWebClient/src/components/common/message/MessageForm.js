@@ -14,16 +14,18 @@ import { imageFileUpload } from './../../../actions/helper';
 
 const renderInput = (field) => {
   return (
-    <div>
-      <input {...field.input} type="text" className="message-text" autoComplete="off"
-       onClick={field.onClick} />
+    <div className="text-input-wrapper">
+      <input {...field.input} type="text" id="message-text" autoComplete="off"
+        value={field.value}
+        onClick={field.onClick} />
     </div>
   )
 };
 
 function mapStateToProps(state) {
   return {
-    profile: state.user.profile
+    profile: state.user.profile,
+    position: state.app.position
   };
 }
 
@@ -32,15 +34,17 @@ class MessageForm extends Component{
     super(props);
 
     this.state = {
-      type: null,
-      file: null
+      type: "Message",
+      file: null,
+      value: null
     };
 
     this.initialImage = this.initialImage.bind(this);
+    this.cancelAll = this.cancelAll.bind(this);
     this.setSpeaker = this.setSpeaker.bind(this);
-    this.selectFile = this.selectFile.bind(this);
+    this.setLocation = this.setLocation.bind(this);
+    this.setImage = this.setImage.bind(this);
     this.onChange = this.onChange.bind(this);
-    this.cancelUpload = this.cancelUpload.bind(this);
   }
 
   async onSubmit(values) {
@@ -48,32 +52,45 @@ class MessageForm extends Component{
       const formData = new FormData();
       formData.append('image', this.state.file);
 
-      const result = await imageFileUpload(formData);
-      values.contents = result.data;
+      const result = await imageFileUpload(formData, "image");
+      if (result.data && result.data.length > 0) {
+        values.contents = result.data[0].fileUrl;
+      }
+    } else if (this.state.type === "Location") {
+      values.contents = JSON.stringify(this.props.position);
     }
 
-    if (this.props.type === "dm") {
-      this.props.sendDM(values, this.state.type, this.props.conversationIdx);
-    } else { 
-      this.props.sendMessage(values, this.state.type);  
+    if (values.contents !== "") {
+      if (this.props.type === "dm") {
+        this.props.sendDM(values, this.state.type, this.props.conversationIdx);
+      } else { 
+        this.props.sendMessage(values, this.state.type);  
+      }
     }
 
     // 전송이 모두 끝난 후엔 초기화!
+    values.contents = "";
     this.initialImage();
     this.props.reset('newMessage');
   }
 
   initialImage() {
     window.$("input:file").val("");
-    window.$(".message-text").val("");
-    window.$(".message-text").attr("readonly", false);  
+    window.$("#message-text").val("");
+    window.$("#message-text").attr("disabled", false);  
+    window.$("#message-text").focus();
     window.$(".message-write-fa").css("color", "#bdc6c9");
-    this.setState({ type: "", file: null });
+    this.setState({ type: "Message", file: null });
   }
 
   setSpeaker() {
     if (this.state.type !== "LoudSpeaker") {
-      if (this.props.profile.point < 100) {
+      if (this.state.type !== "Message"){
+        toast.error('　확성기 모드로 설정할 수 없습니다!', {
+          position: "top-right", autoClose: 2000, pauseOnHover: true,
+          hideProgressBar: true, closeOnClick: true, draggable: false
+        });
+      } else if (this.props.profile.point < 100) {
         toast.error('　포인트가 모자랍니다!', {
           position: "top-right", autoClose: 2000, pauseOnHover: true,
           hideProgressBar: true, closeOnClick: true, draggable: false
@@ -91,9 +108,18 @@ class MessageForm extends Component{
         position: "top-right", autoClose: 2000, pauseOnHover: true,
         hideProgressBar: true, closeOnClick: true, draggable: false
       });
-      this.setState({type: null});
+      this.setState({type: "Message"});
       window.$(".message-write-fa").css("color", "#bdc6c9");
     }
+  }
+
+  setLocation() {
+    this.setState({type: "Location"});
+    window.$("#message-text").val("현재 접속 중인 위치를 전송합니다");
+  }
+
+  setImage() {   
+    window.$("input:file").click();
   }
 
   onChange(e) {
@@ -103,57 +129,57 @@ class MessageForm extends Component{
     });
 
     const fileName = window.$("input:file").val().replace(/^.*[\\\/]/, '');
-    window.$("input:text").val("이미지를 전송합니다 : " + fileName);
-    window.$(".message-text").attr("readonly", true);
-  }
+    const ext = fileName.split(".").pop().toLowerCase();
 
-  selectFile() {   
-    if (this.state.type !== "Image") { // 이미지가 이미 업로드된 상태가 아니라면
-      window.$("input:file").click();
-      const ext = window.$("input:file").val().split(".").pop().toLowerCase();
-      if(ext.length > 0){
-        if(window.$.inArray(ext, ["gif","png","jpg","jpeg"]) == -1) { 
-          alert("gif,png,jpg 파일만 업로드 할수 있습니다.");
-          return false;  
-        }                  
+    if (ext.length > 0) {
+      if (!["gif","png","jpg","jpeg"].includes(ext)) {        
+        this.initialImage();
+        toast.error('git, png, jpg 형식의 파일만 업로드할 수 있습니다.', {
+          position: "top-right", autoClose: 2000, pauseOnHover: true,
+          hideProgressBar: true, closeOnClick: true, draggable: false
+        });
+      } else {
+        window.$("#message-text").val("이미지를 전송합니다 : " + fileName);
+        window.$("#message-text").attr("disabled", true);
       }
     }
   }
 
-  cancelUpload() {
-    if (this.state.type === "Image") { // 이미지가 이미 업로드된 상태라면
-      confirmAlert({
-        title: 'Cancel Image',
-        message: "이미지 전송을 취소하시겠습니까?",
-        buttons: [
-          {
-            label: 'Yes',
-            onClick: () => {
+  cancelAll() {
+    const type = this.state.type;
+
+    confirmAlert({
+      title: 'Cancel Image',
+      message: `${type === "Image" ? "이미지":"현 위치"} 전송을 취소하시겠습니까?`,
+      buttons: [
+        {
+          label: 'Yes',
+          onClick: () => {
+            if (type === "Image") {
               this.initialImage();
-            }
-          },
-          {
-            label: 'No',
-            onClick: () => {
-              const fileName = window.$("input:file").val().replace(/^.*[\\\/]/, '');
-              window.$("input:text").val("이미지를 전송합니다 : " + fileName);
+            } else {
+              window.$("#message-text").val("");
+              this.setState({type: "Message"});
             }
           }
-        ]
-      });
-    }
+        },
+        {
+          label: 'No',
+          onClick: () => {}
+        }
+      ]
+    });
   }
 
   render() {
     const { handleSubmit } = this.props;
 
     return(
-      <form className="message-write" encType="multipart/form-data"
+      <form className={`message-write ${this.props.type === "main"?"":"dm-form"}`} 
+        encType="multipart/form-data"
         onSubmit={handleSubmit(this.onSubmit.bind(this))}>
-        <Field name="contents" component={renderInput} onClick={this.cancelUpload} />
-
         { this.props.type === "main" ?
-        <div>
+        <div className="speaker-button-wrapper">
           <button type="button" onClick={this.setSpeaker} data-tip="React-tooltip" className="speaker-button" >
             <FontAwesome className="message-write-fa" name="volume-up" />
           </button>
@@ -164,18 +190,36 @@ class MessageForm extends Component{
           </ReactTooltip>
         </div> : "" }
 
-        <button className="msg-form-button" type="submit">
-          <span className="ti-location-arrow"></span>
+        <Field name="contents" component={renderInput} value={this.state.value} />
+        
+        <button type="button" className={`msg-form-button cancel-button ${this.state.type === "Image" || this.state.type === "Location" ? "active" : ""}`} 
+          disabled={this.state.type === "Image" || this.state.type === "Location" ? null : "true" } 
+          onClick={this.cancelAll}>
+          <span className="ti-close" />
         </button>
 
-        <div className="message-vl" />
-        <button type="button" className="msg-form-button location-button">
-          <span className="ti-location-pin"></span>
+        <button type="button" className={`msg-form-button location-button ${this.state.type === "Location" ? "active" : ""}`}
+          onClick={this.setLocation} data-tip="" data-for="location">
+          <i className={`${this.state.type === "Location" ? "fas" : "far"} fa-compass`}></i>
         </button>
+        <ReactTooltip id="location" className='customeTheme' place="top" type="warning" effect="solid">
+          <p>현재 위치를 전송합니다</p>
+        </ReactTooltip>
+
         <input type="file" id="file" onChange={this.onChange} />
-        <Field name="image" component={renderInput} onClick={this.cancelUpload} />
-        <button type="button" className="msg-form-button image-button" onClick={this.selectFile}>
-          <span className="ti-image"></span>
+
+        <button type="button" className={`msg-form-button image-button ${this.state.type === "Image" ? "active" : ""}`}
+          onClick={this.setImage} data-tip="" data-for="image">
+          <i className={`${this.state.type === "Image" ? "fas" : "far"} fa-images`}></i>
+        </button>
+        <ReactTooltip id="image" className='customeTheme' place="top" type="warning" effect="solid">
+          <p>이미지를 전송합니다</p>
+        </ReactTooltip>
+
+        <div className="message-vl" />
+
+        <button className="msg-form-button msg-submit-button" type="submit">
+          <i className="fas fa-location-arrow"></i>
         </button>
       </form>
     )

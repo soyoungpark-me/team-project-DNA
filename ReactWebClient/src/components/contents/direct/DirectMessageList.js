@@ -205,9 +205,9 @@ class DirectMessageList extends Component {
     }
 
     return (
-      <div className="message-list-wrapper">
+      <div className="message-list-wrapper direct-message">
         <Loader type="Oval" color="#8a78b0" height="130" width="130" />
-        <div className="message-list-chat-wrapper">
+        <div className="message-list-chat-wrapper" style={styles}>
           {contents}
         </div>
         <MessageForm type={"dm"} conversationIdx = {this.props.conversationIdx} />

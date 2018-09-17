@@ -13,7 +13,7 @@ let validationError = {
 
 /*******************
  *  Save
- *  param: lng, lat, type, contents
+ *  param: lng, lat, type, contents, testing
  *  TODO 에러 코드 정리 및 PUSH
  ********************/
 exports.save = (token, param) => {
@@ -38,6 +38,7 @@ exports.save = (token, param) => {
       const lat = param.lat;
       const contents = param.contents;
       const type = param.type || "Message";
+      const testing = param.testing || false;
       
       /* 2. 유효성 체크하기 */
       let isValid = true;
@@ -62,7 +63,10 @@ exports.save = (token, param) => {
 
       let response = '';
 
-      if (type === "LoudSpeaker") { // 확성기일 경우 해당 유저의 잔여 point를 조회한다.
+      if (!testing && type === "LoudSpeaker") { 
+        // 확성기일 경우 해당 유저의 잔여 point를 조회합니다.
+        // 테스트 환경일 경우에는 체크하지 않습니다.
+
         let points = 0;
 
         try {
@@ -80,19 +84,11 @@ exports.save = (token, param) => {
           };
           reject();
         }
-      } else if (type === "Image") {
-        console.log(contents);
-
-        // const response = helpers.uploadSingle(contents);
-        // console.log(response);
-        // contents = "이미지 도전중";
-
-        // 이미지일 경우에는 DB에 파일의 경로만 저장해야 합니다.
       }
 
       // 3. DB에 저장하기
       const messageData = {
-        idx, id, nickname, avatar, lng, lat, type, contents
+        idx, id, nickname, avatar, lng, lat, type, contents, testing
       };    
       
       try {
@@ -101,7 +97,7 @@ exports.save = (token, param) => {
         // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
         reject(err);
       } finally {
-        if (type == 'LoudSpeaker') { // 확성기일 경우 포인트를 차감한다.
+        if (type == 'LoudSpeaker') { // 확성기일 경우 포인트를 차감합니다.
           try {
             await userModel.reducePoints(idx);      
           } catch (err) {
@@ -113,9 +109,9 @@ exports.save = (token, param) => {
       response = {
         status: 201,
         message: "Save Message Successfully",
-        result: result[0]
+        result
       };
-      // 4 등록 성공! 소켓으로 다시 반대로 쏴줘야 한다. 
+      // 4 등록 성공! 소켓으로 다시 반대로 쏴줘야 합니다.
       resolve(response);
     });
   });

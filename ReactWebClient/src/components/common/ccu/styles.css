@@ -148,3 +148,18 @@
 .user-outside {
   color: #d62d20;
 }
+
+.message-list-empty.user .ti-face-sad {
+  position: block;
+  font-size: 45px;
+  color: #634C89 !important;
+}
+
+.message-list-empty.user {
+  margin-top: 50px;
+}
+
+.user-list-empty:first-of-type {
+  margin-top: 10px;
+  margin-bottom: 2px;
+}

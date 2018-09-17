@@ -1,71 +1,59 @@
 const mongo = global.utils.mongo;
+const testMongo = global.utils.testMongo;
+
 const helpers = require('../utils/helpers');
 
 /*******************
  *  Save
- *  @param: messageData = {idx, nickname, avatar, lat, lon, contents}
+ *  @param: messageData = {idx, nickname, avatar, lat, lon, contents, testing}
  ********************/
 exports.save = (messageData) => {
-  // 1. idx 최대값 구하기 
-  return new Promise((resolve, reject) => { 
-    mongo.messageModel.count((err, result) => {
+  let db = mongo;
+  if (messageData.testing) { // 테스트 환경일 경우엔 DB을 테스트용으로 바꾼다.
+    db = testMongo;
+    console.log("... test data is saved");
+  }
+
+  // 1. model 생성하기
+  return new Promise((resolve, reject) => {      
+    const message = new db.messageModel(
+      {
+        user: {
+          idx: messageData.idx,
+          nickname: messageData.nickname,
+          avatar: messageData.avatar
+        },
+        position: {
+          type: "Point",
+          coordinates: [messageData.lng, messageData.lat]
+        },
+        type: messageData.type,
+        contents: messageData.contents,
+        created_at: helpers.getCurrentDate()
+      }
+    );
+
+    // 3. save로 저장
+    message.save((err, result) => {
       if (err) {
-        const customErr = new Error("Error occrred while Counting Messages: " + err);
-        reject(customErr);        
+        reject(err);
       } else {
         resolve(result);
       }
     });
   })
-  .then((count) => {
-    // 2. model 생성하기
-    return new Promise((resolve, reject) => {  
-      let idx = 1;
-      
-      if (count[0]) {
-        idx = count[0].idx + 1;
-      }
-      
-      const message = new mongo.messageModel(
-        {
-          idx,
-          user: {
-            idx: messageData.idx,
-            nickname: messageData.nickname,
-            avatar: messageData.avatar
-          },
-          position: {
-            type: "Point",
-            coordinates: [messageData.lng, messageData.lat]
-          },
-          type: messageData.type,
-          contents: messageData.contents,
-          created_at: helpers.getCurrentDate()
-        }
-      );
-
-      // 3. save로 저장
-      message.save((err) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(idx);
-        }
-      });
-    });
-  })
-  .then((idx) => {
-    return new Promise((resolve, reject) => {   
-      mongo.messageModel.selectOne(idx, (err, result) => {
-        if (err) {
-          const customErr = new Error("Error occrred while selecting All Messages: " + err);
-          reject(customErr);        
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  });
+  // .then((idx) => {
+  //   return new Promise((resolve, reject) => {   
+  //     db.messageModel.selectOne(idx, (err, result) => {
+  //       if (err) {
+  //         const customErr = new Error("Error occrred while selecting All Messages: " + err);
+  //         reject(customErr);        
+  //       } else {
+  //         resolve(result);
+  //       }
+  //     });
+  //   });
+  // });
 };
 
 
@@ -155,7 +143,7 @@ exports.like = (userIdx, messageIdx) => {
             resolve(result);    
           }
         });
-      } else {        // 빼야 한다.
+      } else { // 빼야 한다.
         mongo.messageModel.dislike(userIdx, messageIdx, (err, result) => {
           if (err) {
             const customErr = new Error("Error occrred Pop likes list: " + err);

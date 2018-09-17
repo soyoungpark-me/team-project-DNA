@@ -108,7 +108,6 @@ exports.login = async (req, res, next) => {
   /* PARAM */
   const id = req.body.id || req.params.id;
   const password = req.body.password || req.params.password;
-  console.log(req.body);
 
   /* 유효성 체크하기 */
   let isValid = true;

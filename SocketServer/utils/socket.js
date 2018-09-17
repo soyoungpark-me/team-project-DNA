@@ -1,103 +1,85 @@
-const redis = global.utils.redis;
+/******************************************************************************
+' 파일     : socket.js
+' 작성     : 박소영
+' 목적     : Socket IO 이벤트들을 정리해놓은 파일입니다.
+******************************************************************************/
 
-const geolib = require('geolib');
-var geo = require('georedis').initialize(redis);
+const redis = global.utils.redis;
+const pub = global.utils.pub;
+const sub = global.utils.sub;
+const rabbitMQ = global.utils.rabbitMQ;
+const logger = global.utils.logger;
 
 const messageCtrl = require('../controllers/MessageCtrl');
 const dmCtrl = require('../controllers/DMCtrl');
 const helpers = require('./helpers');
 const errorCode = require('./error').code;
 const config = require('./config');
+const session = require('./session');
+const geolib = require('geolib');
 
-const storeClient = (key, value) => {
-  redis.hmset('clients',              // redis Key
-  key,                                // redis Value / hashmap Key    (socket id)
-  value);                             // redis Value / hashmap Value  (client info)
-};
-
-const storeInfo = (idx, info) => {
-  redis.hmset('info',
-  idx, 
-  info);
-}
-
-const storeGeoInfo = (idx, position) => {
-  geo.addLocation(idx, 
-    { latitude: position[1], longitude: position[0] });
-};
-
-// 정보가 레디스에 존재하는지 체크하지 않아도 자동으로 갱신됩니다.
-// This command overwrites any specified fields already existing in the hash.
-// If key does not exist, a new key holding a hash is created.      
-
-const storeAll = (id, data) => {
-  const idx = data.idx;
-  const client = {
-    idx,
-    position: data.position,
-    radius: data.radius
-  };
-
-  const info = {
-    socket: id,
-    position: data.position,
-    radius: data.radius,
-    nickname: data.nickname,
-    avatar: data.avatar,
-  };
-
-  if(idx && idx !== undefined){
-    storeClient(id, JSON.stringify(client));
-    storeInfo(idx, JSON.stringify(info));
-    storeGeoInfo(idx, data.position);
-  }      
-}
 exports.init = (http) => {
-  /* TODO 테스트용으로 레디스 초기화 (추후 꼭 삭제) */
-  storeClient("s1rzGthx73mJqJ5KAAAG", "{\"idx\": 101, \"position\":[127.197422,37.590531],\"radius\":500}");       
-  storeClient("7WB-k5qboL6Ekp4TAAAH", "{\"idx\": 102, \"position\":[127.099696,37.592049],\"radius\":500}");       
-  storeClient("Ubw5zXKj-2xhMuYSAAAA", "{\"idx\": 103, \"position\":[127.097695,37.590571],\"radius\":300}");       
-  storeClient("UIZA0ogMyaXh5HyBAAAB", "{\"idx\": 104, \"position\":[127.097622,37.591479],\"radius\":500}");      
-  storeInfo(101, "{\"socket\":\"s1rzGthx73mJqJ5KAAAG\", \"position\":[127.197422,37.590531],\"radius\":500, \"nickname\":\"test1\", \"avatar\": \"null\"}");
-  storeInfo(102, "{\"socket\":\"7WB-k5qboL6Ekp4TAAAH\", \"position\":[127.099696,37.592049],\"radius\":500, \"nickname\":\"test2\", \"avatar\": \"null\"}");
-  storeInfo(103, "{\"socket\":\"Ubw5zXKj-2xhMuYSAAAA\", \"position\":[127.097695,37.590571],\"radius\":300, \"nickname\":\"test3\", \"avatar\": \"null\"}");
-  storeInfo(104, "{\"socket\":\"UIZA0ogMyaXh5HyBAAAB\", \"position\":[127.097622,37.591479],\"radius\":500, \"nickname\":\"test4\", \"avatar\": \"null\"}");  
-  storeGeoInfo(101, [127.197422,37.590531]);
-  storeGeoInfo(102, [127.099696,37.592049]);
-  storeGeoInfo(103, [127.097695,37.590571]);
-  storeGeoInfo(104, [127.097622,37.591479]);
-
   const io = require('socket.io')(http, 
     {'pingInterval': config.ping_interval, 'pingTimeout': config.ping_timeout});
   
+  // 서버간 pub/sub을 위해 socket 구독
+  sub.subscribe('socket');
+
+  // data = { socketId, event, response }
+  sub.on('message', (channel, data) => {
+    const parsed = JSON.parse(data);
+
+    if (channel === 'socket') {
+      // 여기에 들어왔다는 것은, 메시지가 도착했는데 소켓이 그 서버에는 없었다는 뜻입니다.
+      // 동시에 다른 서버에도 pub을 했을 테니까... 
+      // 여기서도 똑같이 있으면 처리하고, 대신 없으면 다시 pub 해줄 필요없이 무시합니다.
+      if (Object.keys(io.sockets.sockets).includes(parsed.socketId)) {
+        io.sockets.to(parsed.socketId).emit(parsed.event, parsed.response);
+      }      
+    }
+  });
+
   io.on('connection', (socket) => {
-    console.log('a user connected');   
+    /*******************
+     * 소켓 에러 로그
+    ********************/
+    socket.on('error', (error) => {
+      logger.log("error", "Error: websocket error", error);
+    }).on('connect_error', (error) => {
+      logger.log("error", "Error: websocket error", error);
+    }).on('reconnect_error', (error) => {
+      logger.log("error", "Error: websocket error", error);
+    });
 
     /*******************
      * 소켓 연결
     ********************/
     // 클라에서 보내온 정보를 레디스에 저장합니다.
     socket.on('store', (data) => {
-      storeAll(socket.id, data);
+      session.storeAll(socket.id, data);
     });
 
     // 클라의 연결이 종료되었을 경우 레디스에서 해당 정보를 삭제합니다.
-    socket.on('disconnect', function (data) {
-      console.log('user disconnected');
-      redis.hmget('clients', socket.id, (err, info) => {
-        if (err) console.log(err);
-        if (info && info[0]) {
-          const idx = JSON.parse(info[0]).idx;        
-          redis.hdel('info', idx);
-          redis.zrem('geo:locations', idx);
-        }
-        redis.hdel('clients', socket.id);      
-      });        
+    socket.on('disconnect', () => {
+      session.removeSession(socket.id);
     });
 
     // 클라가 주기적으로 현재 위치를 업데이트하면 이를 레디스에서 갱신합니다.
-    socket.on('update', async (type, data) => {      
-      storeAll(socket.id, data);
+    socket.on('update', async (type, data) => {    
+      // 먼저 현재 위치를 mapKey로 변환해 위치에 변화가 있는지 확인해야 합니다.
+      const position = data.position;
+      const newMapKey = helpers.getMapkey(position);
+      const currentMapKey = await session.returnMapKey(socket.id);
+
+      if (!currentMapKey || currentMapKey === null) {
+        return;
+      }
+
+      if (newMapKey !== currentMapKey) { // 두 값이 다르다면 기존 값을 먼저 지워줘야 합니다.
+        session.removeSession(socket.id);
+      }
+      session.storeAll(socket.id, data);
+      
 
       // 해당 위치와 radius에 맞는 접속자와 접속중인 친구들을 찾아 보내줍니다.
       // 유저에게 type을 받아서, 이에 맞는 정보를 찾아서 보내주면 됩니다.
@@ -105,37 +87,24 @@ exports.init = (http) => {
       //    dm  : 접속 중인 친구 리스트 return
 
       if (type === "geo") {
-        const position = data.position;
-        await new Promise((resolve, reject) => {
+        new Promise(async (resolve, reject) => {
           // nearby @param : {위도, 경도}, 반경
           // 현재 유저의 위치로부터 유저가 설정한 반경값 이내에 존재하는 접속자만 추려냅니다.
           // + 기능 추가 : 주변에 접속중인 사람인지만 보여주지 말고, 그 유저도 내 메시지를 받아볼 수 있는지도 추가합니다.
-          geo.nearby({latitude: position[1], longitude: position[0]}, data.radius, 
-            (err, positions) => {
-              if (err) {
-                console.log(err);
-                reject(err);
-              } else {
-                resolve(positions);
-              }
-            });
+          const positions = await session.returnSessionList("geo", position, data.radius);
+          positions.length > 0 ? resolve(positions) : reject();
         })
-        // .then((positions) => {
-        // // 
-        //   redis.hmget('clients', data.idx, (err, info) => {
-        //     if(err) console.log(err);
-        //     console.log(info);
-        //   });
-        
-        // );
-        // })
         .then((positions) => {
           return new Promise((resolve, reject) => {
             let infoList = [];
 
             positions.map(async (idx, i) => {
-              redis.hmget('info', idx, (err, info) => {
+              // redis의 모든 값들을 가져오지 말고, 
+              // 현재 유저가 존재하는 위치 내 타일에 있는 유저들만 끌고 오면 된다!
+              const mapKey = helpers.getMapkey(position) + "info";
+              redis.hmget(mapKey, idx, (err, info) => {
                 if (err) {
+                  logger.log("error", "Error: websocket error", err);
                   console.log(err);
                   reject(err);
                 }
@@ -182,65 +151,54 @@ exports.init = (http) => {
     ********************/
 
     // 새로 메시지를 생성했을 경우에는
-    socket.on('save_msg', async (token, messageData, radius) => {
+    socket.on('save_msg', async (data) => {
       // 1. DB에 저장하기 위해 컨트롤러를 호출합니다.
       let response = '';  
+      const token = data.token;
+      const messageData = data.messageData;
+      messageData.testing = data.testing;
+      const radius = data.radius;
 
       try {
         response = await messageCtrl.save(token, messageData);
       } catch (err) {
-        console.log(err);
+        logger.log("error", "Error: websocket error", err);
         response = errorCode[err];
-      }
+        console.log(err);
+      } finally {
+        if (!response || response === null) {        
+          return;
+        }
 
-      const messageLat = response.result.position.coordinates[1];
-      const messageLng = response.result.position.coordinates[0];
+        const position = response.result.position.coordinates;
+        session.findUserInBound(io, socket, response, "new_msg") ;
 
-      // 2. 레디스에 저장된 클라이언트의 리스트를 가져옵니다.
-      redis.hgetall('clients', (err, object) => {
-        if (err) console.log(err);
-        
-        Object.keys(object).forEach(function (key) { 
-          // 3. 저장한 결과값을 연결된 소켓에 쏴주기 위해 필터링합니다.
-          const value = JSON.parse(object[key]);
-          const distance = geolib.getDistance(
-            { latitude: value.position[1], longitude: value.position[0] }, // 소켓의 현재 위치 (순서 주의!)
-            { latitude: messageLat, longitude: messageLng }         // 메시지 발생 위치
-          );
-          if (value.radius >= distance) { // 거리 값이 설정한 반경보다 작을 경우에만 이벤트를 보내줍니다.            
-            socket.broadcast.to(key).emit('new_msg', response);
-          }
-        });
-        socket.emit('new_msg', response);
-      });   
-
-      // 4. 해당 메시지가 확성기 타입일 경우에는 푸시 메시지도 보내줘야 합니다.
-      if (messageData.type === "LoudSpeaker") {
-        // 5. 푸시 메시지를 보내줄 대상을 선별해줘야 합니다.        
-        await new Promise((resolve, reject) => {
-          // nearby @param : {위도, 경도}, 반경
-          // 작성된 메시지로의 좌표값으로부터 주어진 반경 이내에 위치한 사용자만 추려냅니다.
-          geo.nearby({latitude: messageLat, longitude: messageLng}, radius, 
-            (err, positions) => {
-              if (err) {
-                console.log(err);
-                reject(err);
-              } else {
-                resolve(positions);
-              }
-            });
-        })
-        .then((positions) => {                               
-          positions.map(async (idx, i) => {
-            redis.hmget('info', idx, (err, info) => {
-              if (err)  console.log(err);
-              else {
-                const json = JSON.parse(info[0]);                
-                socket.to(json.socket).emit("speaker", response.result);
-              }
+        // 4. 해당 메시지가 확성기 타입일 경우에는 푸시 메시지도 보내줘야 합니다.
+        if (messageData.type === "LoudSpeaker") {
+          rabbitMQ.channel.publish("push", "speaker", new Buffer(JSON.stringify(response)));
+          // 5. 푸시 메시지를 보내줄 대상을 선별해줘야 합니다.        
+          await new Promise(async (resolve, reject) => {
+            // nearby @param : {위도, 경도}, 반경
+            // 작성된 메시지로의 좌표값으로부터 주어진 반경 이내에 위치한 사용자만 추려냅니다.
+            const positions = await session.returnSessionList("geo", position, radius);
+            positions.length > 0 ? resolve(positions) : reject();
+          })
+          .then((positions) => {
+            const mapKey = helpers.getMapkey(position) + "info";
+            positions.map(async (idx, i) => {
+              redis.hmget(mapKey, idx, (err, info) => {
+                if (err) {
+                  logger.log("error", "Error: websocket error", err);
+                  console.log(err);
+                }
+                else {
+                  const json = JSON.parse(info[0]);
+                  socket.to(json.socket).emit("speaker", response.result);
+                }
+              });
             });
           });
-        });
+        }
       }
     });
 
@@ -255,29 +213,17 @@ exports.init = (http) => {
       try {
         response = await messageCtrl.like(token, idx);
       } catch (err) {
-        console.log(err);
+        logger.log("error", "Error: websocket error", err);
         response = errorCode[err];
+        console.log(err);
       } finally {
         // 3. 결과물을 이 메시지를 받아보는 유저와 나에게 쏴야 합니다.
         // 기존 메시지 수신 방식이랑 동일하게 하면 됩니다.
-        redis.hgetall('clients', (err, object) => {
-          if (err) console.log(err);
-
-          const messageLat = response.result.position.coordinates[1];
-          const messageLng = response.result.position.coordinates[0];
-          
-          Object.keys(object).forEach(function (key) { 
-            const value = JSON.parse(object[key]);
-            const distance = geolib.getDistance(
-              { latitude: value.position[1], longitude: value.position[0] }, // 소켓의 현재 위치 (순서 주의!)
-              { latitude: messageLat, longitude: messageLng }         // 메시지 발생 위치
-            );
-            if (value.radius >= distance) { // 거리 값이 설정한 반경보다 작을 경우에만 이벤트를 보내줍니다.            
-              socket.broadcast.to(key).emit('apply_like', response);
-            }
-          });
-          socket.emit('apply_like', response);
-        });   
+        if (!response || response === null) {        
+          console.log(err);
+          return;
+        }
+        session.findUserInBound(io, socket, response, "apply_like");
       }      
     });
 
@@ -293,46 +239,36 @@ exports.init = (http) => {
       try {
         response = await dmCtrl.save(token, messageData);
       } catch (err) {
-        console.log(err);
+        logger.log("error", "Error: websocket error", err);
         response = errorCode[err];
+        console.log(err);
       } finally {
         // 3. 결과물을 해당 유저와 나에게 쏴야 합니다.
         // redis의 세션 목록에 해당 유저가 있는지 확인하고, 있으면 쏩니다.
-        redis.hgetall('info', (err, object) => {
-          if (err) console.log(err);
-          const receiver = response.result.receiver;
-          if (object[receiver]) { // 해당 유저가 현재 접속중일 경우에만 보내고,
-            socket.broadcast.to(JSON.parse(object[receiver]).socket).emit('new_dm', response);
+        const receiver = response.result.receiver;
+        redis.hmget("info", receiver, (err, object) => {
+          if (err) {
+            console.log(err);
+            return;
+          } else {
+            if (object && object.length > 0) {
+              const socketId = object[0];
+
+              if (Object.keys(io.sockets.sockets).includes(socketId)){ // 존재할 경우 직접 보냅니다.
+                socket.broadcast.to(socketId).emit('new_dm', response);
+              } else {
+                const data = {
+                  socketId,
+                  event: "new_dm",
+                  response
+                };
+                pub.publish('socket', JSON.stringify(data));
+              }
+            }
           }
-          // 내 자신에게도 발송해줍니다!
-          socket.emit('new_dm', response);
         });
+        socket.emit('new_dm', response);       
       }      
     });
   });
 };
-
-
-// socket.conn.on('packet', function (packet) {
-//   if (packet.type === 'ping') {console.log('received ping');}
-// });
-// socket.conn.on('packetCreate', function (packet) {
-//   if (packet.type === 'pong') console.log('sending pong');
-// });
-
-
-// Working with W3C Geolocation API
-// navigator.geolocation.getCurrentPosition(
-//   function(position) {
-//       alert('You are ' + geolib.getDistance(position.coords, {
-//           latitude: 51.525,
-//           longitude: 7.4575
-//       }) + ' meters away from 51.525, 7.4575');
-//   },
-//   function() {
-//       alert('Position could not be determined.')
-//   },
-//   {
-//       enableHighAccuracy: true
-//   }
-// );

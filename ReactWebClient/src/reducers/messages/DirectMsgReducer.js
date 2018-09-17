@@ -1,7 +1,7 @@
 import { GET_CONVERSATIONS, GET_MESSAGES, SET_FRIENDS_LIST } from './../../actions/messages/DirectMsgAction';
 
 import { FETCH_DATA_SUCCESS } from './../../actions/index';
-import checkError from './../checkError';
+// import checkError from './../checkError';
 
 const INITIAL_STATE = {
   avatar: null,
@@ -11,7 +11,7 @@ const INITIAL_STATE = {
 }
 
 export default function(state = INITIAL_STATE, action){
-  checkError(action);
+  // checkError(action);
 
   switch(action.type) {
     case FETCH_DATA_SUCCESS:// return data and set fetching = false

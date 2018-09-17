@@ -8,8 +8,8 @@ const ROOT_URL = `${config.SERVER_HOST}:${config.USER_PORT}/api`;
 
 export function getProfile(index) {
   let token = '';
-  if (localStorage.getItem("token")) {
-    token = JSON.parse(localStorage.getItem("token")).accessToken;
+  if (sessionStorage.getItem("token")) {
+    token = JSON.parse(sessionStorage.getItem("token")).accessToken;
   }
 
   const request = axios.get(`${ROOT_URL}/user/${index}`,

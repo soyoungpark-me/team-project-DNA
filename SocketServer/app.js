@@ -15,36 +15,13 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
 require('dotenv').config();
 global.utils = require('./utils/global');
 require('./routes')(app);
 
-/* Error Handler*/
-process.stdin.resume(); //so the program will not close instantly
-
-function exitHandler(options, exitCode) {
-  if (options.cleanup || exitCode || exitCode === 0 || options.exit) {
-    global.utils.redis.del("clients");
-    global.utils.redis.del("geo:locations");
-    global.utils.redis.del("info");
-  }  
-
-  if (options.exit) {
-    process.exit();
-  }
-}
-
-process.on('exit', exitHandler.bind(null,{cleanup:true}));            // do something when app is closing
-process.on('SIGINT', exitHandler.bind(null, {exit:true}));            // catches ctrl+c event
-process.on('SIGUSR1', exitHandler.bind(null, {exit:true}));           // catches "kill pid"
-process.on('SIGUSR2', exitHandler.bind(null, {exit:true}));
-// process.on('uncaughtException', exitHandler.bind(null, {exit:true})); // uncaught exceptions
-
-// const server = require('http')
-//   .createServer(lex.middleware(require('redirect-https')()))
-
+// 로컬에서 개발하는 development 모드와, 실제로 배포하는 production 모드로 나누어,
+// 크로스 도메인 문제를 해결하고 production 모드의 경우 https를 적용합니다.
 let server, corsOptions;
 switch(process.env.NODE_ENV){
   case 'development':    
@@ -62,7 +39,7 @@ switch(process.env.NODE_ENV){
       credentials : true
     };
     app.use(cors(corsOptions));
-    // Certificate
+    
     try {
       const privateKey = fs.readFileSync('../SSL/privkey.pem', 'utf8');
       const certificate = fs.readFileSync('../SSL/cert.pem', 'utf8');
@@ -84,18 +61,15 @@ switch(process.env.NODE_ENV){
     return;
 }
 
-const socket = require('./utils/socket').init(server);
-server.listen(process.env.PORT, process.env.HOST, () => {
+const args = process.argv.slice(2);
+if (args.length < 1) {
+  process.exit();
+}
+
+require('./utils/socket').init(server);
+server.listen(args[0], process.env.HOST, () => {
   console.info('[DNA-SocketApiServer] Listening on port %s at %s', 
-  process.env.PORT, process.env.HOST);
+  args[0], process.env.HOST);
 });
 
 module.exports = app;
-
-// app.get('/message', function(req, res){
-//   res.sendFile(__dirname + '/test_message.html');
-// });
-
-// app.get('/dm', function(req, res){
-//   res.sendFile(__dirname + '/test_dm.html');
-// });

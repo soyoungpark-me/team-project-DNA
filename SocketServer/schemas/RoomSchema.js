@@ -8,7 +8,7 @@ let Schema = {};
 
 Schema.createSchema = (mongoose) => {
   const roomSchema = mongoose.Schema({
-    idx: { type: Number, require: true, index: { unique: true } },
+    idx: { type: Number, index: { unique: true } },
     users : [{
       idx: { type: Number, required: true },
       nickname: { type: String, required: true },
@@ -27,9 +27,20 @@ Schema.createSchema = (mongoose) => {
    * 메소드 시작
   ********************/
 
-  // count : idx의 최대값 구하기
-  roomSchema.static('count', function(callback) {
-    return this.find({}, { idx: 1 }, callback).sort({ "idx": -1 }).limit(1);
+  roomSchema.pre('save', function(next) {
+    let doc = this;
+    
+    global.utils.mongo.seqModel.findByIdAndUpdate(
+      {_id: "room"}, {$inc: {idx: 1}}, {upsert: true, new: true}, function(err, count) {
+
+      if (err) {
+        console.log(err);
+        return next(err);
+      }
+      
+      doc.idx = count.idx;
+      next();
+    });
   });
 
   // search : 해당 채팅방이 이미 존재하는지 확인

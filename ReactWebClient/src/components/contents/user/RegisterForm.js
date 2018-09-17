@@ -79,11 +79,14 @@ class RegisterForm extends Component {
 
       if (this.state.file) {
         const formData = new FormData();
-        formData.append('image', this.state.file);
+        formData.append("image", this.state.file);
 
-        const result = await imageFileUpload(formData);
-        console.log(result);
-        props.avatar = result.data;
+        const result = await imageFileUpload(formData, "profile");
+        let avatar = '';
+        if (result.data && result.data.length > 0) {
+          avatar = result.data[0].fileUrl.replace("dna-edge", "dna-edge-profile");
+        }
+        props.avatar = avatar;
       }
       console.log(props);
 

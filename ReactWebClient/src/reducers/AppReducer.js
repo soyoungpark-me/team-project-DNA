@@ -1,6 +1,7 @@
 import { SET_WEB_NOTIFY_ENABLE, SET_WEB_NOTIFY_UNABLE,
           SET_GEO_POSITION, SET_SOCKET_CONNECTED }
   from '../actions/AppActions.js';
+// import checkError from './checkError';
 
 let ignore = '';
 
@@ -17,6 +18,8 @@ const initialState = {
 };
 
 export default function data (state = initialState, action) {
+  // checkError(action);
+  
   switch (action.type) {
     case SET_SOCKET_CONNECTED:
       return { ...state, socket: action.payload };
@@ -29,8 +32,12 @@ export default function data (state = initialState, action) {
 
     case SET_GEO_POSITION:
       const coords = action.payload.coords;
-      const result = { lat: coords.latitude, lng: coords.longitude };
-      return { ...state, position: result }
+      if (action.payload.coords && action.payload.coords !== null) {
+        const result = { lat: coords.latitude, lng: coords.longitude };
+        return { ...state, position: result }
+      } else {
+        return { ...state, position: null }
+      }
 
     default:
       return state;

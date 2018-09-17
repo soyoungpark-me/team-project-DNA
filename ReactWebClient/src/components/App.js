@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { ToastContainer, Slide } from "react-toastify";
-import { BrowserRouter, withRouter } from 'react-router-dom';
+import { Router, withRouter } from 'react-router-dom';
+import history from './../history';
 
 /* for Redux */
 import { connect } from 'react-redux';
@@ -35,23 +36,22 @@ class MyComponent extends Component {
   // 앱이 시작될 때 Fetch 해오기 시작
   componentWillMount() {
     this.props.setGeoPosition();
-    this.props.setSocketConnected();
 
     const path = this.props.location.pathname;
 
-    if (path === "/login" && localStorage.getItem("token")) {
+    if (path === "/login" && sessionStorage.getItem("token")) {
       // 토큰이 있어 넘어왔음에도 login으로 라우팅을 시도할 경우
       // 홈으로 보내버립니다.
-      this.props.history.push('/');
+      this.props.history.push('/main');
       return;
     }
     
     if (path === '/logout') {
       // 로그아웃으로 넘어왔을 땐 토큰을 모두 삭제하고
-      localStorage.removeItem("token");
+      sessionStorage.removeItem("token");
       this.props.setUserIndex(null);
       // 홈으로 보내버립니다.
-      this.props.history.push('/login');
+      history.push('/login');
       return;
     }
   }
@@ -59,21 +59,21 @@ class MyComponent extends Component {
   render() {
     let renderLayout;
 
-    if (localStorage.getItem('token')) {
+    if (sessionStorage.getItem('token')) {
       renderLayout = <AfterLoginLayout />;
     } else {
       renderLayout = <BeforeLoginLayout />;
     }
 
     return (
-      <BrowserRouter>
+      <Router history={history}>
         <div className="h100">
         { renderLayout }
         <ToastContainer transition={Slide} position="top-right" rtl={false}
           autoClose={2000} hideProgressBar newestOnTop closeOnClick
           pauseOnVisibilityChange draggable={false} pauseOnHover />
         </div>
-      </BrowserRouter>
+      </Router>
     );
   }
 }
