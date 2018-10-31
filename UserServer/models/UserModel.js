@@ -466,3 +466,46 @@ exports.report = (userIdx, reportUserIdx) => {
     });
   });
 }
+
+
+/*******************
+ *  SelectPoints
+ *  @param: idx
+ ********************/
+exports.selectPoints = (idx) => {
+  return new Promise((resolve, reject) => {
+    sql = `SELECT points
+             FROM users
+            WHERE idx = ?`;
+            
+    mysql.query(sql, [idx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows[0].points);
+      }
+    })
+  });
+}
+
+
+
+/*******************
+ *  reducePoints
+ *  @param: idx
+ ********************/
+exports.reducePoints = (idx) => {
+  return new Promise((resolve, reject) => {
+    sql = `UPDATE users
+              SET points = points - 100
+            WHERE idx = ?`;
+            
+    mysql.query(sql, [idx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows);
+      }
+    })
+  });
+}
