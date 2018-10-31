@@ -32,6 +32,6 @@ module.exports = {
     }
   ],
   pagination_count: 20,
-  ping_interval: 2000,
+  ping_interval: 3000,
   ping_timeout: 5000
 }

@@ -15,6 +15,7 @@ Schema.createSchema = (mongoose) => {
       avatar: String
     }],
     blind: [ String ],
+    enable: { type: Number, required: true, default: 1 },
     messages: [ dmSchema ],
     last_message: String,
     last_type: String,
@@ -61,10 +62,10 @@ Schema.createSchema = (mongoose) => {
   // selectAll : 전체 조회하기
   roomSchema.static('selectAll', function(userIdx, page, callback) {
     if (!page) { // 페이지 인자가 없음 : 페이지네이션이 되지 않은 경우
-      return this.find({users: { $elemMatch: { idx: userIdx }}}, {'messages': 0}, callback)
+      return this.find({enable: 1, users: { $elemMatch: { idx: userIdx }}}, {'messages': 0}, callback)
         .sort('-updated_at')
     } else {     // 페이지 인자가 있음 : 페이지네이션 적용
-      return this.find({users: { $elemMatch: { idx: userIdx }}}, {'messages': 0}, callback)
+      return this.find({enable: 1, users: { $elemMatch: { idx: userIdx }}}, {'messages': 0}, callback)
         .sort('-updated_at')
         .skip((page-1) * paginationCount).limit(paginationCount);
     }    
@@ -98,6 +99,12 @@ Schema.createSchema = (mongoose) => {
         );
       });
     });
+  });
+
+  // toogleAble : 방 활성화/비활성화 기능
+  roomSchema.static('toogleAble', function(roomIdx, enable, callback) {
+    this.findOneAndUpdate({ idx: parseInt(roomIdx) },
+      { $set: { enable: enable }}, { new: true }, callback);
   });
 
   // saveDM : DM 저장하기

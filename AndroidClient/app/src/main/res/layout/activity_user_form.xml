@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/layout_border_bottom">
+
+            <ImageButton
+                android:id="@+id/backBtn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/back"
+                android:src="@drawable/back"
+                android:layout_marginLeft="15dp"
+                android:onClick="onClick" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="18dp"
+                android:text="프로필 수정"
+                android:tag="nseb"/>
+
+            <ImageButton
+                android:id="@+id/menuBtn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/menu"
+                android:src="@drawable/menu"
+                android:layout_marginTop="1dp"
+                android:layout_marginRight="15dp"
+                android:layout_alignParentRight="true"
+                android:onClick="onClick" />
+        </RelativeLayout>
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="15dp">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="25dp"
+                        android:gravity="center_vertical"
+                        android:textSize="14dp"
+                        android:textColor="@color/pomegrante"
+                        android:text="필수 입력 사항"
+                        android:tag="nseb"/>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:clickable="false"
+                        android:theme="@style/MyTextLabel">
+
+                        <EditText
+                            android:id="@+id/IDEdit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/EditTextThemePrimary"
+                            android:inputType="textPersonName"
+                            android:textSize="17dp"
+                            android:clickable="false"
+                            android:cursorVisible="false"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:hint="아이디" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="false"
+                        android:theme="@style/MyTextLabel">
+
+                        <EditText
+                            android:id="@+id/emailEdit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/EditTextThemePrimary"
+                            android:inputType="textEmailAddress"
+                            android:textSize="17dp"
+                            android:clickable="false"
+                            android:cursorVisible="false"
+                            android:focusable="false"
+                            android:focusableInTouchMode="false"
+                            android:hint="이메일" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:theme="@style/MyTextLabel">
+
+                        <EditText
+                            android:id="@+id/PWEdit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/EditTextThemePrimary"
+                            android:inputType="textPassword"
+                            android:textColor="@color/grayDark"
+                            android:textSize="17dp"
+                            android:hint="비밀번호" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:theme="@style/MyTextLabel">
+
+                        <EditText
+                            android:id="@+id/PWnewEdit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/EditTextThemePrimary"
+                            android:inputType="textPassword"
+                            android:textColor="@color/grayDark"
+                            android:textSize="17dp"
+                            android:hint="새 비밀번호" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/MyTextLabel">
+
+                        <EditText
+                            android:id="@+id/PWcheckEdit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/EditTextThemePrimary"
+                            android:inputType="textPassword"
+                            android:textColor="@color/grayDark"
+                            android:textSize="17dp"
+                            android:hint="비밀번호 확인" />
+                    </android.support.design.widget.TextInputLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginBottom="5dp"
+                    android:background="@color/silver" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="15dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="25dp"
+                        android:gravity="center_vertical"
+                        android:textSize="14dp"
+                        android:textColor="@color/grayText"
+                        android:text="선택 입력 사항"
+                        android:tag="nseb"/>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="8dp"
+                        android:theme="@style/MyTextLabel">
+
+                        <EditText
+                            android:id="@+id/nicknameEdit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:theme="@style/EditTextThemePrimary"
+                            android:inputType="textPersonName"
+                            android:textColor="@color/grayDark"
+                            android:textSize="17dp"
+                            android:hint="닉네임" />
+                    </android.support.design.widget.TextInputLayout>
+
+                    <android.support.design.widget.TextInputLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:theme="@style/MyTextLabel">
+
+                        <EditText
+                            android:id="@+id/infoEdit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="top"
+                            android:theme="@style/EditTextThemePrimary"
+                            android:inputType="textMultiLine"
+                            android:textColor="@color/grayDark"
+                            android:textSize="17dp"
+                            android:hint="상태 메시지" />
+                    </android.support.design.widget.TextInputLayout>
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/silver" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="15dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="25dp"
+                        android:gravity="center_vertical"
+                        android:textSize="14dp"
+                        android:textColor="@color/grayText"
+                        android:text="프로필 사진"
+                        android:tag="nseb"/>
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@color/clouds"
+                        android:layout_margin="4dp"
+                        android:padding="10dp">
+
+                        <android.support.v7.widget.CardView
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:elevation="15dp"
+                            android:layout_gravity="center"
+                            app:cardCornerRadius="40dp">
+
+                            <ImageView
+                                android:id="@+id/avatarImage"
+                                android:layout_height="80dp"
+                                android:layout_width="match_parent"
+                                android:src="@drawable/avatar">
+                            </ImageView>
+                        </android.support.v7.widget.CardView>
+                    </FrameLayout>
+
+                    <Button
+                        android:id="@+id/selectImgBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:textColor="@color/gray"
+                        android:text="이미지 선택하기"
+                        android:onClick="onClick"
+                        android:tag="nseb" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <Button
+            android:id="@+id/profileUpdateBtn"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@drawable/ripple_effect_button"
+            android:textColor="@color/gray"
+            android:text="저장하기"
+            android:onClick="onClick"
+            android:tag="nseb" />
+    </LinearLayout>
+
+    <include
+        android:id="@+id/right_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:choiceMode="singleChoice"
+        layout="@layout/layout_drawer" />
+
+</android.support.v4.widget.DrawerLayout>

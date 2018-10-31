@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="best_chat">
+        <item>10분</item>
+        <item>30분</item>
+        <item>60분</item>
+    </string-array>
+</resources>

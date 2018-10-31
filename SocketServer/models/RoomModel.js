@@ -39,6 +39,12 @@ exports.open = (roomData) => {
             nickname: roomData.user2.nickname,
             avatar: roomData.user2.avatar
           }],
+          messages: [
+            { 
+              sender_idx: 0,
+              contents: "채팅방이 개설되었습니다! 이제 DM을 주고 받을 수 있습니다."
+            }
+          ],
           created_at: helpers.getCurrentDate(),
           updated_at: helpers.getCurrentDate()
         }
@@ -94,6 +100,38 @@ exports.close = (userIdx, roomIdx) => {
   });
 };
 
+
+/*******************
+ *  toogleAble
+ *  @param: roomIdx
+ ********************/
+exports.toogleAble = (roomIdx) => {
+  return new Promise((resolve, reject) => {
+    // 1. 먼저 활성화 유무를 체크한다.
+    mongo.roomModel.selectOne(roomIdx, (err, room) => {
+      if (err) {
+        const customErr = new Error("Error occrred Check is enabled: " + err);
+        reject(customErr);  
+      } else {
+        const result = room[0].enable;
+        resolve(result);
+      }      
+    });
+  })
+  .then((enable) => {
+    return new Promise((resolve, reject) => { 
+      let setEnable = !enable;
+      mongo.roomModel.toogleAble(roomIdx, setEnable, (err, result) => {
+          if (err) {
+            const customErr = new Error("Error occrred while toogleAble Room's DMs: " + err);
+            reject(customErr);        
+          } else {
+            resolve(result);
+          }
+      });
+    });
+  });
+};
 
 
 /*******************

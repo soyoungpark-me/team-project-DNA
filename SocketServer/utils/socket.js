@@ -10,13 +10,14 @@ const sub = global.utils.sub;
 const rabbitMQ = global.utils.rabbitMQ;
 const logger = global.utils.logger;
 
+const geolib = require('geolib');
+const fetch = require('node-fetch');
 const messageCtrl = require('../controllers/MessageCtrl');
 const dmCtrl = require('../controllers/DMCtrl');
 const helpers = require('./helpers');
 const errorCode = require('./error').code;
 const config = require('./config');
 const session = require('./session');
-const geolib = require('geolib');
 
 exports.init = (http) => {
   const io = require('socket.io')(http, 
@@ -56,6 +57,9 @@ exports.init = (http) => {
     ********************/
     // 클라에서 보내온 정보를 레디스에 저장합니다.
     socket.on('store', (data) => {
+      if (Object.prototype.toString.call(data) == "[object String]") {
+        data = JSON.parse(data);
+      }
       session.storeAll(socket.id, data);
     });
 
@@ -66,20 +70,11 @@ exports.init = (http) => {
 
     // 클라가 주기적으로 현재 위치를 업데이트하면 이를 레디스에서 갱신합니다.
     socket.on('update', async (type, data) => {    
-      // 먼저 현재 위치를 mapKey로 변환해 위치에 변화가 있는지 확인해야 합니다.
-      const position = data.position;
-      const newMapKey = helpers.getMapkey(position);
-      const currentMapKey = await session.returnMapKey(socket.id);
-
-      if (!currentMapKey || currentMapKey === null) {
-        return;
-      }
-
-      if (newMapKey !== currentMapKey) { // 두 값이 다르다면 기존 값을 먼저 지워줘야 합니다.
-        session.removeSession(socket.id);
+      if (Object.prototype.toString.call(data) == "[object String]") {
+        data = JSON.parse(data);
       }
       session.storeAll(socket.id, data);
-      
+      const position = data.position;
 
       // 해당 위치와 radius에 맞는 접속자와 접속중인 친구들을 찾아 보내줍니다.
       // 유저에게 type을 받아서, 이에 맞는 정보를 찾아서 보내주면 됩니다.
@@ -99,10 +94,7 @@ exports.init = (http) => {
             let infoList = [];
 
             positions.map(async (idx, i) => {
-              // redis의 모든 값들을 가져오지 말고, 
-              // 현재 유저가 존재하는 위치 내 타일에 있는 유저들만 끌고 오면 된다!
-              const mapKey = helpers.getMapkey(position) + "info";
-              redis.hmget(mapKey, idx, (err, info) => {
+              redis.hmget("info", idx, (err, info) => {
                 if (err) {
                   logger.log("error", "Error: websocket error", err);
                   console.log(err);
@@ -138,9 +130,51 @@ exports.init = (http) => {
             });
           });
         });     
-      } else if (type === "dm"){
-      // 친구 리스트를 받아와서 접속 중인 사람 중에서 추려서 돌려주면 됩니다.
+      } else if (type === "direct"){
+        // 친구 리스트를 받아와서 접속 중인 사람 중에서 추려서 돌려주면 됩니다.)
+        let infoList = [];
+        infoList.push({
+          idx: data.idx
+        });
 
+        fetch(process.env.WAS_SERVER + "/friends/show", {
+          method: "GET",
+          headers: {"token": data.token, 'Content-Type': 'application/json' },
+          withCredentials: true,
+          mode: 'no-cors'
+        })
+        .then(res => res.json())
+        .then((response) => {
+          if (response && (response.status === 201 || response.status === 200)) {
+            response.result.map((row, i) => {
+              const friendIdx = (row.user1_idx === data.idx ? row.user2_idx : row.user1_idx);
+              redis.hmget("info", friendIdx, (err, info) => {
+                if (err) console.log(err);
+                if (info && info.length > 0) {
+                  const json = JSON.parse(info[0]);
+
+                  if (json) {
+                    const result = {
+                      idx: friendIdx,
+                      nickname: json.nickname,
+                      avatar: json.avatar,
+                      inside: true
+                    };
+
+                    infoList.push(result);                    
+                  }
+                }
+
+                if (i+1 === response.result.length) {
+                  socket.emit("direct", infoList);
+                }
+              })
+            })
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
       }
     });
 
@@ -152,13 +186,17 @@ exports.init = (http) => {
 
     // 새로 메시지를 생성했을 경우에는
     socket.on('save_msg', async (data) => {
+      if (Object.prototype.toString.call(data) == "[object String]") {
+        data = JSON.parse(data);
+      }
+
       // 1. DB에 저장하기 위해 컨트롤러를 호출합니다.
       let response = '';  
       const token = data.token;
       const messageData = data.messageData;
-      messageData.testing = data.testing;
+            messageData.testing = data.testing;
       const radius = data.radius;
-
+      
       try {
         response = await messageCtrl.save(token, messageData);
       } catch (err) {
@@ -169,7 +207,7 @@ exports.init = (http) => {
         if (!response || response === null) {        
           return;
         }
-
+        
         const position = response.result.position.coordinates;
         session.findUserInBound(io, socket, response, "new_msg") ;
 
@@ -184,9 +222,8 @@ exports.init = (http) => {
             positions.length > 0 ? resolve(positions) : reject();
           })
           .then((positions) => {
-            const mapKey = helpers.getMapkey(position) + "info";
             positions.map(async (idx, i) => {
-              redis.hmget(mapKey, idx, (err, info) => {
+              redis.hmget("info", idx, (err, info) => {
                 if (err) {
                   logger.log("error", "Error: websocket error", err);
                   console.log(err);
@@ -219,7 +256,7 @@ exports.init = (http) => {
       } finally {
         // 3. 결과물을 이 메시지를 받아보는 유저와 나에게 쏴야 합니다.
         // 기존 메시지 수신 방식이랑 동일하게 하면 됩니다.
-        if (!response || response === null) {        
+        if (!response || response === null) {                  
           console.log(err);
           return;
         }
@@ -233,6 +270,10 @@ exports.init = (http) => {
     ********************/
 
     socket.on('save_dm', async (token, messageData) => {
+      if (Object.prototype.toString.call(messageData) == "[object String]") {
+        messageData = JSON.parse(messageData);
+      }
+
       // 1. DB에 저장하기 위해 컨트롤러를 호출한다.
       let response = '';
 

@@ -15,82 +15,15 @@ const sub = require('redis').createClient(process.env.REDIS_PORT, process.env.EC
 sub.auth(process.env.REDIS_PASSWORD);
 
 // 먼저 세션과 관련된 redis 데이터를 모두 초기화해줍니다.
-redis.flushdb((err, result) => {
+redis.flushdb(() => {
   console.log("[ Redis ] session datas in Redis are removed Successfully ...");
 });
-
-/* mysql */
-const mysql = require('mysql');
-const dbConfig = {
-  host: process.env.MYSQL_HOST,
-  port: process.env.MYSQL_PORT,
-  user: process.env.MYSQL_USER,
-  password: process.env.MYSQL_PASSWORD,
-  database: process.env.DB_NAME
-};
-
-let connection = mysql.createConnection(dbConfig);
-
-connection.connect(function(err){
-  if (err) {
-      console.log("[ MYSQL ] Cannot establish a connection with the database MySQL ... ");
-      connection = reconnect(connection);
-  } else {
-      console.log("[ MYSQL ] *** New connection established with the database MySQL ...")
-  }
-});
-
-function reconnect(connection){
-  console.log("[ MYSQL ] New connection tentative ...");
-
-  if (connection) connection.destroy(); // 현재 커넥션이 존재한다면 끊고 새로 만듭니다.
-  connection = mysql.createConnection(dbConfig);
-
-  connection.connect(function(err){
-      if (err) setTimeout(reconnect, 2000); // 2초마다 연결을 요청합니다.
-      else {
-          console.log("[ MYSQL ] *** New connection established with the database ... ")
-          return connection;
-      }
-  });
-}
-
-connection.on('disconnected', function(){
-  console.log("[ MySQL ] Connection disconnected with the database MySQL ...");
-});
-
-connection.on('error', function(err) {
-  if(err.code === "PROTOCOL_CONNECTION_LOST"){ // 서버 측에서 연결을 끊은 경우
-    console.log("[ MYSQL ] !!! Cannot establish a connection with the database : ("+err.code+")");
-    connection = reconnect(connection);
-  }
-  else if(err.code === "PROTOCOL_ENQUEUE_AFTER_QUIT"){ // 커넥션이 강제로 끊긴 경우
-    console.log("[ MYSQL ] !!! Cannot establish a connection with the database : ("+err.code+")");
-    connection = reconnect(connection);
-  }
-  else if(err.code === "PROTOCOL_ENQUEUE_AFTER_FATAL_ERROR"){ // Fatal error 발생
-    console.log("[ MYSQL ] !!! Cannot establish a connection with the database : ("+err.code+")");
-    connection = reconnect(connection);
-  }
-  else if(err.code === "PROTOCOL_ENQUEUE_HANDSHAKE_TWICE"){ // 이미 커넥션이 존재하는 경우
-    console.log("[ MYSQL ] !!! Cannot establish a connection with the database : ("+err.code+")");
-  }
-  else{ // etc
-    console.log("[ MYSQL ] !!! Cannot establish a connection with the database : ("+err.code+")");
-    connection = reconnect(connection);
-  }
-});
-
-setInterval(function () {
-    connection.query('SELECT 1');
-}, 5000);
-
 
 /* mongodb */
 const mongoose = require('mongoose');
 
 const url = `mongodb://${process.env.EC2_HOST}:${process.env.MONGO_PORT}/${process.env.DB_NAME}`;
-const testUrl = `mongodb://${process.env.EC2_HOST}:${process.env.MONGO_PORT}/test`;
+const testUrl = `mongodb://${process.env.EC2_HOST}:${process.env.MONGO_PORT}/DNA_stress`;
 
 const options = {
   user: process.env.MONGO_USERNAME,
@@ -158,12 +91,14 @@ const rabbitMQ = require('amqplib/callback_api');
 rabbitMQ.channel = '';
 
 rabbitMQ.connect('amqp://localhost', function(err, conn) {
-  conn.createChannel(function(err, ch) {
-    rabbitMQ.channel = ch;
+  if (conn) {
+    conn.createChannel(function(err, ch) {
+      rabbitMQ.channel = ch;
 
-    const ex = 'push';
-    ch.assertExchange(ex, 'direct', {durable: false});
-  });
+      const ex = 'push';
+      ch.assertExchange(ex, 'direct', {durable: false});
+    });
+  }
 });
 
 /* winston */
@@ -182,7 +117,6 @@ const logger = winston.createLogger({
   exitOnError: false,
 });
 
-module.exports.mysql = connection;
 module.exports.redis = redis;
 module.exports.pub = pub;
 module.exports.sub = sub;

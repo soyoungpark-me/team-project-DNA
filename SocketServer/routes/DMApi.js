@@ -13,9 +13,13 @@ module.exports = (router) => {
   router.route('/room')
     .post(authCtrl.auth, roomCtrl.open)
   
-  /* 채팅방 삭제 */
+  /* 채팅방 활성화/비활성화 */
   router.route('/room/:idx')
-    .delete(authCtrl.auth, roomCtrl.close);
+    .delete(authCtrl.auth, roomCtrl.toogleAble);
+    
+  /* 채팅방 삭제 */
+  // router.route('/room/:idx')
+  //   .delete(authCtrl.auth, roomCtrl.close);
 
   /* DM 조회 */
   router.route('/room/:idx/messages')       // All

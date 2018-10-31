@@ -2,8 +2,6 @@ const validator = require('validator');
 
 const messageModel = require('../models/MessageModel');
 const dmModel = require('../models/DMModel');
-const userModel = require('../models/UserModel');
-const helpers = require('../utils/helpers');
 
 let validationError = {
   name:'ValidationError',
@@ -47,25 +45,6 @@ exports.save = async (req, res, next) => {
   if (!isValid) return res.status(400).json(validationError);
   /* 유효성 체크 끝 */
 
-  if (type == 'LoudSpeaker') { // 확성기일 경우 해당 유저의 잔여 point를 조회한다.
-    let points = 0;
-
-    try {
-      points = await userModel.selectPoints(idx);      
-    } catch (err) {
-      // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-      return next(err);
-    }
-
-    if (points < 100) { // 포인트가 100보다 모자랄 경우엔 보낼 수 없다.
-      return res.status(401).json({
-        status: 401,
-        message: "Not enough points",
-        result: { points }        
-      });
-    }
-  }
-
   // 2. DB에 저장하기
   let result = '';
   try {
@@ -77,15 +56,6 @@ exports.save = async (req, res, next) => {
   } catch (error) {
     // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
     return next(error);
-  } finally {
-    if (type == 'LoudSpeaker') { // 확성기일 경우 포인트를 차감한다.
-      try {
-        await userModel.reducePoints(idx);      
-      } catch (err) {
-        // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-        return next(err);
-      }
-    }
   }
 
   // 3. 저장 성공

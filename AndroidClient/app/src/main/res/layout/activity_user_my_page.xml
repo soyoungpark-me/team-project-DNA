@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ivory">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/layout_border_bottom">
+
+            <ImageButton
+                android:id="@+id/backBtn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/back"
+                android:src="@drawable/back"
+                android:layout_marginLeft="15dp"
+                android:onClick="onClick" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="18dp"
+                android:text="마이 페이지"
+                android:tag="nseb"/>
+
+            <ImageButton
+                android:id="@+id/menuBtn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/menu"
+                android:src="@drawable/menu"
+                android:layout_marginTop="1dp"
+                android:layout_marginRight="15dp"
+                android:layout_alignParentRight="true"
+                android:onClick="onClick" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="15dp"
+                android:background="@color/white">
+
+                <LinearLayout
+                    android:id="@+id/myPageProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <android.support.v7.widget.CardView
+                        android:layout_width="45dp"
+                        android:layout_height="45dp"
+                        android:elevation="10dp"
+                        android:layout_marginRight="7dp"
+                        app:cardCornerRadius="20dp">
+                        <ImageView
+                            android:id="@+id/PfAvatar"
+                            android:layout_height="45dp"
+                            android:layout_width="match_parent"
+                            android:src="@drawable/avatar">
+                        </ImageView>
+                    </android.support.v7.widget.CardView>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+                        <LinearLayout
+                            android:layout_marginLeft="5dp"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/PfNickname"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textColor="@color/black"
+                                android:textSize="18dp"
+                                android:tag="nseb" />
+
+                            <TextView
+                                android:id="@+id/PfID"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="3dp"
+                                android:textColor="@color/grayDarker"
+                                android:textSize="14dp"
+                                android:tag="nsb"/>
+                        </LinearLayout>
+                    </RelativeLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/silver" />
+
+            <ScrollView
+                android:id="@+id/myPageScrollView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:fillViewport="true"
+                android:scrollbars="none" >
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/myPageInfo"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:lineSpacingMultiplier="1.2"
+                        android:padding="15dp"
+                        android:background="@color/clouds"
+                        android:text="이 것은 동의를 해야지만 가입할 수 있는 그런 동의이며 동의를 안하면 회원가입을 진행할 수가 없는 그런 동의입니다. gkgkgkgkgkgkgkgkgkkgkgkg" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/silver" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="25dp"
+                        android:layout_marginTop="7dp"
+                        android:gravity="center_vertical"
+                        android:textSize="13dp"
+                        android:paddingLeft="15dp"
+                        android:textColor="@color/gray"
+                        android:text="포스팅"
+                        android:tag="nseb"/>
+
+                    <RelativeLayout
+                        android:id="@+id/myPostBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:layout_marginTop="1dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:background="@drawable/layout_border_horizontal"
+                        android:onClick="onClick">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="@string/fa_pen"
+                            android:layout_marginLeft="10dp"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="20dp"
+                            android:tag="fas"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:textSize="15dp"
+                            android:layout_marginLeft="50dp"
+                            android:gravity="center_vertical"
+                            android:textColor="@color/grayDarker"
+                            android:text="내가 쓴 포스팅"
+                            android:tag="nseb" />
+
+                        <TextView
+                            android:id="@+id/myPostAngle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="@string/fa_up"
+                            android:layout_marginRight="15dp"
+                            android:textColor="@color/silver"
+                            android:textSize="25dp"
+                            android:layout_alignParentRight="true"
+                            android:tag="fas"/>
+                    </RelativeLayout>
+
+                    <ListView
+                        android:id="@+id/myPostList"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:divider="@color/clouds"
+                        android:dividerHeight="1dp" />
+
+                    <RelativeLayout
+                        android:id="@+id/scrapPostBtn"
+                        android:layout_width="match_parent"
+                        android:layout_height="45dp"
+                        android:layout_marginTop="-1dp"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="5dp"
+                        android:background="@drawable/layout_border_horizontal"
+                        android:onClick="onClick">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="@string/fa_scrap"
+                            android:layout_marginLeft="10dp"
+                            android:textColor="@color/colorPrimary"
+                            android:textSize="20dp"
+                            android:tag="fas"/>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:textSize="15dp"
+                            android:layout_marginLeft="50dp"
+                            android:gravity="center_vertical"
+                            android:textColor="@color/grayDarker"
+                            android:text="스크랩한 포스팅"
+                            android:tag="nseb" />
+
+                        <TextView
+                            android:id="@+id/scrapPostAngle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="match_parent"
+                            android:gravity="center_vertical"
+                            android:text="@string/fa_down"
+                            android:layout_marginRight="15dp"
+                            android:textColor="@color/silver"
+                            android:textSize="25dp"
+                            android:layout_alignParentRight="true"
+                            android:tag="fas"/>
+                    </RelativeLayout>
+                    <ListView
+                        android:id="@+id/scrapPostList"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_marginBottom="15dp"
+                        android:divider="@color/clouds"
+                        android:dividerHeight="1dp" />
+                </LinearLayout>
+            </ScrollView>
+
+            <Button
+                android:id="@+id/profileUpdateBtn"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@drawable/ripple_effect_button"
+                android:textColor="@color/gray"
+                android:text="프로필 수정하기"
+                android:onClick="onClick"
+                android:tag="nseb"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <include
+        android:id="@+id/right_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:choiceMode="singleChoice"
+        layout="@layout/layout_drawer" />
+
+</android.support.v4.widget.DrawerLayout>

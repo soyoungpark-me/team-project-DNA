@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:focusable="true"
+        android:focusableInTouchMode="true">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/layout_border_bottom">
+
+            <ImageButton
+                android:id="@+id/backBtn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/back"
+                android:src="@drawable/back"
+                android:layout_marginLeft="15dp"
+                android:layout_centerVertical="true"
+                android:onClick="onClick" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/friendNicknameText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="2dp"
+                    android:gravity="center_vertical"
+                    android:layout_marginLeft="50dp"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="19dp"
+                    android:tag="nseb"/>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginLeft="50dp">
+                    <TextView
+                        android:text="최근 DM : "
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/grayText"
+                        android:textSize="12dp"
+                        android:tag="nsb"/>
+                    <TextView
+                        android:id="@+id/updatedAtText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:textColor="@color/grayText"
+                        android:textSize="12dp"
+                        android:tag="nsb"/>
+                </LinearLayout>
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/menuBtn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/menu"
+                android:src="@drawable/menu"
+                android:layout_marginTop="1dp"
+                android:layout_marginRight="15dp"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:onClick="onClick" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <ListView
+                android:id="@+id/dmListView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:paddingTop="15dp"
+                android:paddingBottom="15dp"
+                android:divider="@android:color/transparent"
+                android:dividerHeight="7dp"
+                android:listSelector="@android:color/transparent"
+                android:background="@drawable/layout_border_horizontal"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="bottom">
+
+                    <EditText
+                        android:id="@+id/dmEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:minHeight="50dp"
+                        android:gravity="center_vertical"
+                        android:layout_marginLeft="15dp"
+                        android:layout_marginRight="120dp"
+                        android:paddingLeft="3dp"
+                        android:maxLines="4"
+                        android:textColor="@color/grayDarker"
+                        android:textSize="17dp"
+                        android:hint="메시지 입력 ..."
+                        android:theme="@style/chatEditTextTheme" />
+
+                    <Button
+                        android:id="@+id/dmLocationBtn"
+                        android:layout_width="25dp"
+                        android:layout_height="50dp"
+                        android:textSize="22dp"
+                        android:textColor="@color/concrete"
+                        android:background="@drawable/transparent"
+                        android:text="@string/fa_compass"
+                        android:tag="far"
+                        android:layout_marginRight="90dp"
+                        android:layout_alignBottom="@id/dmEditText"
+                        android:layout_alignParentRight="true"
+                        android:onClick="onClick" />
+
+                    <Button
+                        android:id="@+id/dmImageBtn"
+                        android:layout_width="25dp"
+                        android:layout_height="50dp"
+                        android:textSize="22dp"
+                        android:textColor="@color/concrete"
+                        android:background="@drawable/transparent"
+                        android:text="@string/fa_image"
+                        android:tag="far"
+                        android:layout_marginRight="55dp"
+                        android:layout_alignBottom="@id/dmEditText"
+                        android:layout_alignParentRight="true"
+                        android:onClick="onClick" />
+
+                    <LinearLayout
+                        android:id="@+id/dmSendBtn"
+                        android:layout_width="45dp"
+                        android:layout_height="match_parent"
+                        android:background="@color/clouds"
+                        android:paddingLeft="10dp"
+                        android:paddingRight="10dp"
+                        android:layout_alignBottom="@id/dmEditText"
+                        android:layout_alignParentRight="true"
+                        android:onClick="onClick">
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="50dp"
+                            android:layout_gravity="bottom"
+                            android:gravity="center"
+                            android:text="@string/fa_send"
+                            android:tag="fas"
+                            android:textSize="22dp"
+                            android:textColor="@color/asbestos" />                       />
+
+                    </LinearLayout>
+                </RelativeLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <include
+        android:id="@+id/right_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:choiceMode="singleChoice"
+        layout="@layout/layout_drawer" />
+
+</android.support.v4.widget.DrawerLayout>

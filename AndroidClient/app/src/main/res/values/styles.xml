@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <!-- Customize your theme here. -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.Button" parent="Widget.AppCompat.Button.Colored">
+        <item name="colorButtonNormal">@color/button</item>
+        <item name="android:textColor">@color/grayDarker</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="EditTextTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlNormal">@color/colorPrimaryLighter</item>
+        <item name="colorControlActivated">@color/white</item>
+        <item name="colorControlHighlight">@color/white</item>
+    </style>
+
+    <style name="EditTextThemePrimary" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlNormal">@color/colorPrimaryLighter</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+        <item name="colorControlHighlight">@color/colorPrimaryDark</item>
+    </style>
+
+    <style name="chatEditTextTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="colorControlNormal">@android:color/transparent</item>
+        <item name="colorControlActivated">@android:color/transparent</item>
+        <item name="android:textCursorDrawable">@color/colorPrimary</item>
+        <item name="android:textColorHint">@color/silver</item>
+        <item name="android:layout_marginLeft">0dp</item>
+        <item name="android:paddingLeft">0dp</item>
+    </style>
+
+    <style name="MyTextLabel" parent="TextAppearance.AppCompat">
+        <item name="colorAccent">@color/colorPrimary</item>
+        <item name="colorControlNormal">@color/colorPrimary</item>
+        <item name="colorControlActivated">@color/colorPrimary</item>
+    </style>
+
+    <style name="MySwitch" parent="Theme.AppCompat.Light">
+        <item name="colorControlActivated">@color/colorRipple</item>
+        <item name="colorControlNormal">@color/concrete</item>
+    </style>
+
+    <style name="MyFloatingActionButton">
+        <item name="android:layout_marginLeft">0dp</item>
+        <item name="android:layout_marginTop">0dp</item>
+        <item name="android:layout_marginRight">0dp</item>
+        <item name="android:layout_marginBottom">0dp</item>
+    </style>
+</resources>

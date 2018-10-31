@@ -16,7 +16,8 @@ const renderField = ({ input, label, placeholder, type }) => (
   <div>
     <label>{label}</label>
     <div>
-      <input {...input} className={`field-${label} form-control`} placeholder={placeholder} type={type} />
+      <input {...input} id={label} className={`field-${label} form-control`} 
+        placeholder={placeholder} type={type} />
     </div>
   </div>
 );
@@ -58,9 +59,9 @@ class LoginForm extends Component {
     }
 
     if (this.state.isValid) {
-      // if (this.submitted) {
-      //   alert("요청이 전송되었습니다. 잠시만 기다려주세요!");
-      // } else {
+      if (this.submitted) {
+        alert("요청이 전송되었습니다. 잠시만 기다려주세요!");
+      } else {
         this.submitted = true;
         
         const API_URL = `${config.SERVER_HOST}:${config.USER_PORT}/api/users/login`;
@@ -93,7 +94,7 @@ class LoginForm extends Component {
               }
             }
         });
-      // }
+      }
     }
   }
 
@@ -105,7 +106,7 @@ class LoginForm extends Component {
 
   render() {
     const { handleSubmit, submitting } = this.props;
-
+    
     return (
       <Form className='form-wrapper' onSubmit={handleSubmit(this.onSubmit.bind(this))}>
         <h1 className='form-title'>Welcome to DNA!</h1>
@@ -113,12 +114,12 @@ class LoginForm extends Component {
         <div className='login-form-tab'>
           <FormGroup>
             <Field component={renderField} name="id" type="text"
-              label="ID" placeholder="아이디를 입력해주세요." />
+              label="ID" placeholder="아이디를 입력해주세요. (test)" />
             <p className="form-error-tag tag-ID">아이디를 입력해주세요.</p>
           </FormGroup>
           <FormGroup>
             <Field component={renderField} name="password" type="password"
-              label="Password" placeholder="비밀번호를 입력해주세요." />
+              label="Password" placeholder="비밀번호를 입력해주세요. (qwer1234)" />
             <p className="form-error-tag tag-Password">비밀번호를 입력해주세요.</p>
           </FormGroup>
           <Button type='submit' disabled={submitting} className='form-button'>LOG IN</Button>

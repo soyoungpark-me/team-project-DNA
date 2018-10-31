@@ -21,7 +21,6 @@ const helpers = require('./helpers');
 exports.storeAll = (socketId, data) => {
   const idx = data.idx;
   const position = data.position;  
-  const mapKey = helpers.getMapkey(position);
   
   const info = {
     socket: socketId,
@@ -32,18 +31,15 @@ exports.storeAll = (socketId, data) => {
   };
 
   if(idx && idx !== undefined){
-    storeHashMap("client", mapKey, socketId, idx);
-    storeHashMap("info", mapKey, idx, JSON.stringify(info));
-
-    // DM을 위해서 mapKey를 붙이지 않은 유저 정보도 가지고 있어야 합니다.
-    redis.hmset("info", idx, socketId);
-    redis.geoadd(mapKey + "geo", position[0], position[1], idx);
-    redis.hmset("tilemap", socketId, mapKey);
+    storeHashMap("client", socketId, idx);
+    storeHashMap("info", idx, JSON.stringify(info));
+    
+    redis.geoadd("geo", position[0], position[1], idx);
   }      
 }
 
-const storeHashMap = (type, mapKey, key, value) => {
-  redis.hmset(mapKey + type, key, value);
+const storeHashMap = (type, key, value) => {
+  redis.hmset(type, key, value);
   // TYPE       key         value
   // client     socket ID   user idx
   // info       user idx    user info JSON
@@ -64,13 +60,11 @@ const storeHashMap = (type, mapKey, key, value) => {
 exports.findUserInBound = (io, socket, response, event) => {
   return new Promise(async (resolve, reject) => {
     // 먼저 현재 위치를 기반으로 client 리스트를 뽑아옵니다.
-    const position = response.result.position.coordinates;
-    const mapKey = helpers.getMapkey(position);
-    const clientList = await this.returnSessionList("client", position);
+    const clientList = await this.returnSessionList("client");
     
     if (clientList) {
       const next = {
-        clientList, mapKey, response
+        clientList, response
       };
       resolve(next);
     } else {
@@ -83,7 +77,7 @@ exports.findUserInBound = (io, socket, response, event) => {
       Object.keys(next.clientList).forEach(function (key) {
         const idx = next.clientList[key];
 
-        redis.hmget(next.mapKey + "info", idx, (err, result) => {
+        redis.hmget("info", idx, (err, result) => {
           if (err) {
             console.log(err);
             reject();
@@ -124,55 +118,32 @@ exports.findUserInBound = (io, socket, response, event) => {
 };
 
 /* 
-  좌표 값을 주면, 해당 좌표의 타일과 옆 타일의 유저를 찾아 반환하는 함수입니다.
+  redis에 저장되어 있는 세션 값들을 반환합니다.
   @param type     : client, info, geo 중 하나
   @param position : 유저를 찾을 기준이 되는 좌표 값
   @param radius   : (type이 geo일 경우) 반경 값
 */
 exports.returnSessionList = (type, position, radius) => {
-  return new Promise((resolve, reject) => {
-    // 먼저 현재 좌표를 이용해 현재 타일과 추가적으로 살펴야 할 타일을 구합니다.
-    const lng = position[0];
-    const lat = position[1];
-    const lngTile = Math.floor(lng * 10);
-    const latTile = Math.floor(lat * 10);
-    const newLngTile = (lng - Math.floor(lng)) * 10 * 2 > 1 ? lngTile + 1 : lngTile - 1;
-    const newLatTile = (lat - Math.floor(lat)) * 10 * 2 > 1 ? latTile + 1 : latTile - 1;
-
-    const selectKeys = [
-      lngTile + "-" + latTile + type,       // 기본 키
-      lngTile + "-" + newLatTile + type,    // 추가로 찾아야 하는 키 (좌우)
-      newLngTile + "-" + latTile + type     // 추가로 찾아야 하는 키 (상하)
-    ];
-
-    let resultForHash = {};
-    let resultForGeo = [];
-
-    selectKeys.map((key, i) => {
-      // 생성한 키 별로 select해, 결과를 합친 다음 결과를 return 합니다.
-      if (type === "geo") {   // 타입이 geo일 경우엔 GEO API를 사용합니다.
-        redis.georadius(key, lng, lat, radius, "m", (err, positions) => {
-          if (err) {
-            console.log(err);
-            reject(err);
-          }
-          resultForGeo = resultForGeo.concat(positions);
-          resolve(resultForGeo);          
-        });
-      } else {                // 타입이 client이거나 info일 경우엔 hash 사용      
-        redis.hgetall(key, (err, object) => {
-          if (err) {
-            console.log(err);
-            reject(err);
-          }
-          resultForHash = Object.assign(resultForHash, object);  
-          
-          if (i === 2) { // 조회가 모두 끝나면 return!
-            resolve(resultForHash);
-          }
-        });
-      }
-    });
+  return new Promise((resolve, reject) => {    
+    if (type === "geo") {   // 타입이 geo일 경우엔 GEO API를 사용합니다.
+      redis.georadius(type, position[0], position[1], radius, "m", (err, positions) => {
+        if (err) {
+          console.log(err);
+          reject(err);
+        }
+        // resultForGeo = resultForGeo.concat(positions);
+        // resolve(resultForGeo);        
+        resolve(positions);  
+      });
+    } else {                // 타입이 client이거나 info일 경우엔 hash 사용      
+      redis.hgetall(type, (err, object) => {
+        if (err) {
+          console.log(err);
+          reject(err);
+        }
+        resolve(object);
+      });
+    }
   });
 }
 
@@ -202,23 +173,18 @@ exports.returnMapKey = (socketID) => {
   @param socketID : 삭제할 유저의 소켓 ID
 */
 exports.removeSession = async (socketID) => {
-  const mapKey = await this.returnMapKey(socketID);
-  redis.hdel("tilemap", socketID);
-
-  if (mapKey && mapKey !== null) {
-    redis.hmget(mapKey + "client", socketID, (err, result) => {
-      if (err) {
-        console.log(err);                
-      } else {
-        if (result && result.length > 0) {
-          const idx = result[0];
-          if (idx && idx !== null) {
-            redis.zrem(mapKey + "geo", idx);
-            redis.hdel(mapKey + "info", idx);
-          }
+  redis.hmget("client", socketID, (err, result) => {
+    if (err) {
+      console.log(err);                
+    } else {
+      if (result && result.length > 0) {
+        const idx = result[0];
+        if (idx && idx !== null) {
+          redis.zrem("geo", idx);
+          redis.hdel("info", idx);
         }
-        redis.hdel(mapKey + "client", socketID);
       }
-    });
-  }      
+      redis.hdel("client", socketID);
+    }
+  });
 }

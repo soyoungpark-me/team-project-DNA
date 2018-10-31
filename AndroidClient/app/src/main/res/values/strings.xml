@@ -1,0 +1,48 @@
+<resources>
+    <string name="app_name">DNA</string>
+
+    <string name="fa_star">&#xf005;</string>
+    <string name="fa_right">&#xf105;</string>
+    <string name="fa_up">&#xf106;</string>
+    <string name="fa_down">&#xf107;</string>
+    <string name="fa_arrow_up">&#xf062;</string>
+    <string name="fa_arrow_down">&#xf063;</string>
+    <string name="fa_caret_left">&#xf0d9;</string>
+
+    <string name="fa_crown">&#xf521;</string>
+
+    <string name="fa_menu">&#xf0c9;</string>
+    <string name="fa_find">&#xf002;</string>
+    <string name="fa_friend">&#xf500;</string>
+
+    <string name="fa_image">&#xf302;</string>
+    <string name="fa_send">&#xf124;</string>
+    <string name="fa_compass">&#xf14e;</string>
+    <string name="fa_speaker">&#xf028;</string>
+
+    <string name="fa_pen">&#xf305;</string>
+    <string name="fa_setting">&#xf013;</string>
+    <string name="fa_home">&#xf015;</string>
+    <string name="fa_frpf">&#xf044;</string>
+    <string name="fa_clock">&#xf017;</string>
+    <string name="fa_circle">&#xf111;</string>
+
+    <string name="fa_chat">&#xf075;</string>
+    <string name="fa_friends">&#xf0c0;</string>
+    <string name="fa_notify">&#xf0f3;</string>
+    <string name="fa_profile">&#xf2bd;</string>
+
+    <string name="fa_like">&#xf164;</string>
+    <string name="fa_share">&#xf1e0;</string>
+    <string name="fa_scrap">&#xf02e;</string>
+
+    <string name="fa_accepted">&#xf46c;</string>
+    <string name="fa_envelop">&#xf658;</string>
+
+    <string name="fa_x">&#xf00d;</string>
+    <string name="fa_marker">&#xf3c5;</string>
+    <string name="fa_radius">&#xf31e;</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>

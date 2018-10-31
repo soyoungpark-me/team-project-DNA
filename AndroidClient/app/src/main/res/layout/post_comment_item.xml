@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:id="@+id/msgContainer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
+
+    <android.support.v7.widget.CardView
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:elevation="12dp"
+        android:layout_marginRight="7dp"
+        app:cardCornerRadius="20dp">
+        <ImageView
+            android:id="@+id/commentAvatar"
+            android:layout_height="38dp"
+            android:layout_width="match_parent"
+            android:src="@drawable/avatar">
+        </ImageView>
+    </android.support.v7.widget.CardView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/commentNickname"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:textSize="15dp"
+                android:textColor="@color/grayDarker"
+                android:tag="nsb" />
+
+            <TextView
+                android:id="@+id/commentDate"
+                android:textColor="@color/grayText"
+                android:textSize="11dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true" />
+
+        </RelativeLayout>
+        <TextView
+            android:id="@+id/commentContent"
+            android:textColor="@color/grayDark"
+            android:textSize="15dp"
+            android:gravity="center_vertical"
+            android:lineSpacingMultiplier="1.15"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</LinearLayout>

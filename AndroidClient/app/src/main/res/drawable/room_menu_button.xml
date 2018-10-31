@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_selected="true"
+        android:drawable="@drawable/room_menu_selected" /> <!-- pressed -->
+    <item android:state_selected="false"
+        android:drawable="@drawable/room_menu_not_selected" /> <!-- default -->
+</selector>

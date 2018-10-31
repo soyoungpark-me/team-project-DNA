@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".friend.fragments.RoomFragment">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_marginTop="7dp"
+        android:layout_marginBottom="7dp"
+        android:layout_marginLeft="15dp"
+        android:textSize="13dp"
+        android:textColor="@color/grayText"
+        android:text="다이렉트 메시지"
+        android:tag="nseb"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/clouds" />
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/concrete" />
+
+    <ListView
+        android:id="@+id/roomList"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="@color/clouds"
+        android:dividerHeight="1dp"/>
+
+</LinearLayout>

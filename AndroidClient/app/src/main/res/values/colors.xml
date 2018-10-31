@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimaryLighter">#E0DCEA</color>
+    <color name="colorPrimaryLight">#7B68A1</color>
+    <color name="colorPrimary">#634C89</color>
+    <color name="colorPrimaryDark">#543e75</color>
+    <color name="colorPrimaryDarker">#422e63</color>
+    <color name="colorAccent">#E71D36</color>
+    <color name="button">#dce73e</color>
+    <color name="colorRipple">#b4be1b</color>
+
+    <color name="colorChatPurple">#6632B5</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="ivory">#fafafa</color>
+    <color name="grayLighter">#d5d9da</color>
+    <color name="grayLight">#9aa0a1</color>
+    <color name="grayText">#7a7f80</color>
+    <color name="gray">#454545</color>
+    <color name="grayDark">#2e2e2e</color>
+    <color name="grayDarker">#26262B</color>
+    <color name="black">#000000</color>
+    <color name="green">#00A000</color>
+    <color name="yellow">#FFA700</color>
+    <color name="red">#D62D20</color>
+
+    <color name="tuquqise">#54B59A</color>
+    <color name="greensea">#479A83</color>
+    <color name="emerald">#64C271</color>
+    <color name="nephritis">#55A560</color>
+    <color name="river">#489AD8</color>
+    <color name="belize">#5F9AC5</color>
+    <color name="amethyst">#9168B5</color>
+    <color name="wisteria">#8357AC</color>
+    <color name="midnightblue">#2E3E4F</color>
+    <color name="sunflower">#EDC233</color>
+    <color name="orange">#EA9F34</color>
+    <color name="carrot">#DB8438</color>
+    <color name="pumkin">#C76026</color>
+    <color name="alizarin">#D95F49</color>
+    <color name="pomegrante">#B44B37</color>
+    <color name="clouds">#EDF0F1</color>
+    <color name="silver">#BEC3C7</color>
+    <color name="concrete">#97A4A6</color>
+    <color name="asbestos">#818B8D</color>
+</resources>

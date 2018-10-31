@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-const paginationCount = require('../utils/config').pagination_count;
-
 let Schema = {};
 
 Schema.createSchema = (mongoose) => {

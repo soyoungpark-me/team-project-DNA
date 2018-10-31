@@ -24,7 +24,7 @@ require('./routes')(app);
 // 크로스 도메인 문제를 해결하고 production 모드의 경우 https를 적용합니다.
 let server, corsOptions;
 switch(process.env.NODE_ENV){
-  case 'development':    
+  case 'development':        
     corsOptions = {
       origin: 'http://localhost:9010',
       credentials : true

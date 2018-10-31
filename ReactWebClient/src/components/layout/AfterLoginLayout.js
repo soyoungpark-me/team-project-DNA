@@ -76,6 +76,7 @@ class MyComponent extends Component {
       const profile = this.props.profile;
 
       let info = {
+        token   : JSON.parse(sessionStorage.getItem("token")).accessToken,
         idx     : profile.idx,                  // 현재 유저의 인덱스 값
         nickname: profile.nickname,             // 현재 유저의 별명
         avatar  : profile.avatar,               // 현재 유저의 프로필 사진 주소
@@ -107,9 +108,13 @@ class MyComponent extends Component {
         this.props.setUserList(data);
       });
 
+      // update에 대한 응답으로 현재 접속한 유저 리스트를 받아와 state에 매핑합니다.
+      socket.on("direct", (data) => {
+        this.props.setUserList(data);
+      });
+
       // 확성기 이벤트를 받았을 경우, 푸시 메시지를 생성합니다.
       socket.on("speaker", (data) => {
-        console.log(data);
         this.makePushNoti(data);
       });
     }

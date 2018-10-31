@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/ivory">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:gravity="center_vertical"
+            android:background="@drawable/layout_border_bottom">
+
+            <ImageButton
+                android:id="@+id/backBtn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/transparent"
+                android:src="@drawable/back"
+                android:layout_marginLeft="15dp"
+                android:onClick="onClick" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:textColor="@color/colorPrimary"
+                android:textSize="18dp"
+                android:text="친구 관리"
+                android:tag="nseb"/>
+
+            <ImageButton
+                android:id="@+id/menuBtn"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:scaleType="fitXY"
+                android:background="@drawable/menu"
+                android:src="@drawable/menu"
+                android:layout_marginTop="1dp"
+                android:layout_marginRight="15dp"
+                android:layout_alignParentRight="true"
+                android:onClick="onClick" />
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            android:background="@color/clouds">
+
+            <Button
+                android:id="@+id/roomBtn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:background="@drawable/room_menu_button"
+                android:textColor="@color/room_menu_color"
+                android:textSize="20dp"
+                android:text="@string/fa_chat"
+                android:paddingBottom="5dp"
+                android:tag="0fas" />
+
+            <Button
+                android:id="@+id/friendBtn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:background="@drawable/room_menu_button"
+                android:textColor="@color/room_menu_color"
+                android:textSize="20dp"
+                android:text="@string/fa_friends"
+                android:paddingBottom="5dp"
+                android:tag="1fas" />
+
+            <Button
+                android:id="@+id/notifyBtn"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent"
+                android:background="@drawable/room_menu_button"
+                android:textColor="@color/room_menu_color"
+                android:textSize="20dp"
+                android:text="@string/fa_notify"
+                android:paddingBottom="5dp"
+                android:tag="2fas" />
+        </LinearLayout>
+
+        <!--<FrameLayout-->
+            <!--android:id="@+id/roomFragContainer"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="match_parent" />-->
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/roomFragContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/ll">
+        </android.support.v4.view.ViewPager>
+    </LinearLayout>
+
+    <include
+        android:id="@+id/right_drawer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="right"
+        android:choiceMode="singleChoice"
+        layout="@layout/layout_drawer" />
+</android.support.v4.widget.DrawerLayout>

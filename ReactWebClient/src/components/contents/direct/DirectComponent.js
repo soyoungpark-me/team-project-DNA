@@ -8,19 +8,12 @@ import styles from './../styles.css';
 import ConversationList from './Conversations/ConversationList';
 import DirectMessageList from './DirectMessageList';
 import UserList from './../../common/ccu/UserList';
-import { timingSafeEqual } from 'crypto';
 
 function mapStateToProps(state) {
   return {
     profile: state.user.profile
   };
 }
-
-const Initial = () => (
-  <div className="message-list-wrapper">
-    empty
-  </div>
-);
 
 export class DirectComponent extends Component {
   constructor(props){

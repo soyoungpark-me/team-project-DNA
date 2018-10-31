@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="horizontal"
+    android:id="@+id/msgContainer"
+    android:layout_width="match_parent"
+    android:layout_height="63dp"
+    android:gravity="center_vertical"
+    android:paddingLeft="15dp"
+    android:paddingRight="15dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="23dp">
+
+            <TextView
+                android:id="@+id/postTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:textSize="15dp"
+                android:textColor="@color/grayDarker" />
+
+            <TextView
+                android:id="@+id/postDate"
+                android:textColor="@color/grayText"
+                android:textSize="11dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true" />
+
+        </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="24dp">
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/postLikeCntIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:textColor="@color/alizarin"
+                    android:textSize="15dp"
+                    android:text="@string/fa_like"
+                    android:tag="fas"/>
+
+                <TextView
+                    android:id="@+id/postLikeCntText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@color/grayText"
+                    android:textSize="13dp" />
+
+                <TextView
+                    android:id="@+id/postCommentCntIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:textColor="@color/greensea"
+                    android:textSize="15dp"
+                    android:text="@string/fa_chat"
+                    android:tag="fas"/>
+
+                <TextView
+                    android:id="@+id/postCommentCntText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@color/grayText"
+                    android:textSize="13dp" />
+
+                <TextView
+                    android:id="@+id/postScrapCntIcon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="5dp"
+                    android:textColor="@color/sunflower"
+                    android:textSize="13dp"
+                    android:text="@string/fa_scrap"
+                    android:tag="fas"/>
+
+                <TextView
+                    android:id="@+id/postScrapCntText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@color/grayText"
+                    android:textSize="15dp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/bookmarkDeleteBtn"
+                android:layout_width="45dp"
+                android:layout_height="24dp"
+                android:layout_alignParentRight="true"
+                android:visibility="invisible"
+                android:background="@drawable/layout_button_bookmark_delete"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/bookmarkDeleteBtnText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="3dp"
+                    android:textColor="@color/white"
+                    android:textSize="12dp"
+                    android:text="@string/fa_x" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/white"
+                    android:textSize="12dp"
+                    android:text="삭제"
+                    android:tag="nsb" />
+
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.nhn.android.maps.NMapView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/mapView"/>
+
+    <LinearLayout
+        android:id="@+id/mapLocationBtn"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:gravity="center"
+        android:onClick="onClick">
+        <LinearLayout
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/layout_button_map">
+            <TextView
+                android:id="@+id/mapSizeAngle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="@color/concrete"
+                android:textSize="18dp"
+                android:text="@string/fa_compass"
+                android:tag="fas"/>
+        </LinearLayout>
+    </LinearLayout>
+</RelativeLayout>

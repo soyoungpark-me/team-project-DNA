@@ -1,9 +1,8 @@
 const validator = require('validator');
+const fetch = require('node-fetch');
 
 const messageModel = require('../models/MessageModel');
-const userModel = require('../models/UserModel');
 const authModel = require('../models/AuthModel');
-const helpers = require('../utils/helpers');
 
 let validationError = {
   name:'ValidationError',
@@ -63,6 +62,10 @@ exports.save = (token, param) => {
 
       let response = '';
 
+      const messageData = {
+        idx, id, nickname, avatar, lng, lat, type, contents, testing
+      };   
+
       if (!testing && type === "LoudSpeaker") { 
         // 확성기일 경우 해당 유저의 잔여 point를 조회합니다.
         // 테스트 환경일 경우에는 체크하지 않습니다.
@@ -70,50 +73,88 @@ exports.save = (token, param) => {
         let points = 0;
 
         try {
-          points = await userModel.selectPoints(idx);      
+          fetch(process.env.USER_SERVER + "/users/point/" + idx, {
+            method: "GET",
+            headers: {"token": token, 'Content-Type': 'application/json' },
+            withCredentials: true,
+            mode: 'no-cors'
+          })
+          .then(res => res.json())
+          .then((response) => {
+            if (response.status === 200) {
+              if (response.result.points < 100) { // 포인트가 100보다 모자랄 경우엔 보낼 수 없다.
+                response = {
+                  status: 401,
+                  message: "Not enough points",
+                  result: { points }        
+                };
+                reject();
+              } else {                
+                resolve(messageData);
+              }
+            } else {
+              reject();
+            }
+          }); 
         } catch (err) {
           // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
           reject(err);
-        }
-
-        if (points < 100) { // 포인트가 100보다 모자랄 경우엔 보낼 수 없다.
+        }        
+      } else {
+        resolve(messageData);
+      }
+    })
+    .then((messageData) => {
+      return new Promise(async (resolve, reject) => {
+        // 3. DB에 저장하기     
+        
+        try {
+          result = await messageModel.save(messageData); 
+        } catch (err) {
+          // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
+          reject(err);
+        } finally {
+          if (messageData.type == 'LoudSpeaker') { // 확성기일 경우 포인트를 차감합니다.
+            try {
+              fetch(process.env.USER_SERVER + "/users/point/" + messageData.idx, {
+                method: "PUT",
+                headers: {"token": token, 'Content-Type': 'application/json' },
+                withCredentials: true,
+                mode: 'no-cors'
+              })
+              .then(res => res.json())
+              .then((response) => {
+                if (response.status === 201) {
+                  resolve(result);
+                } else {
+                  reject();
+                }
+              });
+            } catch (err) {
+              // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
+              reject(err);
+            }
+          } else {
+            resolve(result);
+          }
+        }       
+      });
+    })
+    .then((result) => {
+      return new Promise((resolve, reject) => {
+        if (result) { 
           response = {
-            status: 401,
-            message: "Not enough points",
-            result: { points }        
+            status: 201,
+            message: "Save Message Successfully",
+            result
           };
+          // 4 등록 성공! 소켓으로 다시 반대로 쏴줘야 합니다.
+          resolve(response);
+        } else {
           reject();
         }
-      }
-
-      // 3. DB에 저장하기
-      const messageData = {
-        idx, id, nickname, avatar, lng, lat, type, contents, testing
-      };    
-      
-      try {
-        result = await messageModel.save(messageData); 
-      } catch (err) {
-        // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-        reject(err);
-      } finally {
-        if (type == 'LoudSpeaker') { // 확성기일 경우 포인트를 차감합니다.
-          try {
-            await userModel.reducePoints(idx);      
-          } catch (err) {
-            // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-            reject(err);
-          }
-        }
-      }
-      response = {
-        status: 201,
-        message: "Save Message Successfully",
-        result
-      };
-      // 4 등록 성공! 소켓으로 다시 반대로 쏴줘야 합니다.
-      resolve(response);
-    });
+      })
+    })   
   });
 };
 
@@ -164,36 +205,50 @@ exports.selectOne = async (req, res, next) => {
  *  selectAll
  *  @param: page
  ********************/
-exports.selectAll = async (req, res, next) => {
-  /* PARAM */
-  const idx = req.userData.idx;
-  const page = req.body.page || req.params.page;
-  
-  // 1. 차단 리스트 끌고 오기
-  let blocks = '';
-  try {
-    blocks = await userModel.selectBlock(idx);
-  } catch (err) {
-    // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-    return next(err);
-  }
+exports.selectAll = (req, res, next) => {
+  return new Promise((resolve, reject) => {
+    // 1. 차단 리스트 끌고 오기
+    fetch(process.env.USER_SERVER + "/users/block", {
+      method: "GET",
+      headers: {"token": req.headers.token, 'Content-Type': 'application/json' },
+      withCredentials: true,
+      mode: 'no-cors'
+    })
+    .then(res => res.json())
+    .then((response) => {
+      if (response.status === 200) {
+        result = [];
+        for (let i = 0; i<response.result.length; i++) {          
+          result.push(response.result[i].block_idx);
+        }
+        resolve(result);
+      } else {
+        reject();
+      }
+    })
+  }).then((blocks) => {
+    return new Promise(async () => {
+      /* PARAM */
+      const page = req.body.page || req.params.page;
+    
+      // 2. DB에서 끌고 오기
+      let result = '';
+      try {
+        result = await messageModel.selectAll(blocks, page);
+      } catch (err) {
+        // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
+        return next(err);
+      }
 
-  // 2. DB에서 끌고 오기
-  let result = '';
-  try {
-    result = await messageModel.selectAll(blocks, page);
-  } catch (err) {
-    // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-    return next(err);
-  }
-
-  // 2. 조회 성공
-  const respond = {
-    status: 200,
-    message : "Select Messages Successfully",
-    result: result
-  };
-  return res.status(200).json(respond);
+      // 2. 조회 성공
+      const respond = {
+        status: 200,
+        message : "Select Messages Successfully",
+        result: result
+      };
+      return res.status(200).json(respond);
+    });
+  });
 }
 
 
@@ -202,62 +257,76 @@ exports.selectAll = async (req, res, next) => {
  *  @param: lng, lat, radius, page
  ********************/
 exports.selectCircle = async (req, res, next) => {
-  /* PARAM */
-  const idx = req.userData.idx;
-  const lng = req.body.lng || req.params.lng;
-  const lat = req.body.lat || req.params.lat;
-  const radius = req.body.radius || req.params.radius;
-  const page = req.body.page || req.params.page;  
-  /* 1. 유효성 체크하기 */
-  let isValid = true;
+  return new Promise((resolve, reject) => {
+    // 1. 차단 리스트 끌고 오기
+    fetch(process.env.USER_SERVER + "/users/block", {
+      method: "GET",
+      headers: {"token": req.headers.token, 'Content-Type': 'application/json' },
+      withCredentials: true,
+      mode: 'no-cors'
+    })
+    .then(res => res.json())
+    .then((response) => {
+      if (response.status === 200) {
+        result = [];
+        for (let i = 0; i<response.result.length; i++) {          
+          result.push(response.result[i].block_idx);
+        }
+        resolve(result);
+      } else {
+        reject();
+      }
+    })
+  }).then((blocks) => {
+    return new Promise(async () => {
+      /* PARAM */      
+      const lng = req.body.lng || req.params.lng;
+      const lat = req.body.lat || req.params.lat;
+      const radius = req.body.radius || req.params.radius;
+      const page = req.body.page || req.params.page;  
+      /* 1. 유효성 체크하기 */
+      let isValid = true;
 
-  if (!lng || lng === '' || lng === undefined) {
-    isValid = false;
-    validationError.errors.lng = { message : "Longitude is required" };
-  }
+      if (!lng || lng === '' || lng === undefined) {
+        isValid = false;
+        validationError.errors.lng = { message : "Longitude is required" };
+      }
 
-  if (!lat || lat === '' || lat === undefined) {
-    isValid = false;
-    validationError.errors.lat = { message : "Latitude is required" };
-  }
+      if (!lat || lat === '' || lat === undefined) {
+        isValid = false;
+        validationError.errors.lat = { message : "Latitude is required" };
+      }
 
-  if (!radius || radius === '' || radius === undefined) {
-    isValid = false;
-    validationError.errors.radius = { message : "Radius is required" };
-  }
+      if (!radius || radius === '' || radius === undefined) {
+        isValid = false;
+        validationError.errors.radius = { message : "Radius is required" };
+      }
 
-  if (!isValid) return res.status(400).json(validationError);
-  /* 유효성 체크 끝 */
+      if (!isValid) return res.status(400).json(validationError);
+      /* 유효성 체크 끝 */
 
-  // 2. 차단 리스트 끌고 오기
-  let blocks = '';
-  try {
-    blocks = await userModel.selectBlock(idx);
-  } catch (err) {
-    // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-    return next(err);
-  }
+      // 3. DB에서 끌고 오기
+      let result = '';
+      try {
+        const conditions = {
+          lng, lat, radius
+        };
 
-  // 3. DB에서 끌고 오기
-  let result = '';
-  try {
-    const conditions = {
-      lng, lat, radius
-    };
+        result = await messageModel.selectCircle(conditions, blocks, page);
+      } catch (error) {
+        // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
+        return next(error);
+      }
 
-    result = await messageModel.selectCircle(conditions, blocks, page);
-  } catch (error) {
-    // TODO 에러 잡았을때 응답메세지, 응답코드 수정할것
-    return next(error);
-  }
-
-  // 4. 조회 성공
-  const respond = {
-    status: 200,
-    message : "Select Messages Successfully",
-    result
-  };
-  return res.status(200).json(respond);
+      // 4. 조회 성공
+      const respond = {
+        status: 200,
+        message : "Select Messages Successfully",
+        result
+      };
+      return res.status(200).json(respond);
+    });
+  });
 };
 
 

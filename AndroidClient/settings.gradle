@@ -1,0 +1,1 @@
+include ':app', ':apache-mime4j-core-0.8.2', ':httpmime-4.3.5', ':httpclient-4.5.6', ':httpcore-4.4.10'

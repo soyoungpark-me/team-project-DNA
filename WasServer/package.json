@@ -1,0 +1,28 @@
+{
+  "name": "WASserver",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "start": "NODE_ENV=development nodemon ./app",
+    "dev": "NODE_ENV=development node ./app",
+    "deploy": "NODE_ENV=production node ./app"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "cors": "^2.8.4",
+    "crypto": "^1.0.1",
+    "debug": "~2.6.9",
+    "dotenv": "^6.0.0",
+    "express": "~4.15.5",
+    "jsonwebtoken": "^8.3.0",
+    "morgan": "~1.9.0",
+    "mysql": "^2.15.0",
+    "node-cron": "^1.2.1",
+    "node-fetch": "^2.2.0",
+    "redis": "^2.8.0",
+    "serve-favicon": "~2.4.5",
+    "validator": "^10.5.0"
+  }
+}

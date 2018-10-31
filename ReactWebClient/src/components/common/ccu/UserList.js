@@ -67,13 +67,23 @@ class UserList extends Component {
       );
     } else if (this.props.users) {
       if (this.props.users.length <= 1) {
-        contents = (
-          <div className="message-list-empty user">
-            <span className="ti-face-sad" />
-            <p className="user-list-empty">근처에 아직</p>
-            <p>접속한 유저가 없습니다</p>
-          </div>
-        );
+        if (this.props.type === "main") {
+          contents = (
+            <div className="message-list-empty user">
+              <span className="ti-face-sad" />
+              <p className="user-list-empty">근처에 아직</p>
+              <p>접속한 유저가 없습니다</p>
+            </div>
+          );
+        } else {
+          contents = (
+            <div className="message-list-empty user">
+              <span className="ti-face-sad" />
+              <p className="user-list-empty">친구 중 아직</p>
+              <p>접속한 유저가 없습니다</p>
+            </div>
+          );
+        }
       } else {
         contents = this.renderUsers();
       }

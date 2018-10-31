@@ -143,7 +143,7 @@ exports.like = (userIdx, messageIdx) => {
             resolve(result);    
           }
         });
-      } else { // 빼야 한다.
+      } else {        // 빼야 한다.
         mongo.messageModel.dislike(userIdx, messageIdx, (err, result) => {
           if (err) {
             const customErr = new Error("Error occrred Pop likes list: " + err);

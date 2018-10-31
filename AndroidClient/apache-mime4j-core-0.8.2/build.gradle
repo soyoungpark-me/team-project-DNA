@@ -1,0 +1,2 @@
+configurations.maybeCreate("default")
+artifacts.add("default", file('apache-mime4j-core-0.8.2.jar'))
