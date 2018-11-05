@@ -1,0 +1,18 @@
+{
+	"sort": [ { "created_at": "desc" } ],
+	"query": {
+		"bool": {
+			"must": {
+				"query_string": { 
+					"query": "contents:*"
+				}
+			},
+			"filter": {
+				"geo_distance": {
+					"distance": "120km",
+					"location.coordinates": [127,37]
+				}
+			}
+		}
+	}
+}

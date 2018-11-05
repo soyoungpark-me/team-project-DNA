@@ -42,16 +42,16 @@
         android:layout_alignParentRight="true"
         android:tag="fas"/>
 
-    <ImageButton
-        android:id="@+id/addFriendBtn"
-        android:layout_width="40dp"
-        android:layout_height="24dp"
-        android:layout_marginRight="45dp"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:padding="0dp"
-        android:scaleType="fitXY"
-        android:background="@drawable/layout_border_rounded"
-        android:src="@drawable/add_friend"
-        android:onClick="onClick" />
+    <!--<ImageButton-->
+        <!--android:id="@+id/addFriendBtn"-->
+        <!--android:layout_width="40dp"-->
+        <!--android:layout_height="24dp"-->
+        <!--android:layout_marginRight="45dp"-->
+        <!--android:layout_centerVertical="true"-->
+        <!--android:layout_alignParentRight="true"-->
+        <!--android:padding="0dp"-->
+        <!--android:scaleType="fitXY"-->
+        <!--android:background="@drawable/layout_border_rounded"-->
+        <!--android:src="@drawable/add_friend"-->
+        <!--android:onClick="onClick" />-->
 </RelativeLayout>

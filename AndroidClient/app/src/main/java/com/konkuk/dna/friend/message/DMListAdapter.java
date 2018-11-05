@@ -37,6 +37,10 @@ public class DMListAdapter extends ArrayAdapter<DMMessage> {
     private final String TYPE_IMAGE = "Image";         // 이미지 전송
     private final String TYPE_SHARE = "Share";         // 포스팅 공유
 
+    private final int VTYPE_MINE = 0;
+    private final int VTYPE_OTHER_AVATAR = 1;
+    private final int VTYPE_OTHER_NONE = 2;
+
     public DMListAdapter(@NonNull Context context, int resource, @NonNull ArrayList<DMMessage> objects) {
         super(context, resource, objects);
 
@@ -69,26 +73,47 @@ public class DMListAdapter extends ArrayAdapter<DMMessage> {
     public View getView(int position, @Nullable View v, @NonNull ViewGroup parent) {
         DMMessage message = messages.get(position);
 
+        v = null;
         if (v == null) {
             LayoutInflater layoutInflater = (LayoutInflater)
                     context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             // TODO 해당 메시지의 작성자가 현재 접속한 유저인지를 판별해 left, right를 정해줘야 합니다.
             // TODO 상대방이 작성했으면서 '최초 메시지'일 경우에는 프로필 이미지를 보여줘야 합니다.
 
-            if (position == 0 || position == 6) { // 프로필 이미지를 포함하는 부분
-                v = layoutInflater.inflate(R.layout.chat_item_with_avatar, null);
-
-
-                ImageView messageAvatar = (ImageView) v.findViewById(R.id.msgAvatar);
-//                if (message.getAvatar() != null) {
-//                    Picasso.get().load(message.getAvatar()).into(messageAvatar);
-//                }
-
-            } else if (position < 3 || position > 6) { // 프로필 이미지 없는 상대 메시지
-                v = layoutInflater.inflate(R.layout.chat_item_left, null);
-            } else {                                   // 내 메시지
+            if(message.getViewType() == VTYPE_MINE){
                 v = layoutInflater.inflate(R.layout.chat_item_right, null);
             }
+            else if(message.getViewType() == VTYPE_OTHER_AVATAR){
+                v = layoutInflater.inflate(R.layout.chat_item_with_profile, null);
+
+                TextView messageNickname = (TextView) v.findViewById(R.id.msgNickname);
+                messageNickname.setText(message.getNickname());
+                messageNickname.setTypeface(NSB);
+
+                ImageView messageAvatar = (ImageView) v.findViewById(R.id.msgAvatar);
+
+                if (message.getAvatar() != null) {
+                    Picasso.get().load(message.getAvatar()).into(messageAvatar);
+                }
+            }
+            else if(message.getViewType() == VTYPE_OTHER_NONE){
+                v = layoutInflater.inflate(R.layout.chat_item_left, null);
+            }
+//
+//            if (position == 0 || position == 6) { // 프로필 이미지를 포함하는 부분
+//                v = layoutInflater.inflate(R.layout.chat_item_with_avatar, null);
+//
+//
+//                ImageView messageAvatar = (ImageView) v.findViewById(R.id.msgAvatar);
+////                if (message.getAvatar() != null) {
+////                    Picasso.get().load(message.getAvatar()).into(messageAvatar);
+////                }
+//
+//            } else if (position < 3 || position > 6) { // 프로필 이미지 없는 상대 메시지
+//                v = layoutInflater.inflate(R.layout.chat_item_left, null);
+//            } else {                                   // 내 메시지
+//                v = layoutInflater.inflate(R.layout.chat_item_right, null);
+//            }
         }
 
         LinearLayout messageLikeWrapper = (LinearLayout) v.findViewById(R.id.likeWrapper);

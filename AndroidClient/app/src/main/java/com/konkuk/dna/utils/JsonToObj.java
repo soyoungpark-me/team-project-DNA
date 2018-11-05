@@ -6,12 +6,15 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.konkuk.dna.chat.ChatMessage;
+import com.konkuk.dna.chat.ChatUser;
+import com.konkuk.dna.friend.message.DMMessage;
 import com.konkuk.dna.friend.message.DMRoom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import static com.konkuk.dna.utils.ConvertType.DatetoStr;
+import static com.konkuk.dna.utils.ConvertType.getStringAddQuote;
 import static com.konkuk.dna.utils.ConvertType.getStringNoQuote;
 
 public class JsonToObj {
@@ -145,6 +148,7 @@ public class JsonToObj {
         JsonObject jsonObject = (JsonObject) jsonParser.parse(jsonResult);
 
         ArrayList<Integer> whoLikes = new ArrayList<>();
+        boolean amILike = false;
         int user_idx;
         String nickname, avatar, position, like_count;
         double lng, lat;
@@ -176,8 +180,12 @@ public class JsonToObj {
 
                 like_count = oneObject.get("like_count").toString();
                 JsonArray wholikesArray = (JsonArray) oneObject.get("likes");
+                amILike = false;
                 for(int j=0; j<wholikesArray.size(); j++){
                     whoLikes.add(Integer.parseInt(wholikesArray.get(j).toString()));
+                    if(whoLikes.get(j) == myIdx){
+                        amILike = true;
+                    }
                 }
 
                 _id = getStringNoQuote(oneObject.get("_id").toString());
@@ -222,10 +230,7 @@ public class JsonToObj {
 
                 prev_idx = user_idx;
 
-                Log.e(msg_type, resultArray.get(i).toString());
-
-                //Log.e("!!!", user_idx+"/"+nickname+"/"+avatar+"/"+contents+"/"+created_at+"/"+like_count+"/"+msg_type+"/"+msg_idx);
-                chatMessages.add(new ChatMessage(user_idx, nickname, avatar, contents, DatetoStr(created_at), like_count, msg_type, lng, lat, whoLikes, msg_idx, viewType));
+                chatMessages.add(new ChatMessage(user_idx, nickname, avatar, contents, DatetoStr(created_at), like_count, msg_type, lng, lat, whoLikes, msg_idx, viewType, amILike));
 
             }
         }else{
@@ -234,6 +239,83 @@ public class JsonToObj {
         }
 
         return chatMessages;
+    }
+
+
+    /*
+     * DM 방 채팅 리스트 조회
+     * */
+    public static ArrayList<DMMessage> DMMsgJsonToObj(int myIdx, String nickname, String jsonResult){
+        //Log.e("DM MSG", jsonResult);
+        ArrayList<DMMessage> dmMessages = new ArrayList<>();
+        String type="", created_at="", _id, contents="";
+        String avatar;
+        int sender_idx=-1;
+
+        // 이전 메세지의 idx확인
+        int prev_idx = -1;
+        // 내꺼, 너꺼, 사진있는 너꺼
+        int viewType=-1;
+
+
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jsonParser.parse(jsonResult);
+
+        if(jsonObject.get("status")!=null && jsonObject.get("status").toString().equals("200")) {
+            JsonObject resultObject = (JsonObject) jsonObject.get("result");
+            avatar = getStringNoQuote(resultObject.get("avatar").toString());
+
+            JsonArray dmsArray = (JsonArray) resultObject.get("DMs");
+            for(int i=0; i<dmsArray.size(); i++){
+                JsonObject oneDMObject = (JsonObject) dmsArray.get(i);
+                type = getStringNoQuote(oneDMObject.get("type").toString());
+                created_at = getStringNoQuote(oneDMObject.get("created_at").toString());
+                _id = getStringNoQuote(oneDMObject.get("_id").toString());
+                sender_idx = Integer.parseInt(oneDMObject.get("sender_idx").toString());
+                contents = getStringNoQuote(oneDMObject.get("contents").toString());
+
+                if(myIdx == sender_idx){
+                    //지금 메세지가 내 메세지이면
+                    if(i!=0 && prev_idx!=sender_idx) {
+                        // 이전에 있던 메시지가 다른사람것이라면 프로필이 필요해! 물론 내메세지가 리스트의 마지막이 아니였다면
+                        DMMessage tmp = dmMessages.get(dmMessages.size()-1);
+                        tmp.setViewType(1);
+                        dmMessages.remove(dmMessages.size()-1);
+                        dmMessages.add(tmp);
+                    }
+                    viewType = 0;
+
+                }else{
+                    //지금 메세지가 남의 메세지라면
+                    if(i == dmsArray.size()-1){
+                        // 그지역의 첫번째 메세지이면 지금 메세지에 프로필 필요
+
+                        viewType = 1;
+
+                    }else if(i!=0 && prev_idx!=sender_idx && prev_idx != myIdx){
+                        // 이전사람이 내가 아니고 지금메세지와도 다른 사람의 메세지면 프로필 필요
+                        DMMessage tmp = dmMessages.get(dmMessages.size()-1);
+                        tmp.setViewType(1);
+                        dmMessages.remove(dmMessages.size()-1);
+                        dmMessages.add(tmp);
+
+                        viewType = 2;
+                    }else{
+                        //
+                        viewType = 2;
+                    }
+                }
+
+                prev_idx = sender_idx;
+
+                dmMessages.add(new DMMessage(sender_idx, contents, DatetoStr(created_at), type, viewType, avatar, nickname));
+            }
+        }
+        else{
+            Log.e("!!!=", "SERVER ERROR, CANNOT RECEIVE MSG.");
+            dmMessages = null;
+        }
+        return dmMessages;
     }
 
     /*
@@ -270,8 +352,9 @@ public class JsonToObj {
 
                 JsonArray usersarray = (JsonArray) oneObject.get("users");
                 for(int j=0; j<2; j++){
-                    JsonObject userObject = (JsonObject) usersarray.get(i);
+                    JsonObject userObject = (JsonObject) usersarray.get(j);
                     if(myIdx == Integer.parseInt(userObject.get("idx").toString())){
+
                         m__id =  getStringNoQuote(userObject.get("_id").toString());
                         m_idx = Integer.parseInt(userObject.get("idx").toString());
                         m_nickname =  getStringNoQuote(userObject.get("nickname").toString());
@@ -286,12 +369,17 @@ public class JsonToObj {
                 created_at = getStringNoQuote(oneObject.get("created_at").toString());
                 updated_at = getStringNoQuote(oneObject.get("updated_at").toString());
                 __v = Integer.parseInt(oneObject.get("__v").toString());
-//                last_message = getStringNoQuote(oneObject.get("last_message").toString()); // NullPointerException 발생
+
                 last_message = "";
-                last_type = getStringNoQuote(oneObject.get("last_type").toString());
+                if (oneObject.get("last_message")!=null) {
+                    last_message = getStringNoQuote(oneObject.get("last_message").toString());
+                }
 
+                last_type = "";
+                if (oneObject.get("last_type")!=null) {
+                    last_type = getStringNoQuote(oneObject.get("last_type").toString());
+                }
 
-                Log.e(f_nickname,last_message);
                 // TODO 멤버변수에 대한 설명이 필요함
                 Dmrooms.add(new DMRoom(room_idx, f_idx, f_nickname, f_avatar, last_message, last_type, DatetoStr(updated_at)));
             }
@@ -302,4 +390,37 @@ public class JsonToObj {
 
         return Dmrooms;
     }
+
+
+    /*
+     * 현재 접속 멤버 홛인 Json변환 메소드
+     * */
+    public static ArrayList<ChatUser> ConnectUserJsonToObj(String jsonResult, int myIdx){
+
+        ArrayList<ChatUser> result= new ArrayList<>();
+        int idx;
+        String nickname, avatar;
+        boolean inside;
+
+        JsonParser jsonParser = new JsonParser();
+        JsonArray jsonArray = (JsonArray) jsonParser.parse(jsonResult);
+        //JsonObject jsonObject = (JsonObject) jsonParser.parse(jsonResult);
+
+        for(int i=0; i<jsonArray.size(); i++){
+            JsonObject arr = (JsonObject) jsonArray.get(i);
+
+            idx = Integer.parseInt(getStringNoQuote(arr.get("idx").toString()));
+            nickname = getStringNoQuote(arr.get("nickname").toString());
+            avatar = getStringNoQuote(arr.get("avatar").toString());
+            inside = arr.get("inside").getAsBoolean();
+
+            if(myIdx != idx){
+                result.add(new ChatUser(idx, nickname, avatar, inside));
+            }
+        }
+
+        return result;
+    }
+
+
 }

@@ -19,6 +19,9 @@ import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
+import com.google.gson.JsonObject;
+import com.konkuk.dna.utils.EventListener;
+import com.konkuk.dna.utils.SocketConnection;
 import com.konkuk.dna.utils.helpers.BaseActivity;
 import com.konkuk.dna.chat.ChatActivity;
 import com.konkuk.dna.utils.dbmanage.Dbhelper;
@@ -29,8 +32,15 @@ import com.konkuk.dna.post.Comment;
 import com.konkuk.dna.post.Post;
 import com.konkuk.dna.post.PostFormActivity;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
+import static com.konkuk.dna.utils.ObjToJson.StoreObjToJson;
 
 public class MainActivity extends BaseActivity {
     private DrawerLayout menuDrawer;
@@ -50,6 +60,16 @@ public class MainActivity extends BaseActivity {
 
     private Dbhelper dbhelper;
 
+    private static final int SOCKET_CONNECT = 0;
+    private static final int SOCKET_PING = 1;
+    private static final int SOCKET_NEW_DM = 2;
+    private static final int SOCKET_NEW_MSG = 3;
+    private static final int SOCKET_APPLY_LIKE = 4;
+    private static final int SOCKET_SPEAKER = 5;
+    private static final int SOCKET_GEO = 6;
+    private static final int SOCKET_DIRECT = 7;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,10 +81,85 @@ public class MainActivity extends BaseActivity {
         FirebaseMessaging.getInstance().subscribeToTopic("chat");
         Log.d("MainActivity", "token : " + FirebaseInstanceId.getInstance().getToken());
 
+        socketinit();
         init();
     }
 
+    public void socketinit(){
+        dbhelper = new Dbhelper(this);
+        //소켓을 사용하는 가장 첫번째 액티비티에서 소켓 커넥션을 실행한다.
+        SocketConnection.initInstance();
+
+        //TODO : MainActivity Listener
+        // 소켓 연결되면 store 할 것
+        SocketConnection.getSocket().on(SocketConnection.getSocket().EVENT_CONNECT, new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.e("Socket Connected",SocketConnection.getSocket().connected()+"");
+                JsonObject storeJson = StoreObjToJson(dbhelper, gpsTracker.getLongitude(), gpsTracker.getLatitude());
+                SocketConnection.emit("store", storeJson);
+            }
+        });
+        // 핑이 오면 update 할 것
+        SocketConnection.getSocket().on("ping", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                Log.e("Socket ON", "ping");
+                JsonObject updateJson = StoreObjToJson(dbhelper, gpsTracker.getLongitude(), gpsTracker.getLatitude());
+                SocketConnection.emit("update", "geo", updateJson);
+            }
+        });
+
+        //TODO : DMActivity Listener
+        SocketConnection.getSocket().on("new_dm", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+
+                EventBus.getDefault().post(new EventListener(SOCKET_NEW_DM, null));
+            }
+        });
+
+        //TODO : ChatActivity Listener
+        // 새로운 메시지가 오면 화면을 새로고침 할 것
+        SocketConnection.getSocket().on("new_msg", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                EventBus.getDefault().post(new EventListener(SOCKET_NEW_MSG, null));
+            }
+        });
+        // 좋아요 신호가 오면 화면을 새로고침 할 것
+        SocketConnection.getSocket().on("apply_like", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                EventBus.getDefault().post(new EventListener(SOCKET_APPLY_LIKE, args[0].toString()));
+            }
+        });
+        // push가 오면 push 알림을 띄울 것
+        SocketConnection.getSocket().on("speaker", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                EventBus.getDefault().post(new EventListener(SOCKET_SPEAKER, null));
+            }
+        });
+
+        //TODO: InitHelpers Listener
+        SocketConnection.getSocket().on("geo", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                EventBus.getDefault().post(new EventListener(SOCKET_GEO, args[0].toString()));
+            }
+        });
+
+        SocketConnection.getSocket().on("direct", new Emitter.Listener() {
+            @Override
+            public void call(Object... args) {
+                EventBus.getDefault().post(new EventListener(SOCKET_DIRECT, args[0].toString()));
+            }
+        });
+    }
+
     public void init() {
+
         menuDrawer = findViewById(R.id.drawer_layout);
         InitHelpers.initDrawer(this, menuDrawer, 0);
 
@@ -83,7 +178,6 @@ public class MainActivity extends BaseActivity {
                 AnimHelpers.dpToPx(this, -80), AnimHelpers.dpToPx(this, 25));
 
         // TODO 반경, 위치 초기값 설정해줘야 합니다!
-        dbhelper = new Dbhelper(this);
         radius = dbhelper.getMyRadius();
         longitude = gpsTracker.getLongitude();
         latitude = gpsTracker.getLatitude();
@@ -187,7 +281,7 @@ public class MainActivity extends BaseActivity {
         mapFragment.drawPostLocations(posts);
     }
 
-    //뒤로가기를 누르면 화면이 꺠지지 않고, 2번 누르면 앱이 종료되도록 만들기
+    //뒤로가기를 누르면 화면이 깨지지 않고, 2번 누르면 앱이 종료되도록 만들기
     @Override
     public void onBackPressed() {
         long tempTime = System.currentTimeMillis();
@@ -201,4 +295,30 @@ public class MainActivity extends BaseActivity {
             Toast.makeText(this, "2초내에 한번 더 누르면 종료됩니다.", Toast.LENGTH_SHORT).show();
         }
     }
+
+
+    @Override
+    public void finish() {
+        super.finish();
+        Log.e("Acivity", "finish");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        SocketConnection.getSocket().off("ping");
+        SocketConnection.getSocket().off("new_msg");
+        SocketConnection.getSocket().off("new_dm");
+        SocketConnection.getSocket().off("speaker");
+        SocketConnection.getSocket().off("apply_like");
+
+        SocketConnection.disconnect();
+
+        Log.e("App", "destroy");
+        //Log.e("Socket", SocketConnection.getSocket().connected()+"");
+
+    }
+
+
 }

@@ -222,17 +222,33 @@ exports.init = (http) => {
             positions.length > 0 ? resolve(positions) : reject();
           })
           .then((positions) => {
-            positions.map(async (idx, i) => {
-              redis.hmget("info", idx, (err, info) => {
+            positions.map(async (target, i) => {
+              redis.hgetall("client", (err, object) => {
                 if (err) {
-                  logger.log("error", "Error: websocket error", err);
                   console.log(err);
+                  return;
+                } else {
+                  const keys = Object.keys(object);
+                  keys.forEach((key) => {
+                    redis.hmget("client", key, (err, idx) => {
+                      if (idx && idx[0] && idx[0] == target) {                  
+                        const socketId = key;
+                        
+                        if (Object.keys(io.sockets.sockets).includes(socketId)){ // 존재할 경우 직접 보냅니다.
+                          socket.to(socketId).emit('speaker', response.result);
+                        } else {
+                          const data = {
+                            socketId,
+                            event: "speaker",
+                            response: response.result
+                          };
+                          pub.publish('socket', JSON.stringify(data));
+                        }
+                      }
+                    });
+                  });
                 }
-                else {
-                  const json = JSON.parse(info[0]);
-                  socket.to(json.socket).emit("speaker", response.result);
-                }
-              });
+              });   
             });
           });
         }
@@ -287,25 +303,32 @@ exports.init = (http) => {
         // 3. 결과물을 해당 유저와 나에게 쏴야 합니다.
         // redis의 세션 목록에 해당 유저가 있는지 확인하고, 있으면 쏩니다.
         const receiver = response.result.receiver;
-        redis.hmget("info", receiver, (err, object) => {
+        const sender = response.result.dm.sender_idx;
+        
+        redis.hgetall("client", (err, object) => {
           if (err) {
             console.log(err);
             return;
           } else {
-            if (object && object.length > 0) {
-              const socketId = object[0];
+            const keys = Object.keys(object);
+            keys.forEach((key) => {
+              redis.hmget("client", key, (err, idx) => {
+                if (idx && idx[0] && (idx[0] == receiver || idx[0] == sender)) {                  
+                  const socketId = key;
 
-              if (Object.keys(io.sockets.sockets).includes(socketId)){ // 존재할 경우 직접 보냅니다.
-                socket.broadcast.to(socketId).emit('new_dm', response);
-              } else {
-                const data = {
-                  socketId,
-                  event: "new_dm",
-                  response
-                };
-                pub.publish('socket', JSON.stringify(data));
-              }
-            }
+                  if (Object.keys(io.sockets.sockets).includes(socketId)){ // 존재할 경우 직접 보냅니다.
+                    socket.broadcast.to(socketId).emit('new_dm', response);
+                  } else {
+                    const data = {
+                      socketId,
+                      event: "new_dm",
+                      response
+                    };
+                    pub.publish('socket', JSON.stringify(data));
+                  }
+                }
+              });
+            });
           }
         });
         socket.emit('new_dm', response);       

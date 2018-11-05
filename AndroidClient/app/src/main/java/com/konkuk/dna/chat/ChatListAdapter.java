@@ -5,6 +5,9 @@ import android.content.Context;
 import android.graphics.Typeface;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.ViewHolder;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,6 +44,7 @@ public class ChatListAdapter extends ArrayAdapter<ChatMessage> {
     private final String TYPE_IMAGE = "Image";              // 이미지 전송
     private final String TYPE_SHARE = "Share";              // 포스팅 공유
 
+    private final int VTYPE_SYSTEM = -1;
     private final int VTYPE_MINE = 0;
     private final int VTYPE_OTHER_AVATAR = 1;
     private final int VTYPE_OTHER_NONE = 2;
@@ -79,12 +83,7 @@ public class ChatListAdapter extends ArrayAdapter<ChatMessage> {
     @Override
     public View getView(int position, @Nullable View v, @NonNull ViewGroup parent) {
         ChatMessage message = messages.get(position);
-        ChatMessage prev_message = null;
-        if(position>0){
-            prev_message = messages.get(position-1);
-        }
 
-        myIdx = 5;
         v = null;
         if (v == null) {
             LayoutInflater layoutInflater = (LayoutInflater)
@@ -124,66 +123,32 @@ public class ChatListAdapter extends ArrayAdapter<ChatMessage> {
                     v = layoutInflater.inflate(R.layout.chat_item_left, null);
                 }
             }
-//
-//            if(message.getIdx() == myIdx){
-//                // 내 메세지, 프로필 없음
-//                if (message.getType().equals(TYPE_LOUDSPEAKER)) { // 확성기 상태일 경우
-//                    v = layoutInflater.inflate(R.layout.chat_item_loudspeaker_right, null);
-//                } else {
-//                    v = layoutInflater.inflate(R.layout.chat_item_right, null);
-//                }
-//            }else if(prev_message!=null && (prev_message.getIdx() == message.getIdx())){
-//                // 남의 메세지, 프로필 없음
-//                if (message.getType().equals(TYPE_LOUDSPEAKER)) { // 확성기 상태일 경우
-//                    v = layoutInflater.inflate(R.layout.chat_item_loudspeaker_left, null);
-//                } else {
-//                    v = layoutInflater.inflate(R.layout.chat_item_left, null);
-//                }
-//            }else{
-//                // 남의 메세지, 프로필 있음
-//                if (message.getType().equals(TYPE_LOUDSPEAKER)) { // 확성기 상태일 경우
-//                    v = layoutInflater.inflate(R.layout.chat_item_loudspeaker_with_profile, null);
-//                } else {
-//                    v = layoutInflater.inflate(R.layout.chat_item_with_profile, null);
-//                }
-//
-//                TextView messageNickname = (TextView) v.findViewById(R.id.msgNickname);
-//                messageNickname.setText(message.getUserName());
-//                messageNickname.setTypeface(NSB);
-//
-//                ImageView messageAvatar = (ImageView) v.findViewById(R.id.msgAvatar);
-//
-//                if (message.getAvatar() != null) {
-//                    Picasso.get().load(message.getAvatar()).into(messageAvatar);
-//                }
-//            }
-        }
 
-        LinearLayout messageLikeWrapper = (LinearLayout) v.findViewById(R.id.likeWrapper);
-        RelativeLayout msgLocationWrapper = (RelativeLayout) v.findViewById(R.id.msgLocationWrapper);
-        ImageView msgImage = (ImageView) v.findViewById(R.id.msgImage);
-        TextView msgText = (TextView) v.findViewById(R.id.msgText);
-        TextView msgShare = (TextView) v.findViewById(R.id.msgShare);
-        TextView likeCount = (TextView) v.findViewById(R.id.likeCount);
-        TextView dateText = (TextView) v.findViewById(R.id.dateText);
-        TextView likeStar = (TextView) v.findViewById(R.id.likeStar);
+            LinearLayout messageLikeWrapper = (LinearLayout) v.findViewById(R.id.likeWrapper);
+            RelativeLayout msgLocationWrapper = (RelativeLayout) v.findViewById(R.id.msgLocationWrapper);
+            ImageView msgImage = (ImageView) v.findViewById(R.id.msgImage);
+            TextView msgText = (TextView) v.findViewById(R.id.msgText);
+            TextView msgShare = (TextView) v.findViewById(R.id.msgShare);
+            TextView likeCount = (TextView) v.findViewById(R.id.likeCount);
+            TextView dateText = (TextView) v.findViewById(R.id.dateText);
+            TextView likeStar = (TextView) v.findViewById(R.id.likeStar);
 
 
-        switch(message.getType()) {
-            case TYPE_LOUDSPEAKER:
-            case TYPE_MESSAGE:
-                if (msgText != null) {
-                    msgText.setVisibility(View.VISIBLE);
-                    msgText.setText(message.getContents());
-                }
-                break;
-            case TYPE_IMAGE:
-                if (msgImage != null) {
-                    msgImage.setVisibility(View.VISIBLE);
-                    Picasso.get().load(message.getContents()).into(msgImage);
-                }
-                break;
-            case TYPE_LOCATION:
+            switch(message.getType()) {
+                case TYPE_LOUDSPEAKER:
+                case TYPE_MESSAGE:
+                    if (msgText != null) {
+                        msgText.setVisibility(View.VISIBLE);
+                        msgText.setText(message.getContents());
+                    }
+                    break;
+                case TYPE_IMAGE:
+                    if (msgImage != null) {
+                        msgImage.setVisibility(View.VISIBLE);
+                        Picasso.get().load(message.getContents()).into(msgImage);
+                    }
+                    break;
+                case TYPE_LOCATION:
 //                if (msgLocationWrapper != null) {
 //                    msgLocationWrapper.setVisibility(View.VISIBLE);
 //                    msgLocationWrapper.setId(message.getIdx());
@@ -196,51 +161,36 @@ public class ChatListAdapter extends ArrayAdapter<ChatMessage> {
 //                    fragTransaction.commit();
 //                }
 
-                break;
-            case TYPE_SHARE:
-                if (msgShare != null) {
-                    msgShare.setVisibility(View.VISIBLE);
-                    msgShare.setText("[공유] " + message.getContents());
-                }
-                break;
-        }
-
-        likeCount.setText(message.getLike());
-        dateText.setText(message.getDate());
-
-        dateText.setTypeface(NSB);
-        likeStar.setTypeface(fontAwesomeS);
-
-        isMyMessage = false;
-        for(int i=0; i<message.getWhoLikes().size(); i++){
-            if(message.getWhoLikes().get(i) == myIdx){
-                isMyMessage = true;
-            }else{
-                isMyMessage = false;
+                    break;
+                case TYPE_SHARE:
+                    if (msgShare != null) {
+                        msgShare.setVisibility(View.VISIBLE);
+                        msgShare.setText("[공유] " + message.getContents());
+                    }
+                    break;
             }
-        }
+
+            likeCount.setText(message.getLike());
+            dateText.setText(message.getDate());
+
+            dateText.setTypeface(NSB);
+            likeStar.setTypeface(fontAwesomeS);
 
 
-//        messageLikeWrapper.setClickable(true);
-//
-//        messageLikeWrapper.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                //소켓에 눌렀다고 보내기
-//                isMyMessage = true;
-//            }
-//        });
+            // TODO 내가 좋아요를 클릭했을 경우와 클릭하지 않았을 경우 다른 뷰를 보여줘야 합니다.
+            if (messages.get(position).isAmILike()) { // 클릭했을 경우
+                likeCount.setTextColor(context.getResources().getColor(R.color.yellow));
+                likeStar.setTextColor(context.getResources().getColor(R.color.yellow));
+                //messageLikeWrapper.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.button_like_clicked));
+                messageLikeWrapper.setBackgroundResource(R.drawable.button_like_clicked);
 
-        // TODO 내가 좋아요를 클릭했을 경우와 클릭하지 않았을 경우 다른 뷰를 보여줘야 합니다.
-        if (isMyMessage) { // 클릭했을 경우
-            likeCount.setTextColor(context.getResources().getColor(R.color.yellow));
-            likeStar.setTextColor(context.getResources().getColor(R.color.yellow));
-            messageLikeWrapper.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.button_like_clicked));
+            } else {
+                likeCount.setTextColor(context.getResources().getColor(R.color.grayDark));
+                likeStar.setTextColor(context.getResources().getColor(R.color.grayLighter));
+                //messageLikeWrapper.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.button_like_default));
+                messageLikeWrapper.setBackgroundResource(R.drawable.button_like_default);
+            }
 
-        } else {
-            likeCount.setTextColor(context.getResources().getColor(R.color.grayDark));
-            likeStar.setTextColor(context.getResources().getColor(R.color.grayLighter));
-            messageLikeWrapper.setBackgroundDrawable(context.getResources().getDrawable(R.drawable.button_like_default));
         }
 
         return v;

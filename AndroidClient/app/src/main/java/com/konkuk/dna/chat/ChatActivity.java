@@ -29,6 +29,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
+import com.konkuk.dna.utils.EventListener;
 import com.konkuk.dna.utils.helpers.BaseActivity;
 import com.konkuk.dna.utils.ServerURL;
 import com.konkuk.dna.utils.SocketConnection;
@@ -40,6 +41,10 @@ import com.konkuk.dna.R;
 import com.konkuk.dna.utils.HttpReqRes;
 import com.konkuk.dna.map.MapFragment;
 import com.squareup.picasso.Picasso;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -79,7 +84,6 @@ public class ChatActivity extends BaseActivity {
     private boolean mapIsOpen = true, bestChatIsOpen = true;
 
     /* 메시지의 타입을 구분하기 위한 변수들입니다 */
-    /* 메시지의 타입을 구분하기 위한 변수들입니다 */
     private final String TYPE_MESSAGE = "Message";          // 일반 메시지 전송
     private final String TYPE_LOUDSPEAKER = "LoudSpeaker";  // 확성기 전송
     private final String TYPE_LOCATION = "Location";        // 현재 위치 전송
@@ -88,26 +92,25 @@ public class ChatActivity extends BaseActivity {
     private String messageType = TYPE_MESSAGE;
 
     private Dbhelper dbhelper;
-    private Socket mSocket;
+    //private Socket mSocket;
     private Context context = this;
 
     private final int GET_FROM_GALLERY = 3;
     private Uri selectedImage;
+
+    private static final int SOCKET_NEW_MSG = 3;
+    private static final int SOCKET_APPLY_LIKE = 4;
+    private static final int SOCKET_SPEAKER = 5;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        init();
-        socketInit();
+        EventBus.getDefault().register(this);
 
-//        msgListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-//                mSocket.emit("like", dbhelper.getAccessToken(), chatMessages.get(i).getMsg_idx());
-//            }
-//        });
+        init();
+        //socketInit();
     }
 
     public void init() {
@@ -156,7 +159,8 @@ public class ChatActivity extends BaseActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 ChatMessage cm = (ChatMessage) adapterView.getAdapter().getItem(i);
 
-                mSocket.emit("like", dbhelper.getAccessToken(), cm.getMsg_idx());
+                SocketConnection.emit("like", dbhelper.getAccessToken(), cm.getMsg_idx());
+                //mSocket.emit("like", dbhelper.getAccessToken(), cm.getMsg_idx());
             }
         });
 
@@ -386,65 +390,63 @@ public class ChatActivity extends BaseActivity {
         set = new AnimatorSet();
     }
 
-    public void socketInit(){
-        SocketConnection socketCon = new SocketConnection();
-        mSocket = socketCon.getSocket();
-
-        // 소켓 연결되면 store 할 것
-        mSocket.on(Socket.EVENT_CONNECT, new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                Log.e("Socket Connected",mSocket.connected()+"");
-                JsonObject storeJson = StoreObjToJson(dbhelper, gpsTracker.getLongitude(), gpsTracker.getLatitude());
-                mSocket.emit("store", storeJson);
-            }
-        });
-        // 핑이 오면 update 할 것
-        mSocket.on("ping", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                Log.e("Socket Ping", "COME!!!");
-                JsonObject updateJson = StoreObjToJson(dbhelper, gpsTracker.getLongitude(), gpsTracker.getLatitude());
-                mSocket.emit("update", "geo", updateJson);
-            }
-        });
-        // TODO: 새로운 메시지가 오면 화면을 새로고침 할 것
-        mSocket.on("new_msg", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void OnEventListener(EventListener event){
+        ChatSetAsyncTask csat;
+        switch (event.message){
+            case SOCKET_NEW_MSG:
                 Log.e("Socket GET MESSAGE", "MSG COME!!!");
-
-                ChatSetAsyncTask csat = new ChatSetAsyncTask(context, radius, msgListView, bestChatAvatar, bestChatContent, bestChatNickname, bestChatDate, chatMessages);
+                csat = new ChatSetAsyncTask(context, radius, msgListView, bestChatAvatar, bestChatContent, bestChatNickname, bestChatDate, chatMessages);
                 csat.execute(longitude, latitude);
-                //scrollMyListViewToBottom();
-            }
-        });
-        // TODO: 좋아요 신호가 오면 화면을 새로고침 할 것
-        mSocket.on("apply_like", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                Log.e("Socket GET Like", "Apply Like COME!!!");
-
-                ChatSetAsyncTask csat = new ChatSetAsyncTask(context, radius, msgListView, bestChatAvatar, bestChatContent, bestChatNickname, bestChatDate, chatMessages);
+                break;
+            case SOCKET_APPLY_LIKE:
+                Log.e("Socket GET Like", "Apply Like COME!!!" + event.args);
+                csat = new ChatSetAsyncTask(context, radius, msgListView, bestChatAvatar, bestChatContent, bestChatNickname, bestChatDate, chatMessages);
                 csat.execute(longitude, latitude);
-                //scrollMyListViewToBottom();
-            }
-        });
-        // TODO: push가 오면 push 알림을 띄울 것
-        mSocket.on("speaker", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                Log.e("Socket GET Like", "Apply Like COME!!!");
-
-//                ChatSetAsyncTask csat = new ChatSetAsyncTask(context, radius, msgListView, bestChatAvatar, bestChatContent, bestChatNickname, bestChatDate);
-//                csat.execute(longitude, latitude);
-            }
-        });
-
-        mSocket.connect();
+                break;
+            case SOCKET_SPEAKER:
+                Log.e("Socket PUSH", "PUSH COME!!!");
+                break;
+            default:
+                break;
+        }
     }
 
+    public void socketInit(){
+//        // TODO: 새로운 메시지가 오면 화면을 새로고침 할 것
+//        SocketConnection.getSocket().on("new_msg", new Emitter.Listener() {
+//            @Override
+//            public void call(Object... args) {
+//                Log.e("Socket GET MESSAGE", "MSG COME!!!");
+//
+//                ChatSetAsyncTask csat = new ChatSetAsyncTask(context, radius, msgListView, bestChatAvatar, bestChatContent, bestChatNickname, bestChatDate, chatMessages);
+//                csat.execute(longitude, latitude);
+//                //scrollMyListViewToBottom();
+//            }
+//        });
+//        // TODO: 좋아요 신호가 오면 화면을 새로고침 할 것
+//        SocketConnection.getSocket().on("apply_like", new Emitter.Listener() {
+//            @Override
+//            public void call(Object... args) {
+//                Log.e("Socket GET Like", "Apply Like COME!!!"+args[0].toString());
+//
+//                ChatSetAsyncTask csat = new ChatSetAsyncTask(context, radius, msgListView, bestChatAvatar, bestChatContent, bestChatNickname, bestChatDate, chatMessages);
+//                csat.execute(longitude, latitude);
+//                //scrollMyListViewToBottom();
+//            }
+//        });
+//        // TODO: push가 오면 push 알림을 띄울 것
+//        SocketConnection.getSocket().on("speaker", new Emitter.Listener() {
+//            @Override
+//            public void call(Object... args) {
+//                Log.e("Socket PUSH", "PUSH COME!!!");
+//
+////                ChatSetAsyncTask csat = new ChatSetAsyncTask(context, radius, msgListView, bestChatAvatar, bestChatContent, bestChatNickname, bestChatDate);
+////                csat.execute(longitude, latitude);
+//            }
+//        });
 
+    }
 
 
     public void onClick(View v) {
@@ -536,7 +538,7 @@ public class ChatActivity extends BaseActivity {
             case R.id.msgSendBtn: // 메시지 전송 버튼 클릭
 
                 JsonObject sendMsgJson = SendMsgObjToJson(dbhelper, gpsTracker.getLongitude(), gpsTracker.getLatitude(), messageType, msgEditText.getText().toString());
-                mSocket.emit("save_msg", sendMsgJson);
+                SocketConnection.emit("save_msg", sendMsgJson);
 
                 msgEditText.setText("");
                 msgEditText.setEnabled(true);
@@ -607,14 +609,15 @@ public class ChatActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         mapFragment.initMapCenter(longitude, latitude, radius);
+        if(!EventBus.getDefault().isRegistered(this)){
+            EventBus.getDefault().register(this);
+        }
     }
 
     @Override
-    protected void onDestroy() {
-        mSocket.close();
-        mSocket.disconnect();
-
-        super.onDestroy();
+    protected void onStop() {
+        super.onStop();
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
@@ -685,7 +688,8 @@ class ChatSetAsyncTask extends AsyncTask <Double, Integer, ArrayList<String>>  {
 
     @Override
     protected void onPreExecute() {
-        now_pos = msgListView.getFirstVisiblePosition();
+        now_pos = msgListView.getLastVisiblePosition();
+        //now_pos = msgListView.getFirstVisiblePosition();
         super.onPreExecute();
     }
 

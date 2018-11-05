@@ -1,0 +1,26 @@
+
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": "*"
+      },
+      "Action": "es:*",
+      "Resource": "arn:aws:es:ap-northeast-2:390224176652:domain/soyoungpark/*",
+      "Condition": {
+        "IpAddress": {
+          "aws:SourceIp": [
+            "1.231.145.30",
+            "211.49.134.24",
+            "172.17.0.1",
+            "172.31.23.80",
+            "52.79.228.84",
+            "192.168.51.112"
+          ]
+        }
+      }
+    }
+  ]
+}

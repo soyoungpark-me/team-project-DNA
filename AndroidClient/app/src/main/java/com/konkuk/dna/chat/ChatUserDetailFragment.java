@@ -1,4 +1,4 @@
-package com.konkuk.dna.friend.manage;
+package com.konkuk.dna.chat;
 
 
 import android.app.AlertDialog;
@@ -9,6 +9,7 @@ import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -26,7 +27,7 @@ import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
 
-public class FriendDetailFragment extends DialogFragment implements View.OnClickListener{
+public class ChatUserDetailFragment extends DialogFragment implements View.OnClickListener{
     private static Typeface NSEB;
     private static Typeface NSB;
     private static Typeface NSR;
@@ -34,12 +35,12 @@ public class FriendDetailFragment extends DialogFragment implements View.OnClick
 
     private ImageView detailAvatar;
     private TextView detailNickname, detailID, detailInfo, detailDMBtnText, detailDeleteBtnText,
-        detailDMBtnIcon, detailDeleteBtnIcon;
-    private LinearLayout detailDMBtn, detailDeleteBtn;
-    private Friend friend;
+            detailDMBtnIcon, detailDeleteBtnIcon;
+    private LinearLayout detailAddBtn, detailBanBtn;
+    private ChatUser user;
 
 
-    public FriendDetailFragment() {}
+    public ChatUserDetailFragment() {}
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -52,7 +53,7 @@ public class FriendDetailFragment extends DialogFragment implements View.OnClick
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View v = inflater.inflate(R.layout.fragment_friend_detail, container, false);
+        View v = inflater.inflate(R.layout.fragment_chat_user_detail, container, false);
         getDialog().setCanceledOnTouchOutside(true);
 
         return v;
@@ -80,34 +81,38 @@ public class FriendDetailFragment extends DialogFragment implements View.OnClick
         detailDMBtnIcon = (TextView) getView().findViewById(R.id.detailDMBtnIcon);
         detailDeleteBtnText = (TextView) getView().findViewById(R.id.detailDeleteBtnText);
         detailDeleteBtnIcon = (TextView) getView().findViewById(R.id.detailDeleteBtnIcon);
-        detailDMBtn = (LinearLayout) getView().findViewById(R.id.detailDMBtn);
-        detailDeleteBtn = (LinearLayout) getView().findViewById(R.id.detailDeleteBtn);
+        detailAddBtn = (LinearLayout) getView().findViewById(R.id.detailAddBtn);
+        detailBanBtn = (LinearLayout) getView().findViewById(R.id.detailBanBtn);
 
-        detailDMBtn.setOnClickListener(this);
-        detailDeleteBtn.setOnClickListener(this);
+        detailAddBtn.setOnClickListener(this);
+        detailBanBtn.setOnClickListener(this);
 
-        if (friend != null) {
-            if (friend.getAvatar() != null && friend.getAvatar() != "") {
-                Picasso.get().load(friend.getAvatar()).into(detailAvatar);
+        // TODO 해당 유저의 idx 값으로 User서버에 요청해 전체 프로필 정보를 가져와야 합니다!
+
+        if (user != null) {
+            if (user.getAvatar() != null && user.getAvatar() != "") {
+                Picasso.get().load(user.getAvatar()).into(detailAvatar);
             }
-            detailNickname.setText(friend.getNickname());
+            detailNickname.setText(user.getNickname());
             detailNickname.setTypeface(NSEB);
-            detailID.setText(friend.getID());
+            detailID.setText(user.getID());
             detailID.setTypeface(NSB);
-            if (friend.getInfo() != "" && friend.getInfo() != null) {
-                detailInfo.setText(friend.getInfo());
+            if (user.getInfo() != "" && user.getInfo() != null) {
+                detailInfo.setText(user.getInfo());
             } else {
-                detailInfo.setText("해당 친구는 작성한 상태 메시지가 없습니다.");
+                detailInfo.setText("해당 유저는 작성한 상태 메시지가 없습니다.");
             }
         }
         detailDMBtnText.setTypeface(NSB);
         detailDMBtnIcon.setTypeface(fontAwesomeS);
         detailDeleteBtnText.setTypeface(NSB);
         detailDeleteBtnIcon.setTypeface(fontAwesomeS);
+
+        // TODO 해당 유저가 나와 친구 관계인지 아닌지 확인하고, 친구 추가 버튼을 활성화/비활성화 합니다.
     }
 
-    public void setData(Friend friend) {
-        this.friend = friend;
+    public void setData(ChatUser user) {
+        this.user = user;
     }
 
     @Override
@@ -131,16 +136,11 @@ public class FriendDetailFragment extends DialogFragment implements View.OnClick
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.detailDMBtn:  // DM 보내기 버튼 클릭
-                Intent intent = new Intent (getActivity(), DMActivity.class);
-                // TODO 해당 친구와의 채팅방 정보를 서버에서 가져와서 세팅해줘야 합니다.
-                DMRoom room = new DMRoom(0, 1, "3457soso", "https://pbs.twimg.com/media/DbYfg2IWkAENdiS.jpg", "내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용", "Message", "2018-01-24");
-                intent.putExtra("roomIdx", room.getIdx());
-                intent.putExtra("roomUpdated", room.getUpdateDate());
-                startActivity(intent);
+            case R.id.detailAddBtn:  // 친구 요청하기 버튼 클릭
+                Log.d("ChatUserDetail", "친구 요청 버튼 클릭");
                 break;
 
-            case R.id.detailDeleteBtn:  // 친구 삭제 버튼 클릭
+            case R.id.detailBanBtn:  // 차단 버튼 클릭
                 DialogSimple();
                 break;
         }
@@ -148,11 +148,11 @@ public class FriendDetailFragment extends DialogFragment implements View.OnClick
 
     private void DialogSimple(){
         AlertDialog.Builder alt_bld = new AlertDialog.Builder(getActivity());
-        alt_bld.setMessage("해당 친구를 삭제하시겠습니까? 친구와 더 이상 DM을 주고 받을 수 없습니다.").setCancelable(
+        alt_bld.setMessage("해당 사용자를 차단하시겠습니까? 해당 사용자의 메시지가 더 이상 보이지 않습니다.").setCancelable(
                 false).setPositiveButton("YES",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
-                       // TODO 삭제 버튼 클릭 이벤트 처
+                        // TODO 삭제 버튼 클릭 이벤트 처리
                         dialog.cancel();
                     }
                 }).setNegativeButton("NO",

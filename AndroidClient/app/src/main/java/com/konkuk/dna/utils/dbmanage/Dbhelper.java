@@ -162,6 +162,20 @@ public class Dbhelper extends SQLiteOpenHelper {
     }
 
     /*
+     * 내 id 가져오기
+     * */
+    public String getMyId(){
+        String myId = null;
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ DNAEntry.TABLE_NAME, null);
+        while(cursor.moveToNext()){
+            myId = cursor.getString(1);
+        }
+        return myId;
+    }
+
+    /*
      * 내 idx 가져오기
      * */
     public int getMyIdx(){

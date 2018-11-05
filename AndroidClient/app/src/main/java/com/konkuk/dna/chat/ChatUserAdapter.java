@@ -72,18 +72,6 @@ public class ChatUserAdapter extends ArrayAdapter<ChatUser> {
             status.setTextColor(context.getResources().getColor(R.color.red));
         }
 
-        // TODO 해당 유저가 나와 친구 관계인지 아닌지 확인하고, 친구 추가 버튼을 보여줍니다.
-        if (position % 2 == 0) { // TODO 여기에 [친구 관계가 아닌] 조건을 추가해주면 됩니다.
-            addFriendBtn.setVisibility(View.GONE);
-        } else {
-            addFriendBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // TODO 친구 버튼이 눌렸을 경우
-                }
-            });
-        }
-
         return v;
     }
 }

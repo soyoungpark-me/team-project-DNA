@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">DNA</string>
 
+    <string name="fa_logout">&#xf2f5;</string>
     <string name="fa_star">&#xf005;</string>
     <string name="fa_right">&#xf105;</string>
     <string name="fa_up">&#xf106;</string>

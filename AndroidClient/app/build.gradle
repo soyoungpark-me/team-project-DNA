@@ -51,6 +51,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:16.0.4'
     implementation 'com.google.firebase:firebase-messaging:17.3.3'
     compileOnly 'org.jbundle.util.osgi.wrapped:org.jbundle.util.osgi.wrapped.org.apache.http.client:4.1.2'
+
+    implementation 'org.greenrobot:eventbus:3.1.1'
 }
 
 apply plugin: 'com.google.gms.google-services'

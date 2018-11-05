@@ -97,8 +97,11 @@ public class UserSettingActivity extends BaseActivity {
                 break;
 
             case R.id.settingSaveBtn: // 저장 버튼 클릭
-                Log.d("test", "저장 버튼 클릭");
                 dbhelper.updateRadius(radius);
+
+                //TODO: Drawer에 적혀있는 '현재 채팅 환경' update가 작동하지 않음.
+                //InitHelpers.initDrawer(this, menuDrawer, 2);
+                //InitHelpers.updateDrawer(this, menuDrawer);
                 finish();
                 break;
         }

@@ -74,7 +74,7 @@
             android:orientation="horizontal">
 
             <LinearLayout
-                android:id="@+id/detailDMBtn"
+                android:id="@+id/detailAddBtn"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="50dp"
@@ -83,7 +83,7 @@
                 android:onClick="onClick">
                 <TextView
                     android:id="@+id/detailDMBtnIcon"
-                    android:text="@string/fa_chat"
+                    android:text="@string/fa_send"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginRight="5dp"
@@ -91,7 +91,7 @@
                     android:textSize="16dp" />
                 <TextView
                     android:id="@+id/detailDMBtnText"
-                    android:text="DM 전송"
+                    android:text="친구 요청"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/gray"
@@ -99,7 +99,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/detailDeleteBtn"
+                android:id="@+id/detailBanBtn"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="50dp"
@@ -118,7 +118,7 @@
 
                 <TextView
                     android:id="@+id/detailDeleteBtnText"
-                    android:text="친구 삭제"
+                    android:text="유저 차단"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/gray"

@@ -79,62 +79,73 @@
         android:layout_height="1dp"
         android:background="@color/silver" />
 
-
     <LinearLayout
-        android:id="@+id/homeBtn"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:gravity="center"
-        android:background="@drawable/ripple_effect_button"
-        android:onClick="onClick">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
-        <TextView
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/homeBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:background="@drawable/ripple_effect_button"
+            android:onClick="onClick">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/fa_home"
+                android:textColor="@color/gray"
+                android:textSize="18dp"
+                android:tag="fas"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="13dp"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/grayDarker"
+                android:text="메인으로"
+                android:tag="nseb" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
             android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="@string/fa_home"
-            android:textColor="@color/gray"
-            android:textSize="24dp"
-            android:tag="fas"/>
+            android:background="@color/silver" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="15dp"
-            android:layout_marginLeft="15dp"
-            android:gravity="center_vertical"
-            android:textColor="@color/grayDarker"
-            android:text="메인으로"
-            android:tag="nseb" />
-    </LinearLayout>
+        <LinearLayout
+            android:id="@+id/logoutBtn"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="40dp"
+            android:gravity="center"
+            android:background="@drawable/ripple_effect_chat_left"
+            android:onClick="onClick">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="@string/fa_logout"
+                android:textColor="@color/gray"
+                android:textSize="18dp"
+                android:tag="fas"/>
 
-    <LinearLayout
-        android:id="@+id/logoutBtn"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:gravity="center"
-        android:background="@color/colorPrimary"
-        android:onClick="onClick">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="@string/fa_home"
-            android:textColor="@color/grayLighter"
-            android:textSize="24dp"
-            android:tag="fas"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:textSize="15dp"
-            android:layout_marginLeft="15dp"
-            android:gravity="center_vertical"
-            android:textColor="@color/grayLighter"
-            android:text="로그아웃"
-            android:tag="nseb" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:textSize="13dp"
+                android:layout_marginLeft="10dp"
+                android:gravity="center_vertical"
+                android:textColor="@color/grayDarker"
+                android:text="로그아웃"
+                android:tag="nseb" />
+        </LinearLayout>
     </LinearLayout>
 
     <View

@@ -14,6 +14,7 @@ public class ChatMessage {
     private double lat;         // 위도
 
     private ArrayList<Integer> whoLikes;
+    private boolean amILike;
     private int msg_idx;
     private String type;
 
@@ -31,7 +32,7 @@ public class ChatMessage {
 
 
     public ChatMessage(int idx, String userName, String avatar, String contents, String date,
-                       String like, String type, double lng, double lat, ArrayList<Integer> whoLikes, int msg_idx, int viewType){
+                       String like, String type, double lng, double lat, ArrayList<Integer> whoLikes, int msg_idx, int viewType, boolean amILike){
         this.idx = idx;
         this.userName = userName;
         this.avatar = avatar;
@@ -44,6 +45,7 @@ public class ChatMessage {
         this.whoLikes = whoLikes;
         this.msg_idx = msg_idx;
         this.viewType = viewType;
+        this.amILike = amILike;
 
     }
 
@@ -107,5 +109,13 @@ public class ChatMessage {
     }
     public void setViewType(int viewType) {
         this.viewType = viewType;
+    }
+
+    public boolean isAmILike() {
+        return amILike;
+    }
+
+    public void setAmILike(boolean amILike) {
+        this.amILike = amILike;
     }
 }
