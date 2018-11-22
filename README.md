@@ -1,12 +1,13 @@
 # DNA (Dear, Nearby Anyone)
 
-* 2018년 2학기의 졸업작품 프로젝트를 위한 저장소입니다.
+![소개 이미지](https://blogfiles.pstatic.net/MjAxODA4MTRfMTky/MDAxNTM0MTc3NzY1MTM0.NCF4J6dMHOkkdIOZfhedD3jE3ClrDsU62BCsdAeryVog.SYjZhtyBsQAmZE8KFL6X0tSj9-sHzwbr3qhSbeTFfWYg.PNG.3457soso/title.png)
 
+* 2018년 2학기의 졸업작품 프로젝트를 위한 저장소입니다.
 * README에 개발하면서 힘들었던 점, 깊게 고민이 필요했던 점 등에 대해 **일지 형식**으로 기록하고 있습니다.
 
-  
 
 
+------
 
 ## 목차
 
@@ -14,15 +15,17 @@
 
 2. ##### [프로젝트 아키텍처 구조도](#프로젝트-아키텍처-구조도)
 
-3. ##### [개발 일지](#개발-일지)
+3. ##### [스크린샷](#스크린샷)
+
+4. ##### [역할 분담 및 개발 일지](#역할-분담-및-개발-일지)
+
+   
 
 ***
 
 ## 프로젝트 소개
 
-#### **"특별한 이벤트가 일어나는 공간에 있는 사람만 느낄 수 있는 감정과 생각을, 부담없이 공유할 수 있는 서비스를 만들어 보고 싶습니다.**"
-
-![소개 이미지](https://blogfiles.pstatic.net/MjAxODA4MTRfMTky/MDAxNTM0MTc3NzY1MTM0.NCF4J6dMHOkkdIOZfhedD3jE3ClrDsU62BCsdAeryVog.SYjZhtyBsQAmZE8KFL6X0tSj9-sHzwbr3qhSbeTFfWYg.PNG.3457soso/title.png)
+##### **"특별한 이벤트가 일어나는 공간에 있는 사람만 느낄 수 있는 감정과 생각을, 부담없이 공유할 수 있는 서비스를 만들어 보고 싶습니다.**"
 
 ![포스터](https://github.com/3457soso/team-project-DNA/blob/master/Resource/DNA_poster.png?raw=true)
 
@@ -64,11 +67,45 @@
 
 ## 스크린샷
 
+##### 회원가입
+
+![회원가입](https://github.com/3457soso/team-project-DNA/blob/master/Resource/ScreenShot_Register.png?raw=true)
+
+회원가입 후 로그인을 통해 서비스를 이용할 수 있습니다!
+
+
+
+##### 위치 기반 채팅
+
+![채팅](https://github.com/3457soso/team-project-DNA/blob/master/Resource/ScreenShot_Chat.png?raw=true)
+
+프로젝트의 메인 기능으로, 특정 반경 내의 유저들과 메시지를 주고 받을 수 있습니다.
+
+
+
+##### DM (Direct Message)
+
+![DM](https://github.com/3457soso/team-project-DNA/blob/master/Resource/ScreenShot_DM.png?raw=true)
+
+친구로 추가한 사용자들과는 1:1로 DM을 주고 받을 수 있습니다.
+
 
 
 ***
 
-## 개발 일지
+## 역할 분담 및 개발 일지
+
+#### 맡은 부분
+
+프로젝트에서 저는 **인증 구현, 서버 개발, 웹 클라이언트 개발, 안드로이드 클라이언트 UI 개발**을 담당했고, 주요 기술로 Node.js와 Socket.IO, 데이터 베이스로 MongoDB, 세션 저장소로 Redis, 웹 프레임워크로 React를 사용했습니다. 
+
+
+
+#### 개발 일지
+
+개발하면서 고민이 필요했던 부분, 추가적으로 공부가 필요했던 부분들에 대해 일지 형식으로 기록했습니다.
+
+직접 부딪히며 공부해 적용한 기술들이라 틀린 부분이 있을 수 있습니다! (많이 틀렸을 것 같습니다...)
 
 | 번호 |    날짜    | 내용 (링크)                                                  |
 | :--: | :--------: | ------------------------------------------------------------ |
@@ -88,8 +125,3 @@
 |  14  | 2018.09.11 | [**성능 개선 2) RabbitMQ를 통해 소켓 서버 기능 분할하기**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.09.11%20:%20%EC%84%B1%EB%8A%A5%20%EA%B0%9C%EC%84%A0%202\)%20RabbitMQ%EB%A5%BC%20%ED%86%B5%ED%95%B4%20%EC%86%8C%EC%BC%93%20%EC%84%9C%EB%B2%84%20%EA%B8%B0%EB%8A%A5%20%EB%B6%84%ED%95%A0%ED%95%98%EA%B8%B0.md) |
 |  15  | 2018.09.14 | [**성능 개선 3) 타일 도입! Redis 내의 모든 세션을 끌고 오지 말자**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.09.14%20:%20%EC%84%B1%EB%8A%A5%20%EA%B0%9C%EC%84%A0%203\)%20%ED%83%80%EC%9D%BC%20%EB%8F%84%EC%9E%85!%20Redis%20%EB%82%B4%EC%9D%98%20%EB%AA%A8%EB%93%A0%20%EC%84%B8%EC%85%98%EC%9D%84%20%EB%81%8C%EA%B3%A0%20%EC%98%A4%EC%A7%80%20%EB%A7%90%EC%9E%90.md) |
 |  16  | 2018.09.17 | [**성능 개선 4) HAProxy를 통한 SocketServer의 ScaleOut**](https://github.com/3457soso/team-project-DNA/blob/master/devLog/2018.09.17%20:%20%EC%84%B1%EB%8A%A5%20%EA%B0%9C%EC%84%A0%204\)%20HAProxy%EB%A5%BC%20%ED%86%B5%ED%95%9C%20SocketServer%EC%9D%98%20ScaleOut.md) |
-
-
-#### 
-
-
