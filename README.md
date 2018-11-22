@@ -14,7 +14,9 @@
 
 ![소개 이미지](https://blogfiles.pstatic.net/MjAxODA4MTRfMTky/MDAxNTM0MTc3NzY1MTM0.NCF4J6dMHOkkdIOZfhedD3jE3ClrDsU62BCsdAeryVog.SYjZhtyBsQAmZE8KFL6X0tSj9-sHzwbr3qhSbeTFfWYg.PNG.3457soso/title.png)
 
-- 초기 기획서 : [Require_Analysis_DNA_project.pdf](https://github.com/3457soso/project_DNA/blob/master/DNA_project.pdf) (만들어준 팀원들 고마워요!)
+- 초기 기획서 : [Require_Analysis_DNA_project.pdf](https://github.com/3457soso/project_DNA/blob/master/DNA_project.pdf) 
+
+- 최종 발표 자료 : 
 
 - 실시간이면서 다량의 요청이 들어오는 서비스를 개발해 보고 싶었고, 만들고 직접 써보기에 재미있는 주제를 정해 최대한 완성도를 높여서 완성하고, 실제로 **배포까지** 해보는 것을 목표로 주제를 잡았습니다.
 
