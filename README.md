@@ -4,7 +4,17 @@
 
 * README에 개발하면서 힘들었던 점, 깊게 고민이 필요했던 점 등에 대해 **일지 형식**으로 기록하고 있습니다.
 
-  ​
+  
+
+
+
+## 목차
+
+1. ##### [프로젝트 소개](#프로젝트-소개)
+
+2. ##### [프로젝트 아키텍처 구조도](#프로젝트-아키텍처-구조도)
+
+3. ##### [개발 일지](#개발-일지)
 
 ***
 
@@ -14,9 +24,11 @@
 
 ![소개 이미지](https://blogfiles.pstatic.net/MjAxODA4MTRfMTky/MDAxNTM0MTc3NzY1MTM0.NCF4J6dMHOkkdIOZfhedD3jE3ClrDsU62BCsdAeryVog.SYjZhtyBsQAmZE8KFL6X0tSj9-sHzwbr3qhSbeTFfWYg.PNG.3457soso/title.png)
 
-- 초기 기획서 : [Require_Analysis_DNA_project.pdf](https://github.com/3457soso/project_DNA/blob/master/DNA_project.pdf) 
+![포스터](https://github.com/3457soso/team-project-DNA/blob/master/Resource/DNA_poster.png?raw=true)
 
-- 최종 발표 자료 : 
+
+
+- **발표 자료 :** [DNA_project](https://github.com/3457soso/team-project-DNA/blob/master/Resource/DNA_project.pdf)
 
 - 실시간이면서 다량의 요청이 들어오는 서비스를 개발해 보고 싶었고, 만들고 직접 써보기에 재미있는 주제를 정해 최대한 완성도를 높여서 완성하고, 실제로 **배포까지** 해보는 것을 목표로 주제를 잡았습니다.
 
@@ -28,40 +40,35 @@
 
 ## 프로젝트 아키텍처 구조도
 
-#### 2018.09.01 : 성능 개선 전
-![아키텍처 구조도](https://github.com/3457soso/team-project-DNA/blob/master/Resource/Arcitecture_Design_0901.png)
+##### 2018.09.01 : 성능 개선 전
+
+![아키텍처 구조1](https://github.com/3457soso/team-project-DNA/raw/master/Resource/Arcitecture_Design_0901.png)
+
+기능 구현을 모두 완료한 상태의 구조입니다.
 
 
 
+##### 2018.09.17 : 성능 개선 후
 
-#### 2018.09.09 : AWS lambda 추가
-![아키텍처 구조1](https://github.com/3457soso/team-project-DNA/blob/master/Resource/Arcitecture_Design_0909.png)
-주요 기능은 모두 개발이 완료 된 상태의 구조도입니다.
+![아키텍처 구조2](https://github.com/3457soso/team-project-DNA/raw/master/Resource/Arcitecture_Design_0916.png)
 
-추후 성능 상의 개선점이 생겨 아키텍처가 변경되면 해당 내용도 추가해 다시 업로드할 예정입니다!
+프로젝트를 모두 끝낸 이후 상태의 구조입니다.
 
-
-
-#### 2018.09.11 : RabbitMQ 추가
-![아키텍처 구조2](https://github.com/3457soso/team-project-DNA/blob/master/Resource/Arcitecture_Design_0911.png)
-주요 기능은 모두 개발이 완료 된 상태의 구조도입니다.
+- **2018.09.09 : AWS lambda 추가**
+- **2018.09.11 : RabbitMQ 추가**
+- **2018.09.17 : Socket Server Scale out**
 
 
-#### 2018.09.17 : Socket Server Scale out
-![아키텍처 구조2](https://github.com/3457soso/team-project-DNA/blob/master/Resource/Arcitecture_Design_0916.png)
-주요 기능은 모두 개발이 완료 된 상태의 구조도입니다.
 
-추후 성능 상의 개선점이 생겨 아키텍처가 변경되면 해당 내용도 추가해 다시 업로드할 예정입니다!
+------
+
+## 스크린샷
+
+
 
 ***
 
 ## 개발 일지
-
-최대한 해당 부분의 개발이 끝나는 즉시 바로바로 작성하려 노력하고 있지만... 
-
-팀 프로젝트여서 시간에 쫓기며 개발하다 보니 조금씩 밀리는 경우도 있습니다!
-
-
 
 | 번호 |    날짜    | 내용 (링크)                                                  |
 | :--: | :--------: | ------------------------------------------------------------ |
@@ -85,4 +92,4 @@
 
 #### 
 
-**... 진행 중 ...**
+
