@@ -1,15 +1,21 @@
 package com.konkuk.dna.auth;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,6 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.konkuk.dna.MainActivity;
+import com.konkuk.dna.SplashActivity;
 import com.konkuk.dna.utils.helpers.BaseActivity;
 import com.konkuk.dna.utils.ServerURL;
 import com.konkuk.dna.utils.dbmanage.Dbhelper;
@@ -26,6 +33,8 @@ import com.konkuk.dna.utils.JsonToObj;
 
 import java.util.HashMap;
 
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static com.konkuk.dna.auth.LoginActivity.DialogCannotConnect;
 import static com.konkuk.dna.auth.LoginActivity.loginDialog;
 import static com.konkuk.dna.auth.LoginActivity.showLoginDialog;
@@ -34,6 +43,15 @@ import static com.konkuk.dna.utils.ConvertType.getStringNoQuote;
 public class LoginActivity extends BaseActivity {
 
     private Context context;
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (loginDialog != null) {
+            loginDialog.dismiss();
+            loginDialog = null;
+        }
+    }
 
     static ProgressDialog loginDialog;
     private android.app.AlertDialog.Builder dialogCNC;
@@ -49,6 +67,7 @@ public class LoginActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_login);
 
         dialogCNC = new android.app.AlertDialog.Builder(this);
@@ -160,7 +179,7 @@ public class LoginActivity extends BaseActivity {
 }
 
 
-class LoginAsyncTask extends AsyncTask<String, Integer, HashMap<String, String>> {
+class LoginAsyncTask extends AsyncTask<String, Integer, String> {
     private Context context;
     private android.app.AlertDialog.Builder dialogCNC;
     private Dbhelper dbhelper;
@@ -177,7 +196,7 @@ class LoginAsyncTask extends AsyncTask<String, Integer, HashMap<String, String>>
     }
 
     @Override
-    protected HashMap<String, String> doInBackground(String... strings) {
+    protected String doInBackground(String... strings) {
         //로그인 되어 있는지 확인
         //결과를 리턴
 
@@ -186,39 +205,41 @@ class LoginAsyncTask extends AsyncTask<String, Integer, HashMap<String, String>>
         HttpReqRes httpreq = new HttpReqRes();
         String responseResult = httpreq.requestHttpPostLogin(ServerURL.DNA_SERVER+ServerURL.PORT_USER_API+"/users/login", strings[0], strings[1]);
 
-        JsonToObj jto = new JsonToObj();
-        HashMap<String, String> map = jto.LoginJsonToObj(responseResult);
-
-        /*
-        * 리턴은 결과만 반환해서 밴할지 로그인 성공시킬지 결정
-        * */
-        return map;
+        return responseResult;
     }
 
     @Override
-    protected void onPostExecute(HashMap<String, String> map) {
+    protected void onPostExecute(String responseResult) {
         //되어있으면 ActivityChat
         //안 되어있으면 ActivityLogin
 
-        if(map.get("issuccess").equals("true")){
-            /*
-             * 성공했으면 DB에 저장
-             * */
-            dbhelper = new Dbhelper(context);
-            dbhelper.saveUserInfo(map);
-            loginDialog.dismiss();
+        if(responseResult!=null){
+            JsonToObj jto = new JsonToObj();
+            HashMap<String, String> map = jto.LoginJsonToObj(responseResult);
 
-            Intent intent = new Intent(context, MainActivity.class);
-            context.startActivity(intent);
-            ((Activity)context).finish();
+            if(map.get("issuccess").equals("true")){
+                /*
+                 * 성공했으면 DB에 저장
+                 * */
+                dbhelper = new Dbhelper(context);
+                dbhelper.saveUserInfo(map);
+
+                loginDialog.dismiss();
+
+                Intent intent = new Intent(context, MainActivity.class);
+                context.startActivity(intent);
+                ((Activity)context).finish();
+            }else{
+                /*
+                 * 실패했으면 값만 반환
+                * */
+                loginDialog.dismiss();
+
+                DialogCannotConnect(dialogCNC, map.get("message"));
+            }
         }else{
-            /*
-             * 실패했으면 값만 반환
-             * */
             loginDialog.dismiss();
-
-            DialogCannotConnect(dialogCNC, map.get("message"));
-
+            Toast.makeText(context, "서버에 문제가 있습니다.", Toast.LENGTH_SHORT).show();
         }
     }
 }

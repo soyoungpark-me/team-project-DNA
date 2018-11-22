@@ -35,6 +35,7 @@ public class SocketConnection {
     * 인스턴스 시작하기
     * */
     public static void initInstance(){
+        Log.e("SocketConnection", "initInstance");
         if(instance == null){
             instance = new SocketConnection();
         }
@@ -81,16 +82,18 @@ public class SocketConnection {
                 IO.Options opts = new IO.Options();
 //                opts.callFactory = okHttpClient;
 //                opts.webSocketFactory = okHttpClient;
-                String[] trans = {"websocket"};
+                //String[] trans = {"websocket"};
                 opts.forceNew = true;
                 opts.reconnection = false;
-                opts.transports = trans;
+                //opts.transports = trans;
 
                 //socket = IO.socket("https://13.125.78.77:9014", opts);
-                SocketConnection.setSocket(IO.socket(ServerURL.LOCAL_HOST+ServerURL.PORT_SOCKET, opts));
+                SocketConnection.setSocket(IO.socket(ServerURL.DNA_SERVER+ServerURL.PORT_SOCKET, opts));
 
                 //연결!
                 SocketConnection.getSocket().connect();
+                Log.e("SocketConnection", "Try connect");
+                Log.e("SocketConnection", SocketConnection.getSocket().connected()+"");
 
 //            } catch (NoSuchAlgorithmException e) {
 //                e.printStackTrace();
@@ -107,7 +110,7 @@ public class SocketConnection {
             Log.e("Socket is Connected", SocketConnection.getSocket().connected()+"");
             SocketConnection.getSocket().connect();
         }
-        Log.e("Socket Emit", event);
+        //Log.e("Socket Emit", event);
         SocketConnection.getSocket().emit(event, args);
     }
     public static void emit(String event, Object arg1, Object arg2){
@@ -115,12 +118,14 @@ public class SocketConnection {
             Log.e("Socket is Connected", SocketConnection.getSocket().connected()+"");
             SocketConnection.getSocket().connect();
         }
-        Log.e("Socket Emit", event);
+        //Log.e("Socket Emit", event);
         SocketConnection.getSocket().emit(event, arg1, arg2);
     }
 
     public static void disconnect() {
-        SocketConnection.getSocket().disconnect();
+        if(SocketConnection.getSocket()!=null){
+            SocketConnection.getSocket().disconnect();
+        }
         SocketConnection.setSocket(null);
         SocketConnection.setInstance(null);
     }

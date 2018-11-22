@@ -116,6 +116,7 @@ exports.init = (http) => {
                       idx,
                       nickname: json.nickname,
                       avatar: json.avatar,
+                      anonymity: json.anonymity,
                       inside
                     };
                     
@@ -195,7 +196,7 @@ exports.init = (http) => {
       const token = data.token;
       const messageData = data.messageData;
             messageData.testing = data.testing;
-      const radius = data.radius;
+      // const radius = data.radius;
       
       try {
         response = await messageCtrl.save(token, messageData);
@@ -209,49 +210,80 @@ exports.init = (http) => {
         }
         
         const position = response.result.position.coordinates;
-        session.findUserInBound(io, socket, response, "new_msg") ;
+        const currentIdx = response.result.user.idx;
 
-        // 4. 해당 메시지가 확성기 타입일 경우에는 푸시 메시지도 보내줘야 합니다.
-        if (messageData.type === "LoudSpeaker") {
-          rabbitMQ.channel.publish("push", "speaker", new Buffer(JSON.stringify(response)));
-          // 5. 푸시 메시지를 보내줄 대상을 선별해줘야 합니다.        
-          await new Promise(async (resolve, reject) => {
-            // nearby @param : {위도, 경도}, 반경
-            // 작성된 메시지로의 좌표값으로부터 주어진 반경 이내에 위치한 사용자만 추려냅니다.
-            const positions = await session.returnSessionList("geo", position, radius);
-            positions.length > 0 ? resolve(positions) : reject();
-          })
-          .then((positions) => {
-            positions.map(async (target, i) => {
-              redis.hgetall("client", (err, object) => {
-                if (err) {
-                  console.log(err);
-                  return;
-                } else {
-                  const keys = Object.keys(object);
-                  keys.forEach((key) => {
-                    redis.hmget("client", key, (err, idx) => {
-                      if (idx && idx[0] && idx[0] == target) {                  
-                        const socketId = key;
-                        
-                        if (Object.keys(io.sockets.sockets).includes(socketId)){ // 존재할 경우 직접 보냅니다.
-                          socket.to(socketId).emit('speaker', response.result);
-                        } else {
-                          const data = {
-                            socketId,
-                            event: "speaker",
-                            response: response.result
-                          };
-                          pub.publish('socket', JSON.stringify(data));
+        fetch(process.env.USER_SERVER + "/user/" + currentIdx, {
+          method: "GET",
+          headers: {"token": token, 'Content-Type': 'application/json' },
+          withCredentials: true,
+          mode: 'no-cors'
+        })
+        .then(res => res.json())
+        .then(async (userData) => {
+          const nickname = userData.result.nickname;
+          const avatar = userData.result.avatar;
+          const anonymity = userData.result.anonymity;
+          const radius = userData.result.radius;
+
+          const message = {
+            user: {
+              idx: currentIdx,
+              nickname, avatar, anonymity
+            },
+            position: response.result.position,
+            type: response.result.type,
+            like_count: response.result.like_count,
+            likes: response.result.likes,
+            contents: response.result.contents,
+            created_at: response.result.created_at
+          };
+
+          response.result = message;
+
+          session.findUserInBound(io, socket, response, "new_msg") ;
+
+          // 4. 해당 메시지가 확성기 타입일 경우에는 푸시 메시지도 보내줘야 합니다.
+          if (messageData.type === "LoudSpeaker") {
+            // rabbitMQ.channel.publish("push", "speaker", new Buffer(JSON.stringify(response)));
+            // 5. 푸시 메시지를 보내줄 대상을 선별해줘야 합니다.        
+            await new Promise(async (resolve, reject) => {
+              // nearby @param : {위도, 경도}, 반경
+              // 작성된 메시지로의 좌표값으로부터 주어진 반경 이내에 위치한 사용자만 추려냅니다.
+              const positions = await session.returnSessionList("geo", position, radius);
+              positions.length > 0 ? resolve(positions) : reject();
+            })
+            .then((positions) => {
+              positions.map(async (target, i) => {
+                redis.hgetall("client", (err, object) => {
+                  if (err) {
+                    console.log(err);
+                    return;
+                  } else {
+                    const keys = Object.keys(object);
+                    keys.forEach((key) => {
+                      redis.hmget("client", key, (err, idx) => {
+                        if (idx && idx[0] && idx[0] == target) {                  
+                          const socketId = key;                          
+                          
+                          if (Object.keys(io.sockets.sockets).includes(socketId)){ // 존재할 경우 직접 보냅니다.
+                            socket.to(socketId).emit('speaker', message);
+                          } else {
+                            const data = {
+                              socketId,
+                              event: "speaker",
+                              response: response.result
+                            };
+                            pub.publish('socket', JSON.stringify(data));
+                          }
                         }
-                      }
+                      });
                     });
-                  });
-                }
-              });   
+                  }
+                });   
+              });
             });
-          });
-        }
+          }
+        });        
       }
     });
 
@@ -262,7 +294,7 @@ exports.init = (http) => {
     socket.on('like', async (token, idx) => {
       // 1. DB에 저장하기 위해 컨트롤러를 호출한다.
       let response = '';
-
+      
       try {
         response = await messageCtrl.like(token, idx);
       } catch (err) {

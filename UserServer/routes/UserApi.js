@@ -25,5 +25,9 @@ module.exports = (router) => {
     .get(authCtrl.auth, userCtrl.selectPoints) // 포인트 조회하기
     .put(authCtrl.auth, userCtrl.reducePoints) // 포인트 차감하기
   
+  router.route('/users/setting')
+    .get(authCtrl.auth, userCtrl.selectSetting) // 환경 설정 조회하기
+    .put(authCtrl.auth, userCtrl.updateSetting) // 환경 설정 수정하기
+  
   return router;
 };

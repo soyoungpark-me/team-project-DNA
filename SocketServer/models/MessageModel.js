@@ -1,11 +1,12 @@
 const mongo = global.utils.mongo;
 const testMongo = global.utils.testMongo;
 
+const fetch = require('node-fetch');
 const helpers = require('../utils/helpers');
 
 /*******************
  *  Save
- *  @param: messageData = {idx, nickname, avatar, lat, lon, contents, testing}
+ *  @param: messageData = {idx, lat, lon, contents, testing}
  ********************/
 exports.save = (messageData) => {
   let db = mongo;
@@ -19,9 +20,7 @@ exports.save = (messageData) => {
     const message = new db.messageModel(
       {
         user: {
-          idx: messageData.idx,
-          nickname: messageData.nickname,
-          avatar: messageData.avatar
+          idx: messageData.idx
         },
         position: {
           type: "Point",
@@ -42,18 +41,6 @@ exports.save = (messageData) => {
       }
     });
   })
-  // .then((idx) => {
-  //   return new Promise((resolve, reject) => {   
-  //     db.messageModel.selectOne(idx, (err, result) => {
-  //       if (err) {
-  //         const customErr = new Error("Error occrred while selecting All Messages: " + err);
-  //         reject(customErr);        
-  //       } else {
-  //         resolve(result);
-  //       }
-  //     });
-  //   });
-  // });
 };
 
 
@@ -97,18 +84,50 @@ exports.selectAll = (blocks, page) => {
 
 /*******************
  *  SelectCircle
- *  @param: conditions = {lng, lat, radius}, blocks, page
+ *  @param: conditions = {token, lng, lat, radius}, blocks, page
  ********************/
 exports.selectCircle = (conditions, blocks, page) => {
   return new Promise((resolve, reject) => {      
     // DB의 모델에서 바로 끌고 오면 된다.
     mongo.messageModel.selectCircle(conditions, blocks, page, (err, result) => {
-        if (err) {
-          const customErr = new Error("Error occrred while selecting Messages: " + err);
-          reject(customErr);        
-        } else {
-          resolve(result);
-        }
+      let finalArray = [];
+      if (err) {
+        const customErr = new Error("Error occrred while selecting Messages: " + err);
+        reject(customErr);        
+      } else {
+        result.forEach(element => {
+          const idx = element.user.idx;
+          fetch(process.env.USER_SERVER + "/user/" + idx, {
+            method: "GET",
+            headers: {"token": conditions.token, 'Content-Type': 'application/json' },
+            withCredentials: true,
+            mode: 'no-cors'
+          })
+          .then(res => res.json())
+          .then((response) => {
+            const finalData = {
+              idx: element.idx,
+              user: {
+                idx,
+                nickname: response.result.nickname,
+                avatar: response.result.avatar,
+                anonymity: response.result.anonymity
+              },
+              position: element.position,
+              type: element.type,
+              like_count: element.like_count,
+              likes: element.likes,
+              contents: element.contents,
+              created_at: element.created_at
+            };
+            finalArray.push(finalData);
+            
+            if (finalArray.length === result.length) {
+              resolve(finalArray);
+            }
+          });
+        });
+      }
     });
   });
 };
@@ -200,18 +219,50 @@ exports.dislike = (userIdx, roomIdx) => {
 
 /*******************
  *  Best
- *  @param: conditions = {lng, lat, radius}
+ *  @param: conditions = {token, lng, lat, radius}
  ********************/
 exports.best = (conditions) => {
   return new Promise((resolve, reject) => {      
     // DB의 모델에서 바로 끌고 오면 된다.
-    mongo.messageModel.selectBest(conditions, (err, result) => {
-        if (err) {
-          const customErr = new Error("Error occrred while selecting Best Messages: " + err);
-          reject(customErr);        
-        } else {
-          resolve(result);
-        }
+    mongo.messageModel.selectBest(conditions, (err, result) => {      
+      let finalArray = [];        
+      if (err) {
+        const customErr = new Error("Error occrred while selecting Best Messages: " + err);
+        reject(customErr);        
+      } else {
+        result.forEach(element => {
+          const idx = element.user.idx;
+          fetch(process.env.USER_SERVER + "/user/" + idx, {
+            method: "GET",
+            headers: {"token": conditions.token, 'Content-Type': 'application/json' },
+            withCredentials: true,
+            mode: 'no-cors'
+          })
+          .then(res => res.json())
+          .then((response) => {
+            const finalData = {
+              idx: element.idx,
+              user: {
+                idx,
+                nickname: response.result.nickname,
+                avatar: response.result.avatar,
+                anonymity: response.result.anonymity
+              },
+              position: element.position,
+              type: element.type,
+              like_count: element.like_count,
+              likes: element.likes,
+              contents: element.contents,
+              created_at: element.created_at
+            };
+            finalArray.push(finalData);
+            
+            if (finalArray.length === result.length) {
+              resolve(finalArray);
+            }
+          });
+        });
+      }        
     });
   });
 };

@@ -1,14 +1,21 @@
 package com.konkuk.dna.user;
 
+import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.konkuk.dna.post.PostDetailActivity;
+import com.konkuk.dna.utils.HttpReqRes;
+import com.konkuk.dna.utils.dbmanage.Dbhelper;
 import com.konkuk.dna.utils.helpers.BaseActivity;
 import com.konkuk.dna.utils.helpers.AnimHelpers;
 import com.konkuk.dna.utils.helpers.InitHelpers;
@@ -18,6 +25,8 @@ import com.konkuk.dna.post.Post;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import static com.konkuk.dna.utils.JsonToObj.PostingJsonToObj;
 
 public class MyPageActivity extends BaseActivity {
     protected DrawerLayout menuDrawer;
@@ -54,33 +63,16 @@ public class MyPageActivity extends BaseActivity {
         scrapPosts = new ArrayList<Post>();
 
         // TODO 내가 작성한 포스트와 스크랩한 포스트의 리스트를 서버에서 불러와 추가해줘야 합니다.
-        myPosts.add(new Post(1, "http://slingshotesports.com/wp-content/uploads/2017/07/34620595595_b4c90a2e22_b.jpg",
-                "3457soso", "2018.10.05", "제목입니다",
-                "이건 내용인데 사실 많이 쓸 필요는 없긴 한데... \n그래도 왠지 많이 써야할 것 같아서 쓰긴 씁니다.\n메롱메롱\n페이커가 최고임",
-                127.081958, 37.537484, 1, 2, 3,
-                new ArrayList<Comment>(
-                        Arrays.asList(new Comment(null,"test","2018.10.05","이건 댓글입니다."),
-                                new Comment(null,"test","2018.10.05","이건 댓글입니다."))
-                )
-        ));
-        myPosts.add(new Post(2, "http://slingshotesports.com/wp-content/uploads/2017/07/34620595595_b4c90a2e22_b.jpg",
-                "3457soso", "2018.10.05", "제목입니다22",
-                "이건 내용인데 사실 많이 쓸 필요는 없긴 한데... \n그래도 왠지 많이 써야할 것 같아서 쓰긴 씁니다.\n메롱메롱\n페이커가 최고임",
-                127.083559, 37.535743, 3, 2, 1,
-                new ArrayList<Comment>(
-                        Arrays.asList(new Comment(null,"test","2018.10.05","이건 댓글입니다."),
-                                new Comment(null,"test","2018.10.05","이건 댓글입니다."))
-                )
-        ));
-        scrapPosts.add(new Post(3, "http://slingshotesports.com/wp-content/uploads/2017/07/34620595595_b4c90a2e22_b.jpg",
-                "3457soso", "2018.10.05", "제목입니다33",
-                "이건 내용인데 사실 많이 쓸 필요는 없긴 한데... \n그래도 왠지 많이 써야할 것 같아서 쓰긴 씁니다.\n메롱메롱\n페이커가 최고임",
-                127.083559, 37.536343, 2, 1, 3,
-                new ArrayList<Comment>(
-                        Arrays.asList(new Comment(null,"test","2018.10.05","이건 댓글입니다."),
-                                new Comment(null,"test","2018.10.05","이건 댓글입니다."))
-                )
-        ));
+        try {
+            myPosts = new myPostingAsync(this).execute(0).get();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
+        try {
+            scrapPosts = new myPostingAsync(this).execute(1).get();
+        } catch (Exception e){
+            e.printStackTrace();
+        }
 
         /* 내가 쓴 포스팅 */
         myPostListAdatper = new UserPostListAdapter(this, R.layout.post_list_item, myPosts, false);
@@ -89,6 +81,24 @@ public class MyPageActivity extends BaseActivity {
         /* 스크랩한 포스팅 */
         scrapPostListAdatper = new UserPostListAdapter(this, R.layout.post_list_item, scrapPosts, true);
         scrapPostList.setAdapter(scrapPostListAdatper);
+
+        myPostList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent postIntent = new Intent(MyPageActivity.this, PostDetailActivity.class);
+                postIntent.putExtra("post", myPosts.get(i));
+                startActivity(postIntent);
+            }
+        });
+
+        scrapPostList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                Intent postIntent = new Intent(MyPageActivity.this, PostDetailActivity.class);
+                postIntent.putExtra("post", scrapPosts.get(i));
+                startActivity(postIntent);
+            }
+        });
     }
 
     public void onClick(View v) {
@@ -130,5 +140,50 @@ public class MyPageActivity extends BaseActivity {
                 startActivity(updateIntent);
                 break;
         }
+    }
+}
+
+class myPostingAsync extends AsyncTask<Integer, Void, ArrayList<Post>> {
+
+    private Context context;
+    private Dbhelper dbhelper;
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    public myPostingAsync(Context context){
+        this.context = context;
+    }
+
+    @Override
+    protected ArrayList<Post> doInBackground(Integer... ints){
+        ArrayList<Post> postings = new ArrayList<>();
+        String result = null;
+
+        HttpReqRes httpReqRes = new HttpReqRes();
+        dbhelper = new Dbhelper(context);
+
+        switch(ints[0]){
+            case 0:
+                result = httpReqRes.requestHttpGetWASPIwToken("https://dna.soyoungpark.me:9013/api/posting/showMine/", dbhelper.getAccessToken());
+                break;
+            case 1:
+                result = httpReqRes.requestHttpGetWASPIwToken("https://dna.soyoungpark.me:9013/api/posting/bookmark/", dbhelper.getAccessToken());
+                break;
+        }
+
+        Log.v("mypageactivity", "show bookmark httpreq result" + result);
+        postings = PostingJsonToObj(result, 1);
+
+//        Log.v("mypageactivity", "postings test : " + postings.get(0).getContent());
+        return postings;
+    }
+
+    @Override
+    protected void onPostExecute(ArrayList<Post> postings) {
+
+        super.onPostExecute(postings);
     }
 }

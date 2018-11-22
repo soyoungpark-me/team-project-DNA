@@ -3,12 +3,16 @@ package com.konkuk.dna.friend.manage;
 
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -17,14 +21,24 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.konkuk.dna.R;
 import com.konkuk.dna.friend.message.DMActivity;
 import com.konkuk.dna.friend.message.DMRoom;
+import com.konkuk.dna.friend.message.DMRoomListAdapter;
+import com.konkuk.dna.utils.HttpReqRes;
+import com.konkuk.dna.utils.ServerURL;
+import com.konkuk.dna.utils.dbmanage.Dbhelper;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+
+import static com.konkuk.dna.utils.JsonToObj.DMRoomJsonToObj;
+import static com.konkuk.dna.utils.JsonToObj.NewDMRoomJsonToObj;
 
 public class FriendDetailFragment extends DialogFragment implements View.OnClickListener{
     private static Typeface NSEB;
@@ -132,12 +146,15 @@ public class FriendDetailFragment extends DialogFragment implements View.OnClick
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.detailDMBtn:  // DM 보내기 버튼 클릭
-                Intent intent = new Intent (getActivity(), DMActivity.class);
+                CreateDMRoomAsyncTask cdat = new CreateDMRoomAsyncTask(getActivity(), friend);
+                if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB) {
+                    cdat.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }else{
+                    cdat.execute();
+                }
+
                 // TODO 해당 친구와의 채팅방 정보를 서버에서 가져와서 세팅해줘야 합니다.
-                DMRoom room = new DMRoom(0, 1, "3457soso", "https://pbs.twimg.com/media/DbYfg2IWkAENdiS.jpg", "내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용", "Message", "2018-01-24");
-                intent.putExtra("roomIdx", room.getIdx());
-                intent.putExtra("roomUpdated", room.getUpdateDate());
-                startActivity(intent);
+
                 break;
 
             case R.id.detailDeleteBtn:  // 친구 삭제 버튼 클릭
@@ -153,6 +170,7 @@ public class FriendDetailFragment extends DialogFragment implements View.OnClick
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                        // TODO 삭제 버튼 클릭 이벤트 처
+                        new FriendDeleteAsyncTask(getActivity()).execute(id);
                         dialog.cancel();
                     }
                 }).setNegativeButton("NO",
@@ -163,5 +181,78 @@ public class FriendDetailFragment extends DialogFragment implements View.OnClick
                 });
         AlertDialog alert = alt_bld.create();
         alert.show();
+    }
+}
+
+
+
+/*
+ * 비동기 Http 연결 작업 클래스
+ * */
+class CreateDMRoomAsyncTask extends AsyncTask<Void, Integer, DMRoom> {
+
+    private Context context;
+    private String m_token;
+
+    private Dbhelper dbhelper;
+    private Friend friend;
+
+
+    public CreateDMRoomAsyncTask(Context context, Friend friend){
+        this.context = context;
+        this.friend = friend;
+    }
+
+
+    @Override
+    protected DMRoom doInBackground(Void... voids) {
+
+        DMRoom haveDMRoom = null;
+        DMRoom room;
+
+        //TODO : 나의 DM방 중에 해당 유저와의 방이 있는지 확인
+        ArrayList<DMRoom> rooms = new ArrayList<>();
+
+        HttpReqRes httpreq = new HttpReqRes();
+        dbhelper = new Dbhelper(context);
+        m_token = dbhelper.getAccessToken();
+
+
+        String repDMRooms = httpreq.requestHttpGETDMRooms(ServerURL.DNA_SERVER+ServerURL.PORT_SOCKET_API+"/rooms/", m_token);
+        rooms = DMRoomJsonToObj(repDMRooms, dbhelper.getMyIdx());
+
+        for(int i=0; i<rooms.size(); i++){
+            if(rooms.get(i).getUserIdx() == friend.getIdx()){
+                //내 dm목록중에 dm이 있으면 방정보를 담아온다.
+                haveDMRoom = rooms.get(i);
+            }
+        }
+
+        //TODO : 방이 있으면 객체에 담기
+        if(haveDMRoom != null){
+            room = haveDMRoom;
+        }else{
+            //만일 없으면 새로운 DM 개설하기
+            String result = httpreq.requestHttpPostCreateDM(ServerURL.DNA_SERVER+ServerURL.PORT_SOCKET_API+"/room", m_token, friend.getNickname(), friend.getIdx(), friend.getAvatar());
+            Log.e("CreateDM", result);
+
+            room = NewDMRoomJsonToObj(result, dbhelper.getMyIdx());
+        }
+
+        dbhelper.close();
+
+        return room;
+    }
+
+    @Override
+    protected void onPostExecute(DMRoom room) {
+        super.onPostExecute(room);
+
+        Intent intent = new Intent(context, DMActivity.class);
+        intent.putExtra("roomIdx", room.getIdx());
+        intent.putExtra("roomWho", room.getNickname());
+        intent.putExtra("roomUpdated", room.getUpdateDate());
+        context.startActivity(intent);
+
     }
 }

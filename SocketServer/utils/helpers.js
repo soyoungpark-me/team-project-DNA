@@ -23,7 +23,6 @@ const upload = multer({
     bucket: 'dna-edge',
     acl: 'public-read',
     key: function (req, file, callback) {
-      console.log(req);
       const fname = Date.now() + '_' + file.originalname;
       callback(null, fname);
     }

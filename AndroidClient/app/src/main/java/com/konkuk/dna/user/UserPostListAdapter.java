@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 
 import com.konkuk.dna.R;
 import com.konkuk.dna.post.Post;
+import com.konkuk.dna.utils.HttpReqRes;
+import com.konkuk.dna.utils.dbmanage.Dbhelper;
 
 import java.util.ArrayList;
 
@@ -23,6 +26,7 @@ public class UserPostListAdapter extends ArrayAdapter<Post> {
     Context context;
     ArrayList<Post> posts;
     Boolean isBookMark;
+    int idx;
 
     private static Typeface fontAwesomeR;
     private static Typeface fontAwesomeS;
@@ -50,6 +54,7 @@ public class UserPostListAdapter extends ArrayAdapter<Post> {
     @Override
     public View getView(int position, @Nullable View v, @NonNull ViewGroup parent) {
         Post post = posts.get(position);
+        idx = post.getPostingIdx();
 
         if (v == null) {
             LayoutInflater layoutInflater = (LayoutInflater)
@@ -65,16 +70,46 @@ public class UserPostListAdapter extends ArrayAdapter<Post> {
         TextView postCommentCntIcon = v.findViewById(R.id.postCommentCntIcon);
         TextView postScrapCntText = v.findViewById(R.id.postScrapCntText);
         TextView postScrapCntIcon = v.findViewById(R.id.postScrapCntIcon);
-        LinearLayout bookmarkDeleteBtn = v.findViewById(R.id.bookmarkDeleteBtn);
 
+        LinearLayout bookmarkDeleteBtn = v.findViewById(R.id.bookmarkDeleteBtn);
+        TextView bookmarkDeleteBtnText = v.findViewById(R.id.bookmarkDeleteBtnText);
+        bookmarkDeleteBtnText.setTypeface(fontAwesomeS);
+        bookmarkDeleteBtn.setVisibility(View.VISIBLE);
+
+        LinearLayout postMineDeleteBtn = v.findViewById(R.id.postmineDeleteBtn);
+        TextView postMineDeleteBtnText = v.findViewById(R.id.postmineDeleteBtnText);
+        postMineDeleteBtnText.setTypeface(fontAwesomeS);
+        postMineDeleteBtn.setVisibility(View.VISIBLE);
+
+        //북마크인지 내 포스팅인지 확인
         if (isBookMark) {
-            TextView bookmarkDeleteBtnText = v.findViewById(R.id.bookmarkDeleteBtnText);
-            bookmarkDeleteBtnText.setTypeface(fontAwesomeS);
-            bookmarkDeleteBtn.setVisibility(View.VISIBLE);
+            if(postMineDeleteBtn!=null){
+                postMineDeleteBtn.setVisibility(View.GONE);
+            }
+            if(postMineDeleteBtnText!=null){
+                postMineDeleteBtnText.setVisibility(View.GONE);
+            }
             bookmarkDeleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    Log.e("Clicked", "Bookmark delete");
                     DialogSimple();
+                    new deleteMyPostingkAsync(context).execute(idx, 2);
+                }
+            });
+        }else{
+            if(bookmarkDeleteBtn!=null){
+                bookmarkDeleteBtn.setVisibility(View.GONE);
+            }
+            if(bookmarkDeleteBtnText!=null){
+                bookmarkDeleteBtnText.setVisibility(View.GONE);
+            }
+            //TODO : 내 포스팅 삭제 리스너 구현
+            postMineDeleteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Log.v("userpostlistadapter", "mypost del??");
+                    new deleteMyPostingkAsync(context).execute(idx, 1);
                 }
             });
         }
@@ -86,7 +121,7 @@ public class UserPostListAdapter extends ArrayAdapter<Post> {
         postCommentCntIcon.setTypeface(fontAwesomeS);
         postCommentCntText.setText(post.getCommentCount()+" ");
         postScrapCntIcon.setTypeface(fontAwesomeS);
-        postScrapCntText.setText(post.getScrapCount()+" ");
+//        postScrapCntText.setText(post.getScrapCount()+" ");
 
         return v;
     }
@@ -113,3 +148,42 @@ public class UserPostListAdapter extends ArrayAdapter<Post> {
     }
 }
 
+class deleteMyPostingkAsync extends AsyncTask<Integer, Integer, Void> {
+
+    private Context context;
+    private Dbhelper dbhelper;
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    public deleteMyPostingkAsync(Context context){
+        this.context = context;
+    }
+
+    @Override
+    protected Void doInBackground(Integer... ints){
+        ArrayList<Post> postings = new ArrayList<>();
+
+        HttpReqRes httpReqRes = new HttpReqRes();
+        dbhelper = new Dbhelper(context);
+
+        switch (ints[1]) {
+            case 1:
+                httpReqRes.requestHttpPosting("https://dna.soyoungpark.me:9013/api/posting/" + ints[0], dbhelper.getAccessToken(), 2);
+                break;
+
+            case 2:
+                httpReqRes.requestHttpPosting("https://dna.soyoungpark.me:9013/api/posting/bookmark/" + ints[0], dbhelper.getAccessToken(), 2);
+                break;
+        }
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void voids) {
+
+        super.onPostExecute(voids);
+    }
+}

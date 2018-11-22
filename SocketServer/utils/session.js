@@ -10,13 +10,14 @@ const geolib = require('geolib');
 const helpers = require('./helpers');
 /* 
   레디스에 전달 받은 유저 정보를 저장하는 함수입니다.
-  @param id       : 저장할 유저의 idx
-  @param data     : 저장할 내용을 담은 JSON 오브젝트
-         socket   : 해당 유저가 현재 물고 있는 소켓의 아이디
-         position : 유저의 현재 위치
-         radius   : 유저가 설정한 반경 값
-         nickname : 유저의 닉네임
-         avatar   : 유저의 프로필 이미지 주소
+  @param id        : 저장할 유저의 idx
+  @param data      : 저장할 내용을 담은 JSON 오브젝트
+         socket    : 해당 유저가 현재 물고 있는 소켓의 아이디
+         position  : 유저의 현재 위치
+         radius    : 유저가 설정한 반경 값
+         anonymity : 유저의 익명성 여부
+         nickname  : 유저의 닉네임
+         avatar    : 유저의 프로필 이미지 주소
 */
 exports.storeAll = (socketId, data) => {
   const idx = data.idx;
@@ -24,9 +25,10 @@ exports.storeAll = (socketId, data) => {
   
   const info = {
     socket: socketId,
+    nickname: data.nickname,
     position: position,
     radius: data.radius,
-    nickname: data.nickname,
+    anonymity: data.anonymity,
     avatar: data.avatar,
   };
 
@@ -131,8 +133,6 @@ exports.returnSessionList = (type, position, radius) => {
           console.log(err);
           reject(err);
         }
-        // resultForGeo = resultForGeo.concat(positions);
-        // resolve(resultForGeo);        
         resolve(positions);  
       });
     } else {                // 타입이 client이거나 info일 경우엔 hash 사용      

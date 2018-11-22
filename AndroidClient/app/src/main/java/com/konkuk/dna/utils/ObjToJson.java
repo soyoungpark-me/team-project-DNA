@@ -20,6 +20,7 @@ public class ObjToJson {
         jObj.addProperty("idx", dbhelper.getMyIdx());
         jObj.addProperty("nickname", dbhelper.getMyNickname());
         jObj.addProperty("avatar", dbhelper.getMyAvatar());
+        jObj.addProperty("anonymity", dbhelper.getMyAnonymity());
 
         JsonArray posarr = new JsonArray();
         posarr.add(lng);
@@ -58,12 +59,12 @@ public class ObjToJson {
     /*
      * 메세지 전송 용 Json 생성
      * */
-    public static JsonObject SendDMObjToJson(Dbhelper dbhelper, int roomIdx, String msgType, String contents) {
+    public static JsonObject SendDMObjToJson(int roomIdx, String msgType, String contents) {
 
         //JsonObject jObj = new JsonObject();
         JsonObject mdataObj = new JsonObject();
 
-        mdataObj.addProperty("roomIdx", roomIdx);
+        mdataObj.addProperty("room_idx", roomIdx);
         mdataObj.addProperty("type", msgType);
         mdataObj.addProperty("contents", contents);
 
@@ -72,6 +73,20 @@ public class ObjToJson {
         Log.e("SendDMG2J", mdataObj.toString());
 
         return mdataObj;
+    }
+
+    /*
+     * 위치정보 전송 용 Json 생성
+     * */
+    public static JsonObject LocationObjToJson(Double lat, Double lng) {
+
+        //JsonObject jObj = new JsonObject();
+        JsonObject jObj = new JsonObject();
+
+        jObj.addProperty("lat", lat);
+        jObj.addProperty("lng", lng);
+
+        return jObj;
     }
 
 }

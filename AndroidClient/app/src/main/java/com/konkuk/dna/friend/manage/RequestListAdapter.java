@@ -3,17 +3,23 @@ package com.konkuk.dna.friend.manage;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.media.Image;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.konkuk.dna.R;
 import com.konkuk.dna.friend.manage.Request;
+import com.konkuk.dna.utils.HttpReqRes;
+import com.konkuk.dna.utils.dbmanage.Dbhelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -72,6 +78,7 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
     @Override
     public View getView(int position, @Nullable View v, @NonNull ViewGroup parent) {
         Request request = requests.get(position);
+        final int idx = request.getIdx();
 
         if (v == null) {
             LayoutInflater layoutInflater = (LayoutInflater)
@@ -79,8 +86,6 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
 
             if (type == TYPE_RECEIVED) {
                 v = layoutInflater.inflate(R.layout.friend_item_request_received, null);
-            } else if (type == TYPE_ACCEPTED) {
-                v = layoutInflater.inflate(R.layout.friend_item_request_accepted, null);
             } else if (type == TYPE_SENEDED) {
                 v = layoutInflater.inflate(R.layout.friend_item_request_sended, null);
             }
@@ -92,12 +97,78 @@ public class RequestListAdapter extends ArrayAdapter<Request> {
 
             TextView reqNickname = (TextView) v.findViewById(R.id.reqNickname);
             TextView reqDate = (TextView) v.findViewById(R.id.reqDate);
-
             reqNickname.setText(request.getNickname());
             reqNickname.setTypeface(NSEB);
             reqDate.setText(request.getDate());
             reqDate.setTypeface(NSB);
+
+            ImageButton acceptBtn, denyBtn, deleteBtn;
+
+            if (type == TYPE_RECEIVED) {
+                acceptBtn = (ImageButton) v.findViewById(R.id.acceptBtn);
+                acceptBtn.setVisibility(View.VISIBLE);
+                denyBtn = (ImageButton) v.findViewById(R.id.denyBtn);
+                denyBtn.setVisibility(View.VISIBLE);
+                acceptBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.e("Clicked", "accept friend");
+//                    DialogSimple();
+                    new NotifyFriendAsync(context).execute(idx, 1);
+                    }
+                });
+                denyBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.e("Clicked", "deny friend");
+                        new NotifyFriendAsync(context).execute(idx, 2);
+//                    DialogSimple();
+                    }
+                });
+            } else if (type == TYPE_SENEDED) {
+                deleteBtn = (ImageButton) v.findViewById(R.id.deleteBtn);
+                deleteBtn.setVisibility(View.VISIBLE);
+                deleteBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Log.e("Clicked", "delete friend");
+                        new NotifyFriendAsync(context).execute(idx, 2);
+//                    DialogSimple();
+                    }
+                });
+            }
+
         }
         return v;
+    }
+}
+
+class NotifyFriendAsync extends AsyncTask<Integer, String, Integer> {
+    private Context context;
+    private Dbhelper dbhelper;
+
+    //    @Override
+//    protected void onPreExecute() {
+//        super.onPreExecute();
+//    }
+    public NotifyFriendAsync(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    protected Integer doInBackground(Integer... ints) {
+        HttpReqRes httpReqRes = new HttpReqRes();
+        dbhelper = new Dbhelper(context);
+
+        httpReqRes.requestHttpNotifyFriend("https://dna.soyoungpark.me:9013/api/friends/" + ints[0], dbhelper.getAccessToken(), ints[1]);
+
+        return ints[1];
+    }
+
+    @Override
+    protected void onPostExecute(Integer num) {
+
+        super.onPostExecute(num);
+
     }
 }

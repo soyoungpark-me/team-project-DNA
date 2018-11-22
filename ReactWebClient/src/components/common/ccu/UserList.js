@@ -8,6 +8,7 @@ import { connect } from 'react-redux';
 import styles from './styles.css';
 import avatar from './../../../../public/images/avatar.png';
 import imagePath from './../../../../public/images/empty.png';
+import config from './../../../config';
 
 function mapStateToProps(state) {
   return {
@@ -43,14 +44,16 @@ class UserList extends Component {
   renderUsers() {
     return this.props.users    
       .map((user) => {
-        if(this.props.profile.idx !== parseInt(user.idx)) {
+        if (this.props.profile.idx !== parseInt(user.idx)) {
           return (
             <div className="user-list-item" key={user.idx}>
               <div className="avatar-wrapper">
                 <img className="avatar-image"
-                  src={user.avatar !== null && user.avatar !== "null" ? user.avatar : avatar} />
+                  src={user.anonymity === 0 && user.avatar !== null && user.avatar !== "null" 
+                    ? user.avatar : avatar} />
               </div>
-              <p className="user-list-item-nickname">{user.nickname}</p>
+              <p className="user-list-item-nickname">{user.anonymity !== 1 ? user.nickname : 
+                config.ADJECTIVE[user.idx & 100] + " " + config.ANIMAL[user.idx % 100]}</p>
               <FontAwesome name="circle" 
                 className={`user-list-sign ${(user.inside ? "user-inside" : "user-outside")}`} />
             </div>

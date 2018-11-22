@@ -23,25 +23,27 @@ public class ChatUser {
     private String nickname;
     private String avatar;
     private String info;
+    private int anonymity;
     private Boolean inside;
 
 
-    public ChatUser(int idx, String nickname, String avatar, Boolean inside) {
+    public ChatUser(int idx, String nickname, String avatar, int anonymity, Boolean inside) {
         this.idx = idx;
         this.nickname = nickname;
         this.avatar = avatar;
+        this.anonymity = anonymity;
         this.inside = inside;
     }
 
-    public ChatUser(int idx, String ID, String nickname, String avatar, String info, Boolean inside) {
+    public ChatUser(int idx, String ID, String nickname, String avatar, String info, int anonymity, Boolean inside) {
         this.idx = idx;
         this.nickname = nickname;
         this.avatar = avatar;
         this.inside = inside;
         this.info = info;
+        this.anonymity = anonymity;
         this.ID = ID;
     }
-
 
     public int getIdx() {
         return idx;
@@ -70,4 +72,7 @@ public class ChatUser {
     public void setInside(Boolean inside) {
         this.inside = inside;
     }
+
+    public int getAnonymity() { return anonymity; }
+    public void setAnonymity(int anonymity) { this.anonymity = anonymity; }
 }

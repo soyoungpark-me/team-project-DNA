@@ -191,7 +191,30 @@
                         android:paddingBottom="15dp"
                         android:divider="@android:color/transparent"
                         android:dividerHeight="7dp"
-                        android:listSelector="@android:color/transparent"/>
+                        android:listSelector="@android:color/transparent" />
+
+                    <LinearLayout
+                        android:id="@+id/msgListEmpty"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:visibility="gone">
+
+                        <ImageView
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_gravity="center"
+                            android:layout_marginTop="-30dp"
+                            android:src="@drawable/empty" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:textColor="@color/colorPrimaryDark"
+                            android:textSize="15dp"
+                            android:text="이 근방에서는 아직 작성된 메시지가 없습니다"/>
+                    </LinearLayout>
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"

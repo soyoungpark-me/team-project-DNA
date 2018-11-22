@@ -18,11 +18,13 @@ let validationError = {
 exports.write = async (req, res, next) => {
   /* PARAM */
   const userIdx = req.userData.idx;
-  const userLng = req.body.userLng || req.params.userLng;
-  const userLat = req.body.userLat || req.params.userLat;
+  const userNick = req.userData.nickname;
+  const userAvatar = req.userData.avatar;
+  const longitude = req.body.longitude || req.params.longitude;
+  const latitude = req.body.latitude || req.params.latitude;
   const date = req.body.date || req.params.date;
-  const ptitle = req.body.ptitle || req.params.ptitle;
-  const pcontents = req.body.pcontents || req.params.pcontents;
+  const title = req.body.title || req.params.title;
+  const contents = req.body.contents || req.params.contents;
   const onlyme = req.body.onlyme || req.params.onlyme;
   /* 1. 유효성 체크하기 */
   let isValid = true;
@@ -32,24 +34,24 @@ exports.write = async (req, res, next) => {
     validationError.errors.userIdx = { message : "userIDX is required" };
   }
 
-  if (!userLng|| userLng === null ) {
+  if (!longitude|| longitude === null ) {
     isValid = false;
-    validationError.errors.userLng= { message : "userLng is required" };
+    validationError.errors.longitude= { message : "Longitude is required" };
   }
 
-  if (!userLat || userLat === null ) {
+  if (!latitude || latitude === null ) {
     isValid = false;
-    validationError.errors.userYLoc= { message : "userLat is required" };
+    validationError.errors.latitude= { message : "Latitude is required" };
   }
 
-  if (!ptitle || ptitle === null) {
+  if (!title || title === null) {
     isValid = false;
-    validationError.errors.ptitle = { message : "ptitle is required" };
+    validationError.errors.title = { message : "title is required" };
   }
 
-  if (!pcontents || pcontents === null) {
+  if (!contents || contents === null) {
     isValid = false;
-    validationError.errors.pcontents = { message : "pconetnt is required" };
+    validationError.errors.contents = { message : "conetnt is required" };
   }
 
   if (!isValid) return res.status(400).json(validationError);
@@ -57,11 +59,12 @@ exports.write = async (req, res, next) => {
   let result = '';
 
   try {
-    result = await postingModel.write(userIdx, userLng, userLat, date, pcontents, onlyme);
+    result = await postingModel.write(userIdx, userNick, userAvatar, longitude, latitude, date, title, contents, onlyme);
   } catch (err) {
     console.log(err);
     return res.json(errorCode[err]);
   }
+
   const respond = {
     status: 201,
     message : "Write Posting Successfully",
@@ -113,6 +116,45 @@ exports.delete = async (req, res, next) => {
     result
   };
   return res.status(201).json(respond);
+};
+
+/*******************
+ *  Show Allpostings
+ *  @param: useridx, postingidx
+ *  TODO show posting location
+ *  TODO 포스팅 위치 조회
+ ********************/
+exports.showAll = async (req, res, next) => {
+  /* PARAM */
+  const userIdx = req.userData.idx;
+
+  /* 유효성 체크하기 */
+  let isValid = true;
+
+  if (!userIdx || userIdx === null) {
+    isValid = false;
+    validationError.errors.userIdx = { message : "userIDX is required" };
+  }
+
+  if (!isValid) return res.status(400).json(validationError);
+  /* 유효성 체크 끝 */
+
+  let result = '';
+
+  try {
+    result = await postingModel.showAll(userIdx);
+  } catch (err) {
+    console.log(err);
+    return res.json(errorCode[err]);
+  }
+
+  /* 조회 성공 시 */
+  const respond = {
+    status: 200,
+    message : "Show Posting Successfully",
+    result
+  };
+  return res.status(200).json(respond);
 };
 
 /*******************
@@ -284,7 +326,7 @@ exports.unlike = async (req, res, next) => {
 
   /* 삭제 성공 시 */
   const respond = {
-    status: 201,
+    status: 200,
     message : "Unlike posting Successfully",
     result
   };
@@ -300,6 +342,9 @@ exports.unlike = async (req, res, next) => {
 exports.reply = async (req, res, next) => {
   /* PARAM */
   const userIdx = req.userData.idx;
+  const userNick = req.userData.nickname;
+  const userAvatar = req.userData.avatar;
+  const rdate = req.body.rdate || req.params.rdate;
   const postingIdx = req.body.postingIdx || req.params.postingIdx;
   const rcontents = req.body.rcontents || req.params.rcontents;
   /* 1. 유효성 체크하기 */
@@ -325,7 +370,7 @@ exports.reply = async (req, res, next) => {
   let result = '';
 
   try {
-    result = await postingModel.reply(userIdx, postingIdx, rcontents);
+    result = await postingModel.reply(userIdx, userNick, userAvatar, rdate, postingIdx, rcontents);
   } catch (err) {
     console.log(err);
     return res.json(errorCode[err]);
@@ -457,7 +502,7 @@ exports.dbookmark = async (req, res, next) => {
     return res.json(errorCode[err]);
   }
   const respond = {
-    status: 201,
+    status: 200,
     message : "Delete Bookmark Successfully",
     result
   };
@@ -494,10 +539,47 @@ exports.showBookmark = async (req, res, next) => {
     return res.json(errorCode[err]);
   }
   const respond = {
-    status: 201,
+    status: 200,
     message : "Show Bookmark Successfully",
     result
   };
-  return res.status(201).json(respond);
+  return res.status(200).json(respond);
+
+};
+
+/*******************
+ *  Show Bookmark
+ *  @param: useridx
+ *  TODO show my posts
+ *  TODO 내가쓴 포스팅 조회
+ ********************/
+exports.showMyPost = async (req, res, next) => {
+  /* PARAM */
+  const userIdx = req.userData.idx;
+  /* 1. 유효성 체크하기 */
+  let isValid = true;
+
+  if (!userIdx || userIdx === null) {
+    isValid = false;
+    validationError.errors.userIdx = { message : "userIDX is required" };
+  }
+
+
+  if (!isValid) return res.status(400).json(validationError);
+  /* 유효성 체크 끝 */
+  let result = '';
+
+  try {
+    result = await postingModel.showMyPost(userIdx);
+  } catch (err) {
+    console.log(err);
+    return res.json(errorCode[err]);
+  }
+  const respond = {
+    status: 200,
+    message : "Show my posts Successfully",
+    result
+  };
+  return res.status(200).json(respond);
 
 };

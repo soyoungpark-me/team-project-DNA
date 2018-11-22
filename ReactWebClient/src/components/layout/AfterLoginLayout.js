@@ -19,6 +19,7 @@ import DirectComponent from './../contents/direct/DirectComponent';
 import soundMp3 from './../../../public/sounds/sound.mp3';
 import soundOgg from './../../../public/sounds/sound.ogg';
 import speakerPng from './../../../public/images/speaker.png';
+import config from './../../config';
 
 const AfterLoginLayout = withRouter(props => <MyComponent {...props}/>);
 
@@ -76,12 +77,13 @@ class MyComponent extends Component {
       const profile = this.props.profile;
 
       let info = {
-        token   : JSON.parse(sessionStorage.getItem("token")).accessToken,
-        idx     : profile.idx,                  // 현재 유저의 인덱스 값
-        nickname: profile.nickname,             // 현재 유저의 별명
-        avatar  : profile.avatar,               // 현재 유저의 프로필 사진 주소
-        position: [position.lng, position.lat], // 클라이언트의 현재 위치
-        radius  : profile.radius                // 메시지를 받아볼 반경 값
+        token     : JSON.parse(sessionStorage.getItem("token")).accessToken,
+        idx       : profile.idx,                  // 현재 유저의 인덱스 값
+        nickname  : profile.nickname,             // 현재 유저의 별명
+        avatar    : profile.avatar,               // 현재 유저의 프로필 사진 주소
+        position  : [position.lng, position.lat], // 클라이언트의 현재 위치
+        radius    : profile.radius,               // 메시지를 받아볼 반경 값
+        anonymity : profile.anonymity             // 익명 여부
       };
       
       // 2. 연결하면서 현재 정보를 서버에 전송해 저장되도록 합니다.
@@ -168,11 +170,16 @@ class MyComponent extends Component {
   };
 
   makePushNoti(data) {
-    if(this.state.ignore) {
-      return;
+    if (this.state.ignore) return;
+    
+    let nickname = '';
+    if (data.user.anonymity === 1) {
+      console.log('here')
+      nickname = "[익명]";
+    } else {
+      nickname = data.user.nickname;
     }
-
-    const title = data.user.nickname + "님의 확성기";
+    const title = nickname + "님의 확성기";
     const body = data.contents;
     const tag = Date.now(); // 태그 값이 서로 달라야 중복으로 알림이 생깁니다.
     const icon = speakerPng;

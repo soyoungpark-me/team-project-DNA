@@ -4,6 +4,7 @@ package com.konkuk.dna.friend.fragments;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.annotation.Nullable;
@@ -15,6 +16,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.konkuk.dna.R;
+import com.konkuk.dna.utils.EventListener;
 import com.konkuk.dna.utils.HttpReqRes;
 import com.konkuk.dna.utils.ServerURL;
 import com.konkuk.dna.utils.dbmanage.Dbhelper;
@@ -22,6 +24,9 @@ import com.konkuk.dna.utils.dbmanage.Dbhelper;
 import com.konkuk.dna.friend.message.DMActivity;
 import com.konkuk.dna.friend.message.DMRoom;
 import com.konkuk.dna.friend.message.DMRoomListAdapter;
+
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
@@ -39,6 +44,8 @@ public class RoomFragment extends Fragment {
     private final String TYPE_MESSAGE = "Message";     // 일반 메시지 전송
     private final String TYPE_LOCATION = "Location";    // 현재 위치 전송
     private final String TYPE_IMAGE = "Image";       // 이미지 전송
+
+    private static final int SOCKET_DIRECT = 7;
 
     public RoomFragment() {}
 
@@ -60,7 +67,12 @@ public class RoomFragment extends Fragment {
     public void onResume() {
 
         DMRoomAsyncTask dmrat = new DMRoomAsyncTask(getActivity(), dmRoomListAdapter, roomList);
-        dmrat.execute();
+
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB) {
+            dmrat.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }else{
+            dmrat.execute();
+        }
 
         super.onResume();
     }
@@ -71,7 +83,11 @@ public class RoomFragment extends Fragment {
 
         // TODO 서버에서 room 리스트를 받아와서 초기화시켜줘야 합니다.
         DMRoomAsyncTask dmrat = new DMRoomAsyncTask(getActivity(), dmRoomListAdapter, roomList);
-        dmrat.execute();
+        if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB) {
+            dmrat.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        }else{
+            dmrat.execute();
+        }
 //        rooms.add(new DMRoom(0, 1, "3457soso", "https://pbs.twimg.com/media/DbYfg2IWkAENdiS.jpg", "내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용내용", TYPE_MESSAGE, "2018-01-24"));
 //        rooms.add(new DMRoom(1, 2, "test", null, "마지막 메시지2", TYPE_MESSAGE, "2018-01-23"));
 //        rooms.add(new DMRoom(2, 3, "avatar", null, "마지막 메시지2", TYPE_MESSAGE, "2018-01-22"));
@@ -90,11 +106,32 @@ public class RoomFragment extends Fragment {
                 intent.putExtra("roomIdx", room.getIdx());
                 intent.putExtra("roomWho", room.getNickname());
                 intent.putExtra("roomUpdated", room.getUpdateDate());
+
+                if(getActivity().getIntent().getIntExtra("postNum", -1) != -1) {
+                    intent.putExtra("postNum", getActivity().getIntent().getIntExtra("postNum", -1));
+                    intent.putExtra("postTitle", getActivity().getIntent().getStringExtra("postTitle"));
+                }
                 startActivity(intent);
             }
         });
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void OnEventListener(EventListener event) {
+
+        switch (event.message) {
+            case SOCKET_DIRECT:
+                DMRoomAsyncTask dmrat = new DMRoomAsyncTask(getActivity(), dmRoomListAdapter, roomList);
+                if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB) {
+                    dmrat.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }else{
+                    dmrat.execute();
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
 
 
@@ -133,7 +170,7 @@ class DMRoomAsyncTask extends AsyncTask<Double, Integer, ArrayList<DMRoom>> {
         dbhelper = new Dbhelper(context);
         m_token = dbhelper.getAccessToken();
 
-        String repDMRooms = httpreq.requestHttpGETDMRooms(ServerURL.LOCAL_HOST+ServerURL.PORT_SOCKET_API+"/rooms/", m_token);
+        String repDMRooms = httpreq.requestHttpGETDMRooms(ServerURL.DNA_SERVER+ServerURL.PORT_SOCKET_API+"/rooms/", m_token);
 
         Log.e("!!!!!!!", repDMRooms);
 

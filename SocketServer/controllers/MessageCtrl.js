@@ -30,9 +30,7 @@ exports.save = (token, param) => {
     return new Promise(async (resolve, reject) => {
       /* PARAM */
       const idx = userData.idx;
-      const id = userData.id;
-      const nickname = userData.nickname;
-      const avatar = userData.avatar || null;
+      const radius = userData.radius;
       const lng = param.lng;
       const lat = param.lat;
       const contents = param.contents;
@@ -63,7 +61,7 @@ exports.save = (token, param) => {
       let response = '';
 
       const messageData = {
-        idx, id, nickname, avatar, lng, lat, type, contents, testing
+        idx, radius, lng, lat, type, contents, testing
       };   
 
       if (!testing && type === "LoudSpeaker") { 
@@ -309,7 +307,8 @@ exports.selectCircle = async (req, res, next) => {
       let result = '';
       try {
         const conditions = {
-          lng, lat, radius
+          token: req.headers.token,
+          lng, lat, radius          
         };
 
         result = await messageModel.selectCircle(conditions, blocks, page);
@@ -420,6 +419,7 @@ exports.best = async (req, res, next) => {
   let result = '';
   try {
     const conditions = {
+      token: req.headers.token,
       lng, lat, radius
     };
 

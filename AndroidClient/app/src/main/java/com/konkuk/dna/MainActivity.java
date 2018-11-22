@@ -3,10 +3,26 @@ package com.konkuk.dna;
 import android.animation.Animator;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
+import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.ProgressDialog;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.Log;
 import android.view.Display;
@@ -21,6 +37,7 @@ import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.JsonObject;
 import com.konkuk.dna.utils.EventListener;
+import com.konkuk.dna.utils.HttpReqRes;
 import com.konkuk.dna.utils.SocketConnection;
 import com.konkuk.dna.utils.helpers.BaseActivity;
 import com.konkuk.dna.chat.ChatActivity;
@@ -31,15 +48,26 @@ import com.konkuk.dna.map.MapFragment;
 import com.konkuk.dna.post.Comment;
 import com.konkuk.dna.post.Post;
 import com.konkuk.dna.post.PostFormActivity;
+import com.konkuk.dna.utils.helpers.NameHelpers;
+import com.nhn.android.maps.NMapView;
+import com.squareup.picasso.Picasso;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
 
+import static com.konkuk.dna.utils.JsonToObj.PostingCntJsonToObj;
+import static com.konkuk.dna.utils.JsonToObj.PostingJsonToObj;
+import static com.konkuk.dna.utils.JsonToObj.PushJsonToObj;
 import static com.konkuk.dna.utils.ObjToJson.StoreObjToJson;
 
 public class MainActivity extends BaseActivity {
@@ -47,6 +75,10 @@ public class MainActivity extends BaseActivity {
     private MapFragment mapFragment;
     private View mapFragmentView;
     private FloatingActionButton gotoChatBtn, postWriteBtn;
+
+    public ArrayList<Post> getPosts() {
+        return posts;
+    }
 
     private ArrayList<Post> posts;
 
@@ -59,6 +91,8 @@ public class MainActivity extends BaseActivity {
     private long backPressedTime = 0;
 
     private Dbhelper dbhelper;
+
+    private ProgressDialog dialogWaitSocket;
 
     private static final int SOCKET_CONNECT = 0;
     private static final int SOCKET_PING = 1;
@@ -81,12 +115,29 @@ public class MainActivity extends BaseActivity {
         FirebaseMessaging.getInstance().subscribeToTopic("chat");
         Log.d("MainActivity", "token : " + FirebaseInstanceId.getInstance().getToken());
 
+        if(SocketConnection.getSocket()==null){
+            dialogWaitSocket = new ProgressDialog(this);
+            dialogWaitSocket.setCancelable(false);
+            dialogWaitSocket.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialogWaitSocket.setMessage("서버 연동 중 입니다..");
+            // show dialog
+            dialogWaitSocket.show();
+        }
+
         socketinit();
         init();
+        //socketinit();
+        FloatingActionButton myPost = (FloatingActionButton)findViewById(R.id.postWriteBtn);
+        myPost.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                createNewPosting(v);
+            }
+        });
     }
 
     public void socketinit(){
         dbhelper = new Dbhelper(this);
+
         //소켓을 사용하는 가장 첫번째 액티비티에서 소켓 커넥션을 실행한다.
         SocketConnection.initInstance();
 
@@ -98,15 +149,19 @@ public class MainActivity extends BaseActivity {
                 Log.e("Socket Connected",SocketConnection.getSocket().connected()+"");
                 JsonObject storeJson = StoreObjToJson(dbhelper, gpsTracker.getLongitude(), gpsTracker.getLatitude());
                 SocketConnection.emit("store", storeJson);
+                if(dialogWaitSocket!=null) {
+                    dialogWaitSocket.dismiss();
+                }
             }
         });
         // 핑이 오면 update 할 것
         SocketConnection.getSocket().on("ping", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-                Log.e("Socket ON", "ping");
+                Log.e("Socket ON", "ping, radius:"+dbhelper.getMyRadius());
                 JsonObject updateJson = StoreObjToJson(dbhelper, gpsTracker.getLongitude(), gpsTracker.getLatitude());
                 SocketConnection.emit("update", "geo", updateJson);
+                SocketConnection.emit("update", "direct", updateJson);
             }
         });
 
@@ -114,7 +169,7 @@ public class MainActivity extends BaseActivity {
         SocketConnection.getSocket().on("new_dm", new Emitter.Listener() {
             @Override
             public void call(Object... args) {
-
+                Log.e("Socket ON", "new_dm");
                 EventBus.getDefault().post(new EventListener(SOCKET_NEW_DM, null));
             }
         });
@@ -136,29 +191,52 @@ public class MainActivity extends BaseActivity {
         });
         // push가 오면 push 알림을 띄울 것
         SocketConnection.getSocket().on("speaker", new Emitter.Listener() {
+
             @Override
             public void call(Object... args) {
+                ArrayList<String> result = PushJsonToObj(args[0].toString());
+
+                //TODO : add Asynctask
+                String name = "";
+                String avatar = null;
+                String contents = result.get(3);
+
+                if(Integer.parseInt(result.get(2))==0){
+                    //when anonymity = 0
+                    name = result.get(0);
+                    avatar = result.get(1);
+                }else{
+                    //when anonymity = 1
+                    name = NameHelpers.makeName(Integer.parseInt(result.get(4)));
+                    avatar = null;
+                }
+                new generatePictureStyleNotification(getApplicationContext(), name, contents,
+                        avatar).execute();
+
                 EventBus.getDefault().post(new EventListener(SOCKET_SPEAKER, null));
             }
         });
 
         //TODO: InitHelpers Listener
-        SocketConnection.getSocket().on("geo", new Emitter.Listener() {
-            @Override
-            public void call(Object... args) {
-                EventBus.getDefault().post(new EventListener(SOCKET_GEO, args[0].toString()));
-            }
-        });
-
+//        SocketConnection.getSocket().on("geo", new Emitter.Listener() {
+//            @Override
+//            public void call(Object... args) {
+//                EventBus.getDefault().post(new EventListener(SOCKET_GEO, args[0].toString()));
+//            }
+//        });
+//
         SocketConnection.getSocket().on("direct", new Emitter.Listener() {
+
             @Override
             public void call(Object... args) {
+                //Log.e("Socket direct", args[0].toString());
                 EventBus.getDefault().post(new EventListener(SOCKET_DIRECT, args[0].toString()));
             }
         });
     }
 
     public void init() {
+        //dbhelper = new Dbhelper(this);
 
         menuDrawer = findViewById(R.id.drawer_layout);
         InitHelpers.initDrawer(this, menuDrawer, 0);
@@ -179,30 +257,22 @@ public class MainActivity extends BaseActivity {
 
         // TODO 반경, 위치 초기값 설정해줘야 합니다!
         radius = dbhelper.getMyRadius();
+        // 에뮬레이터가 위치를 못잡아서 임시로 넣어놨슴다
+//        longitude = 127.17934280;
+//        latitude = 37.56076250;
         longitude = gpsTracker.getLongitude();
         latitude = gpsTracker.getLatitude();
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
 
-        posts = new ArrayList<Post>();
+//        posts = new ArrayList<Post>();
 
+        try {
+            posts = new showPostingAllAsync(this).execute().get();
+        } catch (Exception e){
+            e.printStackTrace();
+//        new showPostingAsync().execute(posts)
+        };
         // TODO 포스트의 리스트를 서버에서 불러와서 넣어줘야 합니다.
-        posts.add(new Post(0, "http://slingshotesports.com/wp-content/uploads/2017/07/34620595595_b4c90a2e22_b.jpg",
-                "3457soso", "2018.10.05", "건국대학교 맛집입니다",
-                "꼬막집인데 양도 정말 많구요! 밥보다도 꼬막이 많아서 정말 좋습니다ㅠㅠ \n저만 알기 아까워서 공유합니다ㅠ\n꼭 한번 가보세요!",
-                127.081958, 37.537484, 1, 2, 3,
-                new ArrayList<Comment>(
-                        Arrays.asList(new Comment(null,"who_sy","2018.10.05","오 감사합니다 ㅎㅎ 가봐야겠어요."))
-                )
-        ));
-        posts.add(new Post(1, "http://slingshotesports.com/wp-content/uploads/2017/07/34620595595_b4c90a2e22_b.jpg",
-                "3457soso", "2018.10.05", "제목입니다22",
-                "이건 내용인데 사실 많이 쓸 필요는 없긴 한데... \n그래도 왠지 많이 써야할 것 같아서 쓰긴 씁니다.\n메롱메롱\n페이커가 최고임",
-                127.083559, 37.536543, 1, 2, 3,
-                new ArrayList<Comment>(
-                        Arrays.asList(new Comment(null,"test","2018.10.05","이건 댓글입니다."),
-                                new Comment(null,"test","2018.10.05","이건 댓글입니다."))
-                )
-        ));
 
         slideAnimator = ValueAnimator
             .ofInt(height, AnimHelpers.dpToPx(this, 150)).setDuration(500);
@@ -258,12 +328,13 @@ public class MainActivity extends BaseActivity {
                         AnimHelpers.dpToPx(this, 25), AnimHelpers.dpToPx(this, -80));
                 break;
 
-            case R.id.postWriteBtn:
-                Intent formIntent = new Intent(this, PostFormActivity.class);
-                startActivity(formIntent);
-                break;
+//            case R.id.postWriteBtn:
+//                Intent formIntent = new Intent(this, PostFormActivity.class);
+//                startActivity(formIntent);
+//                break;
         }
     }
+
 
     @Override
     protected void onRestart() {
@@ -301,18 +372,22 @@ public class MainActivity extends BaseActivity {
     public void finish() {
         super.finish();
         Log.e("Acivity", "finish");
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
-        SocketConnection.getSocket().off("ping");
-        SocketConnection.getSocket().off("new_msg");
-        SocketConnection.getSocket().off("new_dm");
-        SocketConnection.getSocket().off("speaker");
-        SocketConnection.getSocket().off("apply_like");
-
+        if(SocketConnection.getSocket()!=null) {
+            SocketConnection.getSocket().off("ping");
+            SocketConnection.getSocket().off("new_msg");
+            SocketConnection.getSocket().off("new_dm");
+            SocketConnection.getSocket().off("speaker");
+            SocketConnection.getSocket().off("apply_like");
+            SocketConnection.getSocket().off("geo");
+            SocketConnection.getSocket().off("direct");
+        }
         SocketConnection.disconnect();
 
         Log.e("App", "destroy");
@@ -320,5 +395,121 @@ public class MainActivity extends BaseActivity {
 
     }
 
+    public void createNewPosting(View v){
+        Intent newIntent = new Intent(this, PostFormActivity.class);
+        startActivity(newIntent);
+    }
 
+
+}
+
+class showPostingAllAsync extends AsyncTask<Void, Void, ArrayList<Post>>{
+
+    private Context context;
+    private Dbhelper dbhelper;
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    public showPostingAllAsync(Context context){
+        this.context = context;
+    }
+
+    @Override
+    protected ArrayList<Post> doInBackground(Void... voids){
+        ArrayList<Post> postings = new ArrayList<>();
+        int[] pidx;
+
+        HttpReqRes httpReqRes = new HttpReqRes();
+        dbhelper = new Dbhelper(context);
+
+        String result = httpReqRes.requestHttpGetWASPIwToken("https://dna.soyoungpark.me:9013/api/posting/showAll/", dbhelper.getAccessToken());
+
+//        Log.v("mainactivity", "show allr httpreq result" + result);
+        pidx = PostingCntJsonToObj(result);
+
+        for(int i=0;i<pidx.length;i++){
+            String result1 = httpReqRes.requestHttpGetPosting("https://dna.soyoungpark.me:9013/api/posting/show/" + pidx[i]);
+            postings.add(PostingJsonToObj(result1, 2).get(0));
+
+        }
+//        postings = PostingJsonToObj(result, 2);
+
+        return postings;
+    }
+
+    @Override
+    protected void onPostExecute(ArrayList<Post> postings) {
+
+        super.onPostExecute(postings);
+    }
+}
+
+class generatePictureStyleNotification extends AsyncTask<String, Void, Bitmap> {
+
+    private Context mContext;
+    private String user, message, imageUrl;
+
+    public generatePictureStyleNotification(Context context, String user, String message, String imageUrl) {
+        super();
+        this.mContext = context;
+        this.user = user;
+        this.message = message;
+        this.imageUrl = imageUrl;
+    }
+
+    @Override
+    protected Bitmap doInBackground(String... params) {
+
+        InputStream in;
+        if(imageUrl!=null) {
+            try {
+                URL url = new URL(imageUrl);
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setDoInput(true);
+                connection.connect();
+                in = connection.getInputStream();
+                Bitmap myBitmap = BitmapFactory.decodeStream(in);
+                return myBitmap;
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }else{
+            Bitmap icon = BitmapFactory.decodeResource(mContext.getResources(),
+                    R.drawable.avatar);
+            return icon;
+        }
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Bitmap result) {
+        super.onPostExecute(result);
+
+        Intent intent = new Intent(mContext, SplashActivity.class);
+        intent.putExtra("key", "value");
+        PendingIntent pendingIntent = PendingIntent.getActivity(mContext, 100, intent, PendingIntent.FLAG_ONE_SHOT);
+
+
+        long[] vPattern = {100, 1000, 200, 1000}; //쉼,진동,쉼,진동
+
+        NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(mContext)
+                        .setPriority(NotificationCompat.PRIORITY_MAX)
+                        .setVibrate(vPattern)
+                        .setContentIntent(pendingIntent)
+                        .setSmallIcon(R.mipmap.dna)
+                        .setLargeIcon(result)
+                        .setContentTitle(user+"님의 확성기") //nickname
+                        .setContentText(message);
+
+        NotificationManager mnm = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+
+
+        mnm.notify(0, mBuilder.build());
+    }
 }

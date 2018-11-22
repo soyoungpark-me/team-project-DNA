@@ -38,10 +38,22 @@ dependencies {
     implementation 'com.naver.maps.open:naver-map-api:2.1.2@aar'
     implementation 'com.squareup.picasso:picasso:2.71828'
 
-    implementation project(':apache-mime4j-core-0.8.2')
-    implementation project(':httpmime-4.3.5')
-    implementation project(':httpclient-4.5.6')
-    implementation project(':httpcore-4.4.10')
+    //implementation project(':apache-mime4j-core-0.8.2')
+    //implementation project(':httpmime-4.3.5')
+    //implementation project(':httpclient-4.5.6')
+    //implementation project(':httpcore-4.4.10')
+
+
+    implementation 'org.apache.httpcomponents:httpcore:4.4.10'
+   // implementation 'org.apache.httpcomponents:httpclient:4.5.6'
+    //implementation 'org.apache.httpcomponents:httpmime:4.3.6'
+    implementation 'org.apache.httpcomponents:httpclient:4.3.6'
+    implementation('org.apache.httpcomponents:httpmime:4.3.6') {
+        exclude module: 'httpclient'
+    }
+    implementation 'com.squareup.okhttp3:okhttp:3.4.1'
+
+
     implementation 'com.google.code.gson:gson:2.8.5'
     //implementation 'com.github.nkzawa:socket.io-client:0.5.2'
 

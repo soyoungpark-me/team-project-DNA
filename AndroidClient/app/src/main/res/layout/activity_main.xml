@@ -73,8 +73,8 @@
             android:backgroundTint="@color/colorPrimary"
             app:borderWidth="0dp"
             android:src="@drawable/pencil"
-            android:scaleType="fitXY"
-            android:onClick="onClick" />
+            android:scaleType="fitXY" />
+            <!--android:onClick="onClick" />-->
     </RelativeLayout>
 
     <include

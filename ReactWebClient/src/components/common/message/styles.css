@@ -185,6 +185,11 @@
   border: 1px solid #bdc6c9;
 }
 
+.bubble-wrapper.Share .bubble {
+  background-color: #ffa700;
+  color: #131313;
+}
+
 .wrapper-me {
   text-align: right;
 }

@@ -3,10 +3,12 @@ package com.konkuk.dna.chat;
 
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -20,9 +22,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.konkuk.dna.R;
 import com.konkuk.dna.friend.message.DMActivity;
 import com.konkuk.dna.friend.message.DMRoom;
+import com.konkuk.dna.utils.HttpReqRes;
+import com.konkuk.dna.utils.dbmanage.Dbhelper;
 import com.squareup.picasso.Picasso;
 
 import org.w3c.dom.Text;
@@ -109,6 +115,7 @@ public class ChatUserDetailFragment extends DialogFragment implements View.OnCli
         detailDeleteBtnIcon.setTypeface(fontAwesomeS);
 
         // TODO 해당 유저가 나와 친구 관계인지 아닌지 확인하고, 친구 추가 버튼을 활성화/비활성화 합니다.
+        new chatFriendAsyncTask(getActivity(), detailAddBtn, getView()).execute(user.getIdx());
     }
 
     public void setData(ChatUser user) {
@@ -138,6 +145,7 @@ public class ChatUserDetailFragment extends DialogFragment implements View.OnCli
         switch (view.getId()) {
             case R.id.detailAddBtn:  // 친구 요청하기 버튼 클릭
                 Log.d("ChatUserDetail", "친구 요청 버튼 클릭");
+                new addFriendAsync(getActivity()).execute(user.getIdx());
                 break;
 
             case R.id.detailBanBtn:  // 차단 버튼 클릭
@@ -163,5 +171,81 @@ public class ChatUserDetailFragment extends DialogFragment implements View.OnCli
                 });
         AlertDialog alert = alt_bld.create();
         alert.show();
+    }
+}
+
+class chatFriendAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
+
+    private Context context;
+    private Dbhelper dbhelper;
+    LinearLayout detailAddBtn;
+    View view;
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    public chatFriendAsyncTask(Context context, LinearLayout detailAddBtn, View view){
+        this.context = context;
+        this.detailAddBtn = detailAddBtn;
+        this.view = view;
+    }
+
+    @Override
+    protected Boolean doInBackground(Integer... ints){
+
+        HttpReqRes httpReqRes = new HttpReqRes();
+        dbhelper = new Dbhelper(context);
+
+        String res = httpReqRes.requestHttpGetWASPIwToken("https://dna.soyoungpark.me:9013/api/friends/showWait/" + ints[0], dbhelper.getAccessToken());
+
+        JsonParser jsonParser = new JsonParser();
+        JsonObject jsonObject = (JsonObject) jsonParser.parse(res);
+
+        if(jsonObject.get("status").toString().equals("200")) {
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+    @Override
+    protected void onPostExecute(Boolean flag) {
+
+        super.onPostExecute(flag);
+
+        if(!flag){      // 친구관계도아니고 요청도 안보냄
+            detailAddBtn.setVisibility(view.VISIBLE);
+        }
+    }
+}
+
+class addFriendAsync extends AsyncTask<Integer, String, Void> {
+    private Context context;
+    private Dbhelper dbhelper;
+
+    //    @Override
+//    protected void onPreExecute() {
+//        super.onPreExecute();
+//    }
+    public addFriendAsync(Context context) {
+        this.context = context;
+    }
+
+    @Override
+    protected Void doInBackground(Integer... ints) {
+        HttpReqRes httpReqRes = new HttpReqRes();
+        dbhelper = new Dbhelper(context);
+
+        httpReqRes.requestHttpPostAddFriend("https://dna.soyoungpark.me:9013/api/friends/", dbhelper, ints[0]);
+
+        return null;
+    }
+
+    @Override
+    protected void onPostExecute(Void voids) {
+
+        super.onPostExecute(voids);
     }
 }

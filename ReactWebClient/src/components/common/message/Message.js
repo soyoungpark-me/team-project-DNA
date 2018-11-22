@@ -10,6 +10,7 @@ import MapComponent from './../map/MapComponent';
 import deco from './../../../../public/images/deco.png';
 import megaphone from './../../../../public/images/megaphone.png';
 import avatar from './../../../../public/images/avatar.png';
+import config from './../../../config';
 
 const DayStart = (props) => (
   <div className="start-date-wrapper">
@@ -64,12 +65,19 @@ class Message extends Component {
   }    
 
   render() {
-    let avatarPath;
+    let avatarPath, nickname;
+    const user = this.props.message.user;
 
     if (this.props.type === "DM") {
       avatarPath = this.props.avatar;
+      nickname = "";
     } else {
-      avatarPath = this.props.message.user.avatar;
+      avatarPath = user.avatar;
+      if (user.anonymity === 1) {
+        nickname = config.ADJECTIVE[user.idx & 100] + " " + config.ANIMAL[user.idx % 100];
+      } else {
+        nickname = user.nickname;
+      }
     }
 
     return (
@@ -92,10 +100,11 @@ class Message extends Component {
           <div className="bubble-profile-wrapper">
             <div className="avatar-wrapper">
               <img className="avatar-image"
-                src={avatarPath !== null && avatarPath !== "null" ? avatarPath : avatar} />
+                src={this.props.message.user.anonymity === 0 && avatarPath !== null && avatarPath !== "null" 
+                ? avatarPath : avatar} />
             </div>
             <p className='bubble-title-name'>
-              {this.props.type === "DM" ? "" : this.props.message.user.nickname}
+              {this.props.type === "DM" ? "" : nickname}
             </p>
           </div>
           : ''}
@@ -105,6 +114,7 @@ class Message extends Component {
             <div className="bubble-contents">
               {this.props.message.type === "Message" || this.props.message.type === "LoudSpeaker" ?
                 this.props.message.contents : ""}
+              {this.props.message.type === "Share" ? "[DNA] 모바일에서만 볼 수 있는 메시지 타입입니다" : ""}
               {this.props.message.type === "Image" ? 
                 <img className="bubble-image" src={this.props.message.contents} /> : ""}
               {this.props.message.type === "Location" ? 

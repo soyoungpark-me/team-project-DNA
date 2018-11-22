@@ -88,7 +88,6 @@ class RegisterForm extends Component {
         }
         props.avatar = avatar;
       }
-      console.log(props);
 
       axios.post(API_URL, props, {})
         .then(response => {

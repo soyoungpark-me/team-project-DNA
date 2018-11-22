@@ -3,12 +3,16 @@ package com.konkuk.dna.friend.message;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.support.v4.widget.DrawerLayout;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,6 +20,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
+import com.konkuk.dna.post.Post;
+import com.konkuk.dna.post.PostDetailActivity;
 import com.konkuk.dna.utils.EventListener;
 import com.konkuk.dna.utils.HttpReqRes;
 import com.konkuk.dna.utils.ServerURL;
@@ -40,6 +46,7 @@ import io.socket.emitter.Emitter;
 import static com.konkuk.dna.utils.ConvertType.DatetoStr;
 import static com.konkuk.dna.utils.JsonToObj.ChatAllJsonToObj;
 import static com.konkuk.dna.utils.JsonToObj.DMMsgJsonToObj;
+import static com.konkuk.dna.utils.JsonToObj.PostingJsonToObj;
 import static com.konkuk.dna.utils.ObjToJson.SendDMObjToJson;
 import static com.konkuk.dna.utils.ObjToJson.SendMsgObjToJson;
 
@@ -99,9 +106,14 @@ public class DMActivity extends BaseActivity {
             updatedAtText.setText(getIntent().getStringExtra("roomUpdated"));
             sentWhoText.setText((getIntent().getStringExtra("roomWho")));
 
+            DMSetAsyncTask dsat = new DMSetAsyncTask(this, dmListView, 0);
+
             //DM채팅 불러오기
-            DMSetAsyncTask dsat = new DMSetAsyncTask(this, dmListView);
-            dsat.execute(String.valueOf(roomIdx), getIntent().getStringExtra("roomWho"));
+            if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB) {
+                dsat.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, String.valueOf(roomIdx), getIntent().getStringExtra("roomWho"));
+            }else{
+                dsat.execute(String.valueOf(roomIdx), getIntent().getStringExtra("roomWho"));
+            }
 
             // TODO dmMessages 배열에 실제 메시지 추가해야 합니다. roomIdx로 가져오면 됩니다.
 //            dmMessages.add(new DMMessage(1, "http://file3.instiz.net/data/cached_img/upload/2018/06/22/14/2439cadf98e7bebdabd174ed41ca0849.jpg", "오후 12:34", TYPE_IMAGE));
@@ -113,9 +125,49 @@ public class DMActivity extends BaseActivity {
 //            dmMessages.add(new DMMessage(1, "{\"lat\":37.550544099999996,\"lng\":127.07221989999998}", "오후 12:34", TYPE_LOCATION));
 //            dmMessages.add(new DMMessage(1, "http://www.ohfun.net/contents/article/images/2016/0830/1472551795750578.jpeg", "오후 12:34", TYPE_IMAGE));
 //            dmMessages.add(new DMMessage(0, "내용내용333", "오후 12:34", TYPE_SHARE));
+
+            String postTitle = getIntent().getStringExtra("postTitle");
+            int postNum = getIntent().getIntExtra("postNum",-1);
+            if(postNum!=-1){
+                dmEditText.setText(postTitle+"_"+postNum);
+                dmEditText.setEnabled(false);
+                dmEditText.setBackgroundColor(Color.GRAY);
+                messageType = TYPE_SHARE;
+            }
         }
 
         dmListAdapter = new DMListAdapter(this, R.layout.chat_item_left, dmMessages);
+
+        dmListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                DMMessage clicked_msg = (DMMessage) adapterView.getAdapter().getItem(i);
+                String clicked_type = clicked_msg.getType();
+
+                switch (clicked_type){
+                    case TYPE_LOCATION:
+                        //TODO : 지도 위치 보여주기
+                        break;
+
+                    case TYPE_IMAGE:
+                        //TODO : 사진 확대하기(할 수있으면)
+                        break;
+
+                    case TYPE_SHARE:
+                        //TODO : 공유된 포스팅 들어가기
+                        String[] parse = clicked_msg.getContents().split("_");
+                        int idx = parse.length - 1;
+                        Log.e("check", parse[idx]);
+
+                        DMgetSelectedPostAsync gspa = new DMgetSelectedPostAsync(context);
+                        gspa.execute(Integer.parseInt(parse[idx]));
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        });
 //        dmListView.setAdapter(dmListAdapter);
 //
 //        // 생성된 후 바닥으로 메시지 리스트를 내려줍니다.
@@ -130,7 +182,7 @@ public class DMActivity extends BaseActivity {
         switch (event.message){
             case SOCKET_NEW_DM:
                 Log.e("Socket ON", "new_dm");
-                dsat = new DMSetAsyncTask(context, dmListView);
+                dsat = new DMSetAsyncTask(context, dmListView, 1);
                 dsat.execute(String.valueOf(roomIdx), getIntent().getStringExtra("roomWho"));
                 scrollMyListViewToBottom();
                 break;
@@ -193,16 +245,17 @@ public class DMActivity extends BaseActivity {
 
             case R.id.dmSendBtn: // 메시지 전송 버튼 클릭
                 JsonObject sendMsgJson
-                        = SendDMObjToJson(dbhelper, roomIdx ,messageType, dmEditText.getText().toString());
+                        = SendDMObjToJson(roomIdx ,messageType, dmEditText.getText().toString());
 
                 SocketConnection.emit("save_dm", dbhelper.getAccessToken(), sendMsgJson);
 
-                DMSetAsyncTask dsat = new DMSetAsyncTask(context, dmListView);
-                dsat.execute(String.valueOf(roomIdx), getIntent().getStringExtra("roomWho"));
-                scrollMyListViewToBottom();
+//                DMSetAsyncTask dsat = new DMSetAsyncTask(context, dmListView, 0);
+//                dsat.execute(String.valueOf(roomIdx), getIntent().getStringExtra("roomWho"));
+//                scrollMyListViewToBottom();
 
                 dmEditText.setText("");
                 dmEditText.setEnabled(true);
+                dmEditText.setBackgroundColor(Color.WHITE);
                 messageType = TYPE_MESSAGE;
                 break;
         }
@@ -272,30 +325,17 @@ class DMSetAsyncTask extends AsyncTask<String, Integer, ArrayList<DMMessage>> {
     private DMListAdapter dmListAdapter;
     private ListView dmListView;
 
+    private int mode;
+
     private ArrayList<DMMessage> dmMessages;
     private int now_pos=-1;
+    private static final int MODE_RENEW = 0;
+    private static final int MODE_LIKE = 1;
 
-    private void scrollMyListViewToBottom() {
-        dmListView.post(new Runnable() {
-            @Override
-            public void run() {
-                dmListView.clearFocus();
-                dmListAdapter.notifyDataSetChanged();
-                dmListView.requestFocusFromTouch();
-
-                if(now_pos>0){
-                    dmListView.setSelection(now_pos);
-                }else{
-                    dmListView.setSelection(dmListView.getCount() - 1);
-                }
-
-            }
-        });
-    }
-
-    public DMSetAsyncTask(Context context, ListView dmListView){
+    public DMSetAsyncTask(Context context, ListView dmListView, int mode){
         this.context=context;
         this.dmListView = dmListView;
+        this.mode = mode;
         //this.dmMessages = dmMessages;
     }
 
@@ -334,8 +374,74 @@ class DMSetAsyncTask extends AsyncTask<String, Integer, ArrayList<DMMessage>> {
         dmListView.setAdapter(dmListAdapter);
 
         // 생성된 후 바닥으로 메시지 리스트를 내려줍니다.
-        scrollMyListViewToBottom();
+        switch (mode){
+            case MODE_RENEW:
+                scrollMyListViewToBottom();
+                break;
+            case MODE_LIKE:
+                scrollMyListViewToMemory();
+                break;
+        }
 
+    }
 
+    private void scrollMyListViewToBottom() {
+        dmListView.post(new Runnable() {
+            @Override
+            public void run() {
+                dmListView.clearFocus();
+                dmListAdapter.notifyDataSetChanged();
+                dmListView.requestFocusFromTouch();
+
+                dmListView.setSelection(dmListView.getCount() - 1);
+
+            }
+        });
+    }
+
+    private void scrollMyListViewToMemory() {
+        dmListView.post(new Runnable() {
+            @Override
+            public void run() {
+                dmListView.clearFocus();
+                dmListAdapter.notifyDataSetChanged();
+                dmListView.requestFocusFromTouch();
+                dmListView.setSelection(now_pos);
+            }
+        });
+    }
+}
+
+class DMgetSelectedPostAsync extends AsyncTask<Integer, Void, Post>{
+
+    private Context context;
+    private Dbhelper dbhelper;
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    public DMgetSelectedPostAsync(Context context){
+        this.context = context;
+    }
+
+    @Override
+    protected Post doInBackground(Integer... integers){
+
+        HttpReqRes httpReqRes = new HttpReqRes();
+        String result1 = httpReqRes.requestHttpGetPosting(ServerURL.DNA_SERVER+ServerURL.PORT_WAS_API+"/posting/show/" + integers[0]);
+
+        //Log.e("URL", ServerURL.PORT_WAS_API+"/posting/show/" + integers);
+        return PostingJsonToObj(result1, 2).get(0);
+    }
+
+    @Override
+    protected void onPostExecute(Post posting) {
+
+        Intent postIntent = new Intent(context, PostDetailActivity.class);
+        postIntent.putExtra("post", posting);
+        context.startActivity(postIntent);
+        super.onPostExecute(posting);
     }
 }

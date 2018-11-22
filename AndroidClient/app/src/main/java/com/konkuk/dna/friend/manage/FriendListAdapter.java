@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -17,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.konkuk.dna.R;
+import com.konkuk.dna.utils.HttpReqRes;
+import com.konkuk.dna.utils.dbmanage.Dbhelper;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -94,7 +97,7 @@ public class FriendListAdapter extends ArrayAdapter<Friend> {
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         // TODO 친구 삭제 버튼 클릭 이벤트 처리해야 합니다.
-
+                        new FriendDeleteAsyncTask(context).execute(id);
                         dialog.cancel();
                     }
                 }).setNegativeButton("NO",
@@ -108,3 +111,33 @@ public class FriendListAdapter extends ArrayAdapter<Friend> {
     }
 }
 
+class FriendDeleteAsyncTask extends AsyncTask<Integer, Void, Void> {
+    Context context;
+    Dbhelper dbhelper;
+
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    public FriendDeleteAsyncTask(Context context){ this.context = context; }
+
+    @Override
+    protected Void doInBackground(Integer... ints) {
+        dbhelper = new Dbhelper(context);
+        HttpReqRes httpReqRes = new HttpReqRes();
+        String res = null;
+
+//        int idx = Integer.parseInt(strings[0]);
+
+        res = httpReqRes.requestHttpFriendDelete("https://dna.soyoungpark.me:9013/api/friends/" + ints[0], dbhelper.getAccessToken());
+
+        return null;
+    }
+
+//    @Override
+//    protected void onPostExecute() {
+//        super.onPostExecute();
+//
+//    }
+}

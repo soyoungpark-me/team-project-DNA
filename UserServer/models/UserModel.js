@@ -114,7 +114,7 @@ exports.login = (userData) => {
   .then(() => {
     // 2. 비밀번호 체크
     return new Promise((resolve, reject) => {
-      const sql = `SELECT idx, id, nickname, avatar, description, radius, is_anonymity
+      const sql = `SELECT idx, id, nickname, avatar, description, radius, anonymity, searchable
                      FROM users
                     WHERE id = ? AND password = ?`;
 
@@ -139,7 +139,8 @@ exports.login = (userData) => {
               avatar: rows[0].avatar,
               description: rows[0].description,
               radius: rows[0].radius,
-              is_anonymity: rows[0].is_anonymity
+              anonymity: rows[0].anonymity,
+              searchable: rows[0].searchable
             }
 
             const result = { session, profile }
@@ -397,7 +398,7 @@ exports.addPoints = () => {
   return new Promise((resolve, reject) => {
     sql = `UPDATE users
               SET points = points + 100
-            WHERE is_faulty = 0`;
+            WHERE faulty = 0`;
     mysql.query(sql, [], (err, rows) => {
       if (err) {
         reject(err);
@@ -507,5 +508,52 @@ exports.reducePoints = (idx) => {
         resolve(rows);
       }
     })
+  });
+}
+
+
+/*******************
+ *  selectSetting
+ *  @param: idx
+ ********************/
+exports.selectSetting = (idx) => {
+  return new Promise((resolve, reject) => {
+    sql = `SELECT radius, anonymity, searchable
+             FROM users
+            WHERE idx = ?`;
+            
+    mysql.query(sql, [idx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        resolve(rows[0]);
+      }
+    })
+  });
+}
+
+
+/*******************
+ *  updateSetting
+ *  @param: idx,
+ *          updateData = { radius, anonymity, searchable }
+ ********************/
+exports.updateSetting = (idx, updateData) => {
+  return new Promise((resolve, reject) => {
+    let sql = '';
+    let params = [updateData.radius, updateData.anonymity, updateData.searchable, idx];
+
+    sql = `UPDATE users
+              SET radius = ?, anonymity = ?, searchable = ?
+            WHERE idx = ?`
+    
+    mysql.query(sql, params, 
+        (err, rows) => {
+          if (err) {
+            reject(err);
+          } else {;
+            resolve(rows);
+          }
+    });
   });
 }

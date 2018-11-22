@@ -34,8 +34,6 @@ exports.open = async (req, res, next) => {
     isValid = false;
     validationError.errors.nickname = { message : "User Nickname is required" };
   }
-console.log(req.body);
-  console.log(validationError); 
 
   if (!isValid) return res.status(400).json(validationError);
   /* 유효성 체크 끝 */

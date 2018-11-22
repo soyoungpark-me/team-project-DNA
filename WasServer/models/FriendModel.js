@@ -68,13 +68,13 @@ exports.sendReq = (userIdx, receiverIdx) => {
  *  accept friend request
  *  @param: userData = { idx }
  ********************/
-exports.accReq = (userIdx, senderIdx) => {
+exports.accReq = (userIdx, targetIdx) => {
   // 1. 친구 요청 확인
   return new Promise((resolve, reject) => {
     const sql = `SELECT *
                   FROM friend_wait
                   WHERE (receiver_idx = ? AND sender_idx = ?)`;
-    mysql.query(sql, [userIdx, senderIdx], (err, rows) => {
+    mysql.query(sql, [userIdx, targetIdx], (err, rows) => {
       if (err) {
         reject (err);
       } else {
@@ -91,7 +91,7 @@ exports.accReq = (userIdx, senderIdx) => {
     return new Promise((resolve, reject) => {
       const sql = `DELETE FROM friend_wait
                     WHERE (receiver_idx = ? AND sender_idx = ?)`;
-      mysql.query(sql, [userIdx, senderIdx], (err, rows) => {
+      mysql.query(sql, [userIdx, targetIdx], (err, rows) => {
         if (err) {
           reject (err);
         } else {
@@ -105,29 +105,29 @@ exports.accReq = (userIdx, senderIdx) => {
     });
   })
   .then(() => {
-  // 3. DB에 정보 삽입하기
-    return new Promise((resolve, reject) => {
-      const sql = `INSERT INTO friends (user1_idx, user2_idx)
-                    VALUES     (?, ?)`;
-      mysql.query(sql, [userIdx, senderIdx], (err, rows) => {
-        if (err) {
-          reject (err);
-        } else {
-          if (rows.affectedRows === 1) {
-            resolve();
-          } else {
-            reject(22500);
-          }
-        }
-      });
-    });
-  })
+   // 3. DB에 정보 삽입하기
+     return new Promise((resolve, reject) => {
+       const sql = `INSERT INTO friends (user1_idx, user2_idx)
+                     VALUES     (?, ?)`;
+       mysql.query(sql, [userIdx, targetIdx], (err, rows) => {
+         if (err) {
+           reject (err);
+         } else {
+           if (rows.affectedRows === 1) {
+             resolve();
+           } else {
+             reject(22500);
+           }
+         }
+       });
+     });
+   })
   .then(() => {
     return new Promise((resolve, reject) => {
       const sql = `SELECT idx, nickname, avatar
                    FROM users
                   WHERE idx = ?`;
-      mysql.query(sql, senderIdx, (err, rows) => {
+      mysql.query(sql, targetIdx, (err, rows) => {
         if (err) {
           reject (err);
         } else {
@@ -194,9 +194,9 @@ exports.delReq = (userIdx,targetIdx) => {
    return new Promise((resolve, reject) => {
      const sql = `SELECT *
                    FROM friend_wait
-                   WHERE sender_idx = ? OR receiver_idx = ?`;
+                   WHERE receiver_idx = ?`;
 
-     mysql.query(sql, [userIdx, userIdx], (err, rows) => {
+     mysql.query(sql, userIdx, (err, rows) => {
        if (err) {
          reject(err);
        } else {
@@ -211,6 +211,31 @@ exports.delReq = (userIdx,targetIdx) => {
  };
 
  /*******************
+  *  Show send list
+  *  @param: userData = { idx }
+  ********************/
+  exports.showSendList = (userIdx) => {
+    // 1. 친구여부 확인
+    return new Promise((resolve, reject) => {
+      const sql = `SELECT *
+                    FROM friend_wait
+                    WHERE sender_idx = ?`;
+
+      mysql.query(sql, userIdx, (err, rows) => {
+        if (err) {
+          reject(err);
+        } else {
+          if (rows.length === 0) {
+            reject(33400);
+          } else {
+            resolve(rows);
+          }
+        }
+      });
+    });
+  };
+
+ /*******************
   *  show wait
   *  @param: idx
   ********************/
@@ -218,10 +243,11 @@ exports.delReq = (userIdx,targetIdx) => {
    // 1. 친구대기상태인지 확인
    return new Promise((resolve, reject) => {
      const sql = `SELECT *
-                   FROM friend_wait
-                   WHERE (sender_idx = ? AND receiver_idx = ?) OR (sender_idx = ? AND receiver_idx = ?)`;
+                   FROM friend_wait, friends
+                   WHERE (friend_wait.sender_idx = ? AND friend_wait.receiver_idx = ?) OR (friend_wait.sender_idx = ? AND friend_wait.receiver_idx = ?)
+                    OR (friends.user1_idx = ? AND friends.user2_idx = ?) OR (friends.user1_idx = ? AND friends.user2_idx = ?)`;
 
-     mysql.query(sql, [userIdx, targetIdx, targetIdx, userIdx], (err, rows) => {
+     mysql.query(sql, [userIdx, targetIdx, targetIdx, userIdx, userIdx, targetIdx, targetIdx, userIdx], (err, rows) => {
        if (err) {
          reject(err);
        } else {
@@ -290,6 +316,31 @@ exports.show = (userIdx) => {
                   WHERE user1_idx = ? OR user2_idx = ?`;
 
     mysql.query(sql, [userIdx, userIdx], (err, rows) => {
+      if (err) {
+        reject(err);
+      } else {
+        if (rows.length === 0) {
+          reject(32400);
+        } else {
+          resolve(rows);
+        }
+      }
+    });
+  });
+};
+
+/*******************
+ *  Search user for friend
+ *  @param: idx
+ ********************/
+exports.search = (userIdx, targetIdx) => {
+  // 1. 친구여부 확인
+  return new Promise((resolve, reject) => {
+    const sql = `SELECT *
+                  FROM friends
+                  WHERE idx = ?`;
+
+    mysql.query(sql, targetIdx, (err, rows) => {
       if (err) {
         reject(err);
       } else {

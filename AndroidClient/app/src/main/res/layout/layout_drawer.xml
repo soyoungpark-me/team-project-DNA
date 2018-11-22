@@ -233,7 +233,7 @@
             android:layout_marginLeft="50dp"
             android:gravity="center_vertical"
             android:textColor="@color/grayDarker"
-            android:text="친구 관리"
+            android:text="친구 관리(DM)"
             android:tag="nseb" />
 
         <TextView

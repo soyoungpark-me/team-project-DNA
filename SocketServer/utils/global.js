@@ -56,11 +56,11 @@ let testMongo = mongoose.createConnection(testUrl, options);
 // test에도 스키마와 모델 객체 생성해주기
 testMongo.once('open', function() {
   console.log("[MongoDB] *** New connection established with the *** TEST *** MongoDB ...");
-  const testModel = testMongo.model("testModel", 
+  const messageModel = testMongo.model("messages", 
     require("../schemas/TestSchema").createSchema(mongoose));
-  testMongo["testModel"] = testModel;
+  testMongo["messageModel"] = messageModel;
   
-  testMongo.collection("messagemodels").deleteMany({},function(err){
+  testMongo.collection("messages").deleteMany({},function(err){
     console.log("[MongoDB] dummy messages in test DB are removed Successfully ...");
   });
 });

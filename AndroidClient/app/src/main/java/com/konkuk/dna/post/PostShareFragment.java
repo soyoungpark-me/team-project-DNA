@@ -1,6 +1,7 @@
 package com.konkuk.dna.post;
 
 import android.app.DialogFragment;
+import android.content.Intent;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.konkuk.dna.R;
+import com.konkuk.dna.chat.ChatActivity;
+import com.konkuk.dna.friend.FriendActivity;
 import com.konkuk.dna.utils.helpers.AnimHelpers;
 
 public class PostShareFragment extends DialogFragment implements View.OnClickListener{
@@ -88,13 +91,36 @@ public class PostShareFragment extends DialogFragment implements View.OnClickLis
 
     @Override
     public void onClick(View view) {
+        PostDetailActivity pdactivity;
+        int postNum;
+        String postTitle;
+
         switch (view.getId()) {
             case R.id.shareChatBtn:
                 Log.d("PostShare", "share chat");
+                pdactivity = (PostDetailActivity) getActivity();
+                postNum = pdactivity.getPost().getPostingIdx();
+                postTitle = pdactivity.getPost().getTitle();
+
+                Intent intent = new Intent(getActivity(), ChatActivity.class);
+                intent.putExtra("postNum", postNum);
+                intent.putExtra("postTitle", postTitle);
+
+                startActivity(intent);
+
                 break;
 
             case R.id.shareDMBtn:
                 Log.d("PostShare", "share dm");
+                pdactivity = (PostDetailActivity) getActivity();
+                postNum = pdactivity.getPost().getPostingIdx();
+                postTitle = pdactivity.getPost().getTitle();
+
+                Intent dmintent = new Intent(getActivity(), FriendActivity.class);
+                dmintent.putExtra("postNum", postNum);
+                dmintent.putExtra("postTitle", postTitle);
+
+                startActivity(dmintent);
                 break;
         }
 

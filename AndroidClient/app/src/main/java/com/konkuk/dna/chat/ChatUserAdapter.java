@@ -15,6 +15,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.konkuk.dna.R;
+import com.konkuk.dna.utils.helpers.NameHelpers;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -60,11 +61,18 @@ public class ChatUserAdapter extends ArrayAdapter<ChatUser> {
         TextView status = v.findViewById(R.id.ccuStatus);
         ImageButton addFriendBtn = v.findViewById(R.id.addFriendBtn);
 
-        if (user.getAvatar() != null) {
+        if (user.getAnonymity() == 0 && user.getAvatar() != null) {
             Picasso.get().load(user.getAvatar()).into(avatar);
         }
 
-        nickname.setText(user.getNickname());
+        String name = "";
+        if (user.getAnonymity() == 1) {
+            name = NameHelpers.makeName(user.getIdx());
+        } else {
+            name = user.getNickname();
+        }
+
+        nickname.setText(name);
         status.setTypeface(fontAwesomeS);
         if (user.getInside()) { // 초록불 켜기!
             status.setTextColor(context.getResources().getColor(R.color.green));

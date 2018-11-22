@@ -130,6 +130,36 @@
                                                 android:textSize="14dp" />
                                         </LinearLayout>
 
+                                        <LinearLayout
+                                            android:id="@+id/myPostDeleteBtn"
+                                            android:layout_width="45dp"
+                                            android:layout_height="27dp"
+                                            android:layout_alignParentRight="true"
+                                            android:layout_centerVertical="true"
+                                            android:visibility="invisible"
+                                            android:background="@drawable/layout_button_bookmark_delete"
+                                            android:onClick="onClick"
+                                            android:gravity="center">
+
+                                            <TextView
+                                                android:id="@+id/myPostDeleteBtnText"
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:layout_marginRight="3dp"
+                                                android:textColor="@color/white"
+                                                android:textSize="12dp"
+                                                android:text="@string/fa_x" />
+
+                                            <TextView
+                                                android:layout_width="wrap_content"
+                                                android:layout_height="wrap_content"
+                                                android:textColor="@color/white"
+                                                android:textSize="12dp"
+                                                android:text="삭제"
+                                                android:tag="nsb" />
+
+                                        </LinearLayout>
+
                                         <ImageButton
                                             android:id="@+id/addFriendBtn"
                                             android:layout_width="45dp"
@@ -231,19 +261,19 @@
                                     android:textColor="@color/grayText"
                                     android:textSize="15dp" />
 
-                                <TextView
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/grayText"
-                                    android:textSize="15dp"
-                                    android:text="스크랩 " />
+                                <!--<TextView-->
+                                    <!--android:layout_width="wrap_content"-->
+                                    <!--android:layout_height="wrap_content"-->
+                                    <!--android:textColor="@color/grayText"-->
+                                    <!--android:textSize="15dp"-->
+                                    <!--android:text="스크랩 " />-->
 
-                                <TextView
-                                    android:id="@+id/postScrapCnt"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"
-                                    android:textColor="@color/grayText"
-                                    android:textSize="15dp" />
+                                <!--<TextView-->
+                                    <!--android:id="@+id/postScrapCnt"-->
+                                    <!--android:layout_width="wrap_content"-->
+                                    <!--android:layout_height="wrap_content"-->
+                                    <!--android:textColor="@color/grayText"-->
+                                    <!--android:textSize="15dp" />-->
 
                             </LinearLayout>
 
@@ -328,6 +358,7 @@
                                     android:onClick="onClick">
 
                                     <TextView
+                                        android:id="@+id/postShareBtnIcon"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginRight="7dp"
@@ -337,6 +368,7 @@
                                         android:tag="fas"/>
 
                                     <TextView
+                                        android:id="@+id/postShareBtnText"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:textColor="@color/concrete"

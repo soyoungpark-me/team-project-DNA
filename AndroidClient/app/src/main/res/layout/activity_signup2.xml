@@ -132,14 +132,6 @@
                                 android:hint="이메일" />
                         </android.support.design.widget.TextInputLayout>
 
-                        <Button
-                            android:id="@+id/emailcheckBtn"
-                            android:layout_width="wrap_content"
-                            android:layout_height="match_parent"
-                            android:textColor="@color/gray"
-                            android:text="중복 확인"
-                            android:onClick="onClick"
-                            android:tag="nseb"/>
                     </LinearLayout>
 
                     <android.support.design.widget.TextInputLayout

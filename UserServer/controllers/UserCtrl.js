@@ -174,7 +174,7 @@ exports.select = async (req, res, next) => {
   /* 유효성 체크하기 */
   let isValid = true;
 
-  if (!idx || validator.isEmpty(idx)) {
+  if (!idx || idx === null) {
     isValid = false;
     validationError.errors.idx = { message : 'Idx is required' };
   }
@@ -294,7 +294,7 @@ exports.block = async (req, res, next) => {
   /* 유효성 체크하기 */
   let isValid = true;
 
-  if (!blockUseridx || validator.isEmpty(blockUseridx)) {
+  if (!blockUseridx || blockUseridx === null) {
     isValid = false;
     validationError.errors.blockUseridx = 
       { message : 'User (to Block) Index is required' };
@@ -415,6 +415,17 @@ exports.selectPoints = async (req, res, next) => {
   /* PARAM */
   const idx = req.userData.idx;
 
+  /* 유효성 체크하기 */
+  let isValid = true;
+
+  if (!idx || idx === null) {
+    isValid = false;
+    validationError.errors.idx = { message : 'Idx is required' };
+  }
+
+  if (!isValid) return res.status(400).json(validationError);
+  /* 유효성 체크 끝 */
+
   let result = '';
 
   try {
@@ -442,6 +453,17 @@ exports.reducePoints = async (req, res, next) => {
   /* PARAM */
   const idx = req.userData.idx;
 
+  /* 유효성 체크하기 */
+  let isValid = true;
+
+  if (!idx || idx === null) {
+    isValid = false;
+    validationError.errors.idx = { message : 'Idx is required' };
+  }
+
+  if (!isValid) return res.status(400).json(validationError);
+  /* 유효성 체크 끝 */
+
   let result = '';
 
   try {
@@ -455,6 +477,94 @@ exports.reducePoints = async (req, res, next) => {
   const respond = {
     status: 201,
     message : "Reduce Points Successfully",
+    result
+  };
+  return res.status(201).json(respond);  
+};
+
+
+/*******************
+ *  selectSetting
+ *  @param: idx
+ ********************/
+exports.selectSetting = async (req, res, next) => {
+  /* PARAM */
+  const idx = req.userData.idx;
+
+  /* 유효성 체크하기 */
+  let isValid = true;
+
+  if (!idx || idx === null) {
+    isValid = false;
+    validationError.errors.idx = { message : 'Idx is required' };
+  }
+
+  if (!isValid) return res.status(400).json(validationError);
+  /* 유효성 체크 끝 */
+
+  let result = '';
+
+  try {
+    result = await userModel.selectSetting(idx);
+  } catch (err) {
+    console.log(err);
+    return next(err);
+  }
+
+  /* 조회 성공 시 */
+  const respond = {
+    status: 200,
+    message : "Select Setting Successfully",
+    result
+  };
+  return res.status(200).json(respond);  
+};
+
+
+/*******************
+ *  updateSetting
+ *  @param: idx
+ ********************/
+exports.updateSetting = async (req, res, next) => {
+  /* PARAM */
+  const idx = req.userData.idx;
+  const radius = req.body.radius || req.param.radius;
+  const anonymity = req.body.anonymity || req.param.anonymity;
+  const searchable = req.body.searchable || req.param.searchable;
+
+  const updateData = {
+    radius, anonymity, searchable
+  };
+
+  /* 유효성 체크하기 */
+  let isValid = true;
+
+  if (!idx || idx === null) {
+    isValid = false;
+    validationError.errors.idx = { message : 'Idx is required' };
+  }
+
+  if (radius < 1 || radius > 1000) {
+    isValid = false;
+    validationError.errors.radius = { message : 'Radius is out of bound' };
+  }
+
+  if (!isValid) return res.status(400).json(validationError);
+  /* 유효성 체크 끝 */
+
+  let result = '';
+
+  try {
+    result = await userModel.updateSetting(idx, updateData);
+  } catch (err) {
+    console.log(err);
+    return next(err);
+  }
+
+  /* 조회 성공 시 */
+  const respond = {
+    status: 201,
+    message : "Update Setting Successfully",
     result
   };
   return res.status(201).json(respond);  

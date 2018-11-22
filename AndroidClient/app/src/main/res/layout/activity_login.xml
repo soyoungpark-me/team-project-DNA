@@ -19,7 +19,7 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="이메일 로그인"
+        android:text="DNA에 로그인"
         android:tag="bold"
         android:textColor="#FFF"
         android:textStyle="bold" />

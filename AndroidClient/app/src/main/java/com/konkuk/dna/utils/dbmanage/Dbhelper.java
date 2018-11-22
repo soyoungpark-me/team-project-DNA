@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.util.Log;
 
 import java.util.HashMap;
 
@@ -16,8 +17,9 @@ public class Dbhelper extends SQLiteOpenHelper {
     /*
     * 업데이트를 하다가 디비구조가 변경되면 *반드시* 버전 숫자를 올려주어야 함
     * */
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 4;
     public static final String DATABASE_NAME = "DNATokenDB.db";
+    public static Boolean isNewbie = true;
 
     public static class DNAEntry implements BaseColumns{
         public static final String TABLE_NAME = "userinfo";
@@ -29,7 +31,9 @@ public class Dbhelper extends SQLiteOpenHelper {
         public static final String COLUME_NAME_AVATAR = "avatar";
         public static final String COLUME_NAME_DESCRIPTION = "description";
         public static final String COLUME_NAME_RADIUS = "radius";
-        public static final String COLUME_NAME_ANONIMITY = "is_anonimity";
+        public static final String COLUME_NAME_ANONIMITY = "anonimity";
+        public static final String COLUME_NAME_SEARCHABLE = "searchable";
+        public static final String COLUME_NAME_MY_ADDRESS = "address";
     }
 
     public static final String SQL_CREATE_ENTRIES =
@@ -41,8 +45,10 @@ public class Dbhelper extends SQLiteOpenHelper {
                     DNAEntry.COLUME_NAME_DESCRIPTION +  " TEXT," +
                     DNAEntry.COLUME_NAME_RADIUS +  " INTEGER," +
                     DNAEntry.COLUME_NAME_ANONIMITY +  " INTEGER," +
+                    DNAEntry.COLUME_NAME_SEARCHABLE +  " INTEGER," +
                     DNAEntry.COLUME_NAME_ACCESSTOKEN +  " TEXT," +
-                    DNAEntry.COLUME_NAME_REFRESHTOKEN +  " TEXT )";
+                    DNAEntry.COLUME_NAME_REFRESHTOKEN +  " TEXT," +
+                    DNAEntry.COLUME_NAME_MY_ADDRESS +  " TEXT )";
 
     public Dbhelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -80,15 +86,19 @@ public class Dbhelper extends SQLiteOpenHelper {
         values.put(DNAEntry.COLUME_NAME_AVATAR, getStringNoQuote(map.get("avatar").toString()));
         values.put(DNAEntry.COLUME_NAME_DESCRIPTION, map.get("description").toString());
         values.put(DNAEntry.COLUME_NAME_RADIUS, Integer.parseInt(map.get("radius").toString()));
-        values.put(DNAEntry.COLUME_NAME_ANONIMITY, Integer.parseInt(map.get("is_anonymity").toString()));
+        values.put(DNAEntry.COLUME_NAME_ANONIMITY, Integer.parseInt(map.get("anonymity").toString()));
+        values.put(DNAEntry.COLUME_NAME_SEARCHABLE, Integer.parseInt(map.get("searchable").toString()));
         values.put(DNAEntry.COLUME_NAME_ACCESSTOKEN, getStringNoQuote(map.get("accessToken").toString()));
         values.put(DNAEntry.COLUME_NAME_REFRESHTOKEN, getStringNoQuote(map.get("refreshToken").toString()));
+        values.put(DNAEntry.COLUME_NAME_MY_ADDRESS, getStringNoQuote(map.get("address").toString()));
 
         /*
         * 기존에 있는 내용을 딜리트하고, 다시 유저의 정보를 디비에 저장.
         * */
         db.delete(DNAEntry.TABLE_NAME,null, null);
         db.insert(DNAEntry.TABLE_NAME, null, values);
+
+        isNewbie = false;
     }
 
     /*
@@ -101,6 +111,8 @@ public class Dbhelper extends SQLiteOpenHelper {
          * 기존에 있는 내용을 딜리트
          * */
         db.delete(DNAEntry.TABLE_NAME,null, null);
+
+        isNewbie = true;
     }
 
     /*
@@ -134,6 +146,51 @@ public class Dbhelper extends SQLiteOpenHelper {
     }
 
     /*
+     * 채팅 반경 변경 메소드
+     * */
+    public void updateAnonymity(int anonymity){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(DNAEntry.COLUME_NAME_ANONIMITY, anonymity);
+
+        /*
+         * 받아온 엑세스 토큰을 갱신함..
+         * */
+        db.update(DNAEntry.TABLE_NAME, values, null, null);
+    }
+
+    /*
+     * 채팅 반경 변경 메소드
+     * */
+    public void updateSearchable(int searchable){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(DNAEntry.COLUME_NAME_SEARCHABLE, searchable);
+
+        /*
+         * 받아온 엑세스 토큰을 갱신함..
+         * */
+        db.update(DNAEntry.TABLE_NAME, values, null, null);
+    }
+
+    /*
+     * 채팅 반경 변경 메소드
+     * */
+    public void updateAddress(String address){
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(DNAEntry.COLUME_NAME_MY_ADDRESS, address);
+
+        /*
+         * 받아온 엑세스 토큰을 갱신함..
+         * */
+        db.update(DNAEntry.TABLE_NAME, values, null, null);
+    }
+
+    /*
     * 토큰 가져오기
     * */
     public String getAccessToken(){
@@ -142,8 +199,9 @@ public class Dbhelper extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery("SELECT * FROM "+ DNAEntry.TABLE_NAME, null);
         while(cursor.moveToNext()){
-            str = cursor.getString(7);
+            str = cursor.getString(8);
         }
+
         return str;
     }
 
@@ -156,7 +214,7 @@ public class Dbhelper extends SQLiteOpenHelper {
 
         Cursor cursor = db.rawQuery("SELECT * FROM "+ DNAEntry.TABLE_NAME, null);
         while(cursor.moveToNext()){
-            str = cursor.getString(8);
+            str = cursor.getString(9);
         }
         return str;
     }
@@ -246,4 +304,49 @@ public class Dbhelper extends SQLiteOpenHelper {
         return avatar;
     }
 
+    /*
+     * 내 anonymity 가져오기
+     * */
+    public int getMyAnonymity(){
+        int anonymity = 0;
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ DNAEntry.TABLE_NAME, null);
+        while(cursor.moveToNext()){
+            anonymity = Integer.parseInt(cursor.getString(6));
+        }
+        return anonymity;
+    }
+
+    /*
+     * 내 searchable 가져오기
+     * */
+    public int getMySearchable(){
+        int searchable = 0;
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ DNAEntry.TABLE_NAME, null);
+        while(cursor.moveToNext()){
+            searchable = Integer.parseInt(cursor.getString(7));
+        }
+        return searchable;
+    }
+
+    /*
+     * 내 현재 위치 가져오기
+     * */
+    public String getMyAddress(){
+        String address = "";
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ DNAEntry.TABLE_NAME, null);
+        while(cursor.moveToNext()){
+            address = cursor.getString(10);
+        }
+        return address;
+    }
+
+    public static Boolean getIsNewbie() {
+        return isNewbie;
+    }
 }

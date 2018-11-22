@@ -83,57 +83,57 @@
                 android:divider="@color/clouds"
                 android:dividerHeight="1dp"/>
 
-            <RelativeLayout
-                android:id="@+id/acceptedBtn"
-                android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:layout_marginTop="-1dp"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="5dp"
-                android:background="@drawable/layout_border_horizontal"
-                android:onClick="onClick">
+            <!--<RelativeLayout-->
+                <!--android:id="@+id/acceptedBtn"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="45dp"-->
+                <!--android:layout_marginTop="-1dp"-->
+                <!--android:orientation="horizontal"-->
+                <!--android:gravity="center_vertical"-->
+                <!--android:padding="5dp"-->
+                <!--android:background="@drawable/layout_border_horizontal"-->
+                <!--android:onClick="onClick">-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:text="@string/fa_accepted"
-                    android:layout_marginLeft="10dp"
-                    android:textColor="@color/colorPrimary"
-                    android:textSize="20dp"
-                    android:tag="fas"/>
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:text="@string/fa_accepted"-->
+                    <!--android:layout_marginLeft="10dp"-->
+                    <!--android:textColor="@color/colorPrimary"-->
+                    <!--android:textSize="20dp"-->
+                    <!--android:tag="fas"/>-->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:textSize="15dp"
-                    android:layout_marginLeft="50dp"
-                    android:gravity="center_vertical"
-                    android:textColor="@color/grayDarker"
-                    android:text="승인된 친구 요청"
-                    android:tag="nseb" />
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:textSize="15dp"-->
+                    <!--android:layout_marginLeft="50dp"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:textColor="@color/grayDarker"-->
+                    <!--android:text="승인된 친구 요청"-->
+                    <!--android:tag="nseb" />-->
 
-                <TextView
-                    android:id="@+id/acceptedAngle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:gravity="center_vertical"
-                    android:text="@string/fa_down"
-                    android:layout_marginRight="15dp"
-                    android:textColor="@color/silver"
-                    android:textSize="25dp"
-                    android:layout_alignParentRight="true"
-                    android:tag="fas"/>
-            </RelativeLayout>
+                <!--<TextView-->
+                    <!--android:id="@+id/acceptedAngle"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="match_parent"-->
+                    <!--android:gravity="center_vertical"-->
+                    <!--android:text="@string/fa_down"-->
+                    <!--android:layout_marginRight="15dp"-->
+                    <!--android:textColor="@color/silver"-->
+                    <!--android:textSize="25dp"-->
+                    <!--android:layout_alignParentRight="true"-->
+                    <!--android:tag="fas"/>-->
+            <!--</RelativeLayout>-->
 
-            <ListView
-                android:id="@+id/acceptedList"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginBottom="15dp"
-                android:divider="@color/clouds"
-                android:dividerHeight="1dp"/>
+            <!--<ListView-->
+                <!--android:id="@+id/acceptedList"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="0dp"-->
+                <!--android:layout_marginBottom="15dp"-->
+                <!--android:divider="@color/clouds"-->
+                <!--android:dividerHeight="1dp"/>-->
 
             <RelativeLayout
                 android:id="@+id/sendedBtn"
