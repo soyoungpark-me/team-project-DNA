@@ -11,13 +11,13 @@
 
 ## 목차
 
-1. ##### [프로젝트 소개](#프로젝트-소개)
+1. #### [프로젝트 소개](#프로젝트-소개-1)
 
-2. ##### [프로젝트 아키텍처 구조도](#프로젝트-아키텍처-구조도)
+2. #### [프로젝트 아키텍처 구조도](#프로젝트-아키텍처-구조도-1)
 
-3. ##### [스크린샷](#스크린샷)
+3. #### [스크린샷](#스크린샷-1)
 
-4. ##### [역할 분담 및 개발 일지](#역할-분담-및-개발-일지)
+4. #### [역할 분담 및 개발 일지](#역할-분담-및-개발-일지-1)
 
    
 
@@ -43,7 +43,7 @@
 
 ## 프로젝트 아키텍처 구조도
 
-##### 2018.09.01 : 성능 개선 전
+#### 2018.09.01 : 성능 개선 전
 
 ![아키텍처 구조1](https://github.com/3457soso/team-project-DNA/raw/master/Resource/Arcitecture_Design_0901.png)
 
@@ -51,7 +51,7 @@
 
 
 
-##### 2018.09.17 : 성능 개선 후
+#### 2018.09.17 : 성능 개선 후
 
 ![아키텍처 구조2](https://github.com/3457soso/team-project-DNA/raw/master/Resource/Arcitecture_Design_0916.png)
 
@@ -67,7 +67,7 @@
 
 ## 스크린샷
 
-##### 회원가입
+#### 회원가입
 
 ![회원가입](https://github.com/3457soso/team-project-DNA/blob/master/Resource/ScreenShot_Register.png?raw=true)
 
@@ -75,7 +75,7 @@
 
 
 
-##### 위치 기반 채팅
+#### 위치 기반 채팅
 
 ![채팅](https://github.com/3457soso/team-project-DNA/blob/master/Resource/ScreenShot_Chat.png?raw=true)
 
@@ -83,7 +83,7 @@
 
 
 
-##### DM (Direct Message)
+#### DM (Direct Message)
 
 ![DM](https://github.com/3457soso/team-project-DNA/blob/master/Resource/ScreenShot_DM.png?raw=true)
 
@@ -95,13 +95,13 @@
 
 ## 역할 분담 및 개발 일지
 
-#### 맡은 부분
+### 맡은 부분
 
 프로젝트에서 저는 **인증 구현, 서버 개발, 웹 클라이언트 개발, 안드로이드 클라이언트 UI 개발**을 담당했고, 주요 기술로 Node.js와 Socket.IO, 데이터 베이스로 MongoDB, 세션 저장소로 Redis, 웹 프레임워크로 React를 사용했습니다. 
 
 
 
-#### 개발 일지
+### 개발 일지
 
 개발하면서 고민이 필요했던 부분, 추가적으로 공부가 필요했던 부분들에 대해 일지 형식으로 기록했습니다.
 
