@@ -36,6 +36,7 @@ import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
+import static com.konkuk.dna.utils.ConvertType.DatetoStr;
 import static com.konkuk.dna.utils.JsonToObj.PostingJsonToObj;
 import static com.konkuk.dna.utils.ServerURL.LOCAL_HOST;
 
@@ -160,7 +161,7 @@ public class PostDetailActivity extends BaseActivity {
         }
 
 //        Log.v("postdetail", "comment testing,,, : " + post.getComments().get(0).getAvatar());
-        postDate.setText(post.getDate());
+        postDate.setText(DatetoStr(post.getDate()));
         postTitle.setText(post.getTitle());
         postContent.setText(post.getContent());
 
@@ -241,7 +242,12 @@ public class PostDetailActivity extends BaseActivity {
                 new writeCommentAsync(this, postCommentCnt, post, commentAdapter, commentList, postScrollView, commentEdit).execute(String.valueOf(idx), commentEdit.getText().toString());
                 break;
         }
-        onStop();
+       // onStop();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 
     @Override
@@ -349,6 +355,7 @@ class PostingAsyncTask extends AsyncTask<Integer, Integer, Integer> {
         String result = httpReqRes.requestHttpGetPosting("https://dna.soyoungpark.me:9013/api/posting/show/" + ints[1]);
         post = PostingJsonToObj(result, 2).get(0);
 
+        dbhelper.close();
         return ret;
     }
 
@@ -358,13 +365,13 @@ class PostingAsyncTask extends AsyncTask<Integer, Integer, Integer> {
 
         switch(num) {
             case 1: // 라잌
-//                postLikeCnt.setText(post.getLikeCount());
+                postLikeCnt.setText(post.getLikeCount()+"개");
                 postLikeBtnIcon.setTextColor(context.getResources().getColor(R.color.alizarin));
                 postLikeBtnText.setTextColor(context.getResources().getColor(R.color.alizarin));
                 break;
 
             case 2: //언라잌
-//                postLikeCnt.setText(post.getLikeCount());
+                postLikeCnt.setText(post.getLikeCount()+"개");
                 postLikeBtnIcon.setTextColor(context.getResources().getColor(R.color.grayLight));
                 postLikeBtnText.setTextColor(context.getResources().getColor(R.color.grayLight));
                 break;
@@ -414,6 +421,7 @@ class writeCommentAsync extends AsyncTask<String, String, Post> {
 
         String res = httpReqRes.requestHttpGetPosting("https://dna.soyoungpark.me:9013/api/posting/show/" + Integer.parseInt(strings[0]));
         Post posting = PostingJsonToObj(res, 2).get(0);
+        dbhelper.close();
         return posting;
     }
 
@@ -467,6 +475,7 @@ class addFriendAsync extends AsyncTask<Integer, String, Void> {
 
         httpReqRes.requestHttpPostAddFriend("https://dna.soyoungpark.me:9013/api/friends/", dbhelper, ints[0]);
 
+        dbhelper.close();
         return null;
     }
 

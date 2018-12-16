@@ -286,6 +286,7 @@ class showFriendAsyncTask extends AsyncTask<String, Void, ArrayList<Friend>> {
             }
         }
 
+        dbhelper.close();
         return friends;
     }
 

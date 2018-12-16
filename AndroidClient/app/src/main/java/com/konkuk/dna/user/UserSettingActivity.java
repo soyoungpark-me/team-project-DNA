@@ -181,6 +181,12 @@ public class UserSettingActivity extends BaseActivity {
         super.onResume();
         mapFragment.initMapCenter(longitude, latitude, radius);
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        dbhelper.close();
+    }
 }
 
 class SettingAsyncTask extends AsyncTask<Integer, Integer, String> {
@@ -212,6 +218,8 @@ class SettingAsyncTask extends AsyncTask<Integer, Integer, String> {
 
         String result = httpreq.requestHttpPutSetting(ServerURL.DNA_SERVER+ServerURL.PORT_USER_API+"/users/setting"
                 , m_token, radius, anonymity, searchable);
+
+        dbhelper.close();
 
         return result;
     }

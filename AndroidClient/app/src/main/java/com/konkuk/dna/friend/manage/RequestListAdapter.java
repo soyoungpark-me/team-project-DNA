@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.konkuk.dna.R;
+import com.konkuk.dna.friend.FriendActivity;
 import com.konkuk.dna.friend.manage.Request;
 import com.konkuk.dna.utils.HttpReqRes;
 import com.konkuk.dna.utils.dbmanage.Dbhelper;
@@ -162,11 +163,14 @@ class NotifyFriendAsync extends AsyncTask<Integer, String, Integer> {
 
         httpReqRes.requestHttpNotifyFriend("https://dna.soyoungpark.me:9013/api/friends/" + ints[0], dbhelper.getAccessToken(), ints[1]);
 
+        dbhelper.close();
         return ints[1];
     }
 
     @Override
     protected void onPostExecute(Integer num) {
+        FriendActivity fa = (FriendActivity)context;
+        fa.init();
 
         super.onPostExecute(num);
 

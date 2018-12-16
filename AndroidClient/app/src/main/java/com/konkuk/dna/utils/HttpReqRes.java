@@ -19,11 +19,14 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -58,6 +61,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -113,10 +117,8 @@ public class HttpReqRes {
     /*
      * Signup, Check ID - POST
      * */
-    public String requestHttpPostSignup(String url, String id, String password, String conform_password, String email, String nickname, String description, String avatar) {
+    public String requestHttpPostSignup(String url, String id, String password, String confirm_password, String email, String nickname, String description, String avatar){
 
-        HttpsURLConnection urlConn = null;
-        BufferedReader reader = null;
 
         String result = null;
         try {
@@ -126,20 +128,25 @@ public class HttpReqRes {
             List<NameValuePair> params = new ArrayList<NameValuePair>();
             params.add(new BasicNameValuePair("id", id));
             params.add(new BasicNameValuePair("password", password));
-            params.add(new BasicNameValuePair("conform_password", conform_password));
+            params.add(new BasicNameValuePair("confirm_password", confirm_password));
             params.add(new BasicNameValuePair("email", email));
-            if(nickname==null || nickname==""){
-                nickname = id;
-            }
+//            if(nickname==null || nickname==""){
+//                nickname = id;
+//            }
             params.add(new BasicNameValuePair("nickname", nickname));
             params.add(new BasicNameValuePair("description", description));
-            //params.add(new BasicNameValuePair("avater", password));
+            //params.add(new BasicNameValuePair("avatar", password));
 
             UrlEncodedFormEntity ent = new UrlEncodedFormEntity(params, HTTP.UTF_8);
             post.setEntity(ent);
             HttpResponse responsePOST = client.execute(post);
+
+            Log.e("status", responsePOST.getStatusLine().toString());
             HttpEntity resEntity = responsePOST.getEntity();
-            Log.e("RESPONSE", EntityUtils.toString(resEntity));
+
+            result = EntityUtils.toString(resEntity);
+            Log.e("RESPONSE", result);
+
 //            if(responsePOST.getStatusLine().getStatusCode()==200){
 //                HttpEntity resEntity = responsePOST.getEntity();
 //                if (resEntity != null) {
@@ -151,9 +158,39 @@ public class HttpReqRes {
 //            }
 
 
+
+//            HttpClient client = new DefaultHttpClient();
+//            String postURL = url;
+//            HttpPost httpPost = new HttpPost(postURL);
+//            Charset chars = Charset.forName("UTF-8");
+//
+//            MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+//            builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+//            builder.addTextBody("id", id, ContentType.MULTIPART_FORM_DATA.withCharset("UTF-8"));
+//            builder.addTextBody("password", password, ContentType.MULTIPART_FORM_DATA.withCharset("UTF-8"));
+//            builder.addTextBody("confirm_password", confirm_password, ContentType.MULTIPART_FORM_DATA.withCharset("UTF-8"));
+//            builder.addTextBody("email", email, ContentType.MULTIPART_FORM_DATA.withCharset("UTF-8"));
+//            builder.addTextBody("description", description, ContentType.MULTIPART_FORM_DATA.withCharset("UTF-8"));
+//            builder.addTextBody("nickname", nickname, ContentType.MULTIPART_FORM_DATA.withCharset("UTF-8"));
+//
+//            if(avatar!=null) {
+//                builder.addBinaryBody("avatar", new File("test.txt"),
+//                        ContentType.APPLICATION_OCTET_STREAM, "file.ext");
+//            }
+//            HttpEntity multipart = builder.build();
+//            httpPost.setEntity(multipart);
+//
+//            HttpResponse response = client.execute(httpPost);
+//            //assertThat(response.getStatusLine().getStatusCode(), equalTo(200));
+//            HttpEntity resEntity = response.getEntity();
+//            result = EntityUtils.toString(resEntity);
+//
+//            Log.e("RESPONSE", result);
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
         return result;
     }
 
@@ -531,7 +568,9 @@ public class HttpReqRes {
             nameValuePairs.add(new BasicNameValuePair("nickname", dbhelper.getMyNickname()));
             nameValuePairs.add(new BasicNameValuePair("avatar", dbhelper.getMyAvatar()));
 
-            post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            UrlEncodedFormEntity ent = new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8);
+            post.setEntity(ent);
+            //post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
 
             HttpResponse response = client.execute(post);
             HttpEntity resEntity = response.getEntity();
@@ -619,7 +658,8 @@ public class HttpReqRes {
             nameValuePairs.add(new BasicNameValuePair("userAvatar", dbhelper.getMyAvatar()));
             nameValuePairs.add(new BasicNameValuePair("rdate", sdf.format(dt).toString()));
 
-            post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            UrlEncodedFormEntity ent = new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8);
+            post.setEntity(ent);
 
             HttpResponse response = client.execute(post);
             HttpEntity resEntity = response.getEntity();
@@ -651,7 +691,8 @@ public class HttpReqRes {
 
             nameValuePairs.add(new BasicNameValuePair("receiverIdx", recidx));
 
-            post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+            UrlEncodedFormEntity ent = new UrlEncodedFormEntity(nameValuePairs, HTTP.UTF_8);
+            post.setEntity(ent);
 
             HttpResponse response = client.execute(post);
             HttpEntity resEntity = response.getEntity();

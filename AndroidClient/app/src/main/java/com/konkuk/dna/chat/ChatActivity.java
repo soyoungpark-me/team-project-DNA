@@ -168,6 +168,7 @@ public class ChatActivity extends BaseActivity {
 
         dbhelper = new Dbhelper(this);
         radius = dbhelper.getMyRadius();
+        dbhelper.close();
 
         mapFragment = (MapFragment) getFragmentManager().findFragmentById(R.id.mapFragment);
 
@@ -763,6 +764,8 @@ class ChatSetAsyncTask extends AsyncTask <Double, Integer, ArrayList<String>>  {
                 scrollMyListViewToMemory();
                 break;
         }
+
+        dbhelper.close();
 
     }
 

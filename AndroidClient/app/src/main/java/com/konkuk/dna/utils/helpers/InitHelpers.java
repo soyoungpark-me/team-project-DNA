@@ -215,33 +215,36 @@ public class InitHelpers {
             ccuListView.setAdapter(chatUserAdapter);
         } else if (type == 1){
             drawerForUserList.setVisibility(GONE);
+            drawerForFriend.setVisibility(GONE);
 
-            SocketConnection.getSocket().on("direct", new Emitter.Listener() {
-                @Override
-                public void call(Object... args) {
-                    Log.e("Socket Ping-direct", args[0].toString());
-                    DrawyerAsyncTask dat = new DrawyerAsyncTask(context, ccuListView, v);
-
-//                    if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB) {
-//                        dat.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, args[0].toString(), String.valueOf(dbhelper.getMyIdx()));
-//                    }else{
-//                        dat.execute(args[0].toString(), String.valueOf(dbhelper.getMyIdx()));
-//                    }
-                }
-            });
+//            SocketConnection.getSocket().on("direct", new Emitter.Listener() {
+//                @Override
+//                public void call(Object... args) {
+//                    Log.e("Socket Ping-direct", args[0].toString());
+//                    DrawyerAsyncTask dat = new DrawyerAsyncTask(context, ccuListView, v);
+//
+////                    if (Build.VERSION.SDK_INT>=Build.VERSION_CODES.HONEYCOMB) {
+////                        dat.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, args[0].toString(), String.valueOf(dbhelper.getMyIdx()));
+////                    }else{
+////                        dat.execute(args[0].toString(), String.valueOf(dbhelper.getMyIdx()));
+////                    }
+//                }
+//            });
             // TODO 해당 친구의 프로필을 입력해줘야 합니다.
-            ImageView friendAvatar = (ImageView) v.findViewById(R.id.friendAvatar);
-            TextView friendNickname = (TextView) v.findViewById(R.id.friendNickname);
-            TextView friendNicknameText = (TextView) v.findViewById(R.id.friendNicknameText);
-            TextView friendInfo = (TextView) v.findViewById(R.id.friendInfo);
+//            ImageView friendAvatar = (ImageView) v.findViewById(R.id.friendAvatar);
+//            TextView friendNickname = (TextView) v.findViewById(R.id.friendNickname);
+//            TextView friendNicknameText = (TextView) v.findViewById(R.id.friendNicknameText);
+//            TextView friendInfo = (TextView) v.findViewById(R.id.friendInfo);
 
-            friendNickname.setText("fakerzzang");
-            friendNicknameText.setText("fakerzzang"); // 바로 위에꺼랑 같은 값으로 세팅해주세요!
-            friendInfo.setText("이번 롤드컵에 페이커가 출전하지 못해서 굉장히 유감입니다. 사실 롤을 본 지는 오래 돼서 지금 봐도 뭐가 뭔지는 모릅니다.");
+//            friendNickname.setText("fakerzzang");
+//            friendNicknameText.setText("fakerzzang"); // 바로 위에꺼랑 같은 값으로 세팅해주세요!
+//            friendInfo.setText("이번 롤드컵에 페이커가 출전하지 못해서 굉장히 유감입니다. 사실 롤을 본 지는 오래 돼서 지금 봐도 뭐가 뭔지는 모릅니다.");
         } else if (type == 2) {
             drawerForUserList.setVisibility(GONE);
             drawerForFriend.setVisibility(GONE);
         }
+
+        dbhelper.close();
     }
 
     public static void updateDrawer(final Context context, View v) {

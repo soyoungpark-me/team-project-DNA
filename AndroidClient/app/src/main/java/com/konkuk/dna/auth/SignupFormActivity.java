@@ -13,10 +13,17 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.google.gson.JsonParser;
 import com.konkuk.dna.utils.HttpReqRes;
 import com.konkuk.dna.utils.ServerURL;
 import com.konkuk.dna.utils.helpers.BaseActivity;
 import com.konkuk.dna.R;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
+
+import static com.konkuk.dna.utils.JsonToObj.RegisterJsonToObj;
 
 public class SignupFormActivity extends BaseActivity {
     private EditText IDEdit, emailEdit, PWEdit, PWcheckEdit, nicknameEdit, infoEdit;
@@ -63,8 +70,9 @@ public class SignupFormActivity extends BaseActivity {
                             description = infoEdit.getText().toString();
                         }
 
-                        SignUpAsync suac = new SignUpAsync(id, pw, confirm_pw, email, nickname, description, null);
+                        SignUpAsync suac = new SignUpAsync(context, id, pw, confirm_pw, email, nickname, description, null);
                         suac.execute();
+
                     }
                 }
 
@@ -125,35 +133,58 @@ public class SignupFormActivity extends BaseActivity {
     }
 }
 
-class SignUpAsync extends AsyncTask<String, Void, String> {
+class SignUpAsync extends AsyncTask<String, Void, HashMap<String, String>> {
+    private Context context;
     private String id;
     private String password;
-    private String conform_password;
+    private String confirm_password;
     private String email;
     private String nickname;
     private String description;
     private String avatar;
 
-    public SignUpAsync(String id, String password, String conform_password, String email, String nickname, String description, String avatar) {
+    public SignUpAsync(Context context, String id, String password, String confirm_password, String email, String nickname, String description, String avatar) {
         this.id = id;
         this.password = password;
-        this.conform_password = conform_password;
+        this.confirm_password = confirm_password;
         this.email = email;
         this.nickname = nickname;
         this.description = description;
         this.avatar = avatar;
+        this.context = context;
     }
 
     @Override
-    protected String doInBackground(String... strings) {
+    protected HashMap<String, String> doInBackground(String... strings) {
         HttpReqRes httpReqRes = new HttpReqRes();
-        String result = httpReqRes.requestHttpPostSignup(ServerURL.DNA_SERVER+ServerURL.PORT_USER_API+"/users/register", id, password, conform_password, email, nickname, description, avatar);
+        //Log.e("Check", id+password+email+nickname+description);
+        String result = httpReqRes.requestHttpPostSignup(ServerURL.DNA_SERVER+ServerURL.PORT_USER_API+"/users/register", id, password, confirm_password, email, nickname, description, avatar);
 
-        return null;
+        Log.e("resultStr", result+"");
+        HashMap<String, String> hm;
+        hm =  RegisterJsonToObj(result);
+
+        return hm;
     }
 
     @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
+    protected void onPostExecute(HashMap<String, String> hm) {
+        super.onPostExecute(hm);
+
+
+        if(Boolean.parseBoolean(hm.get("issuccess"))){
+            Toast.makeText(context, "회원가입이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+            Intent intent = new Intent(context, LoginActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK|Intent.FLAG_ACTIVITY_NEW_TASK);
+            context.startActivity(intent);
+        }else{
+            if(Integer.parseInt(hm.get("code")) == 21400){
+                Toast.makeText(context, "이미 사용중인 ID입니다.", Toast.LENGTH_SHORT).show();
+            }else{
+                Toast.makeText(context, "이미 등록된 이메일입니다.", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
     }
 }

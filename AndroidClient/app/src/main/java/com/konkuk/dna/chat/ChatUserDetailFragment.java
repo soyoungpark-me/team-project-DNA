@@ -21,6 +21,7 @@ import android.view.Window;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -200,6 +201,7 @@ class chatFriendAsyncTask extends AsyncTask<Integer, Integer, Boolean> {
 
         String res = httpReqRes.requestHttpGetWASPIwToken("https://dna.soyoungpark.me:9013/api/friends/showWait/" + ints[0], dbhelper.getAccessToken());
 
+        dbhelper.close();
         JsonParser jsonParser = new JsonParser();
         JsonObject jsonObject = (JsonObject) jsonParser.parse(res);
 
@@ -238,14 +240,16 @@ class addFriendAsync extends AsyncTask<Integer, String, Void> {
         HttpReqRes httpReqRes = new HttpReqRes();
         dbhelper = new Dbhelper(context);
 
-        httpReqRes.requestHttpPostAddFriend("https://dna.soyoungpark.me:9013/api/friends/", dbhelper, ints[0]);
+        String res = httpReqRes.requestHttpPostAddFriend("https://dna.soyoungpark.me:9013/api/friends/", dbhelper, ints[0]);
+        Log.v("chatuserdetailfrag", "addfriend res : " + res);
 
+        dbhelper.close();
         return null;
     }
 
     @Override
     protected void onPostExecute(Void voids) {
-
+        Toast.makeText(context, "친구 요청을 전송했습니다.", Toast.LENGTH_SHORT).show();
         super.onPostExecute(voids);
     }
 }

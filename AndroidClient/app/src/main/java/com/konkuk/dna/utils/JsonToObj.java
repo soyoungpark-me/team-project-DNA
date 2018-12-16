@@ -145,7 +145,7 @@ public class JsonToObj {
     /*
      * 회원가입 Json변환 메소드
      * */
-    public HashMap RegisterJsonToObj(String jsonResult){
+    public static HashMap RegisterJsonToObj(String jsonResult){
 
         HashMap<String, String> hm = new HashMap<>();
         JsonParser jsonParser = new JsonParser();
@@ -323,28 +323,28 @@ public class JsonToObj {
                     //지금 메세지가 내 메세지이면
                     if(i!=0 && prev_idx!=sender_idx) {
                         // 이전에 있던 메시지가 다른사람것이라면 프로필이 필요해! 물론 내메세지가 리스트의 마지막이 아니였다면
-                        DMMessage tmp = dmMessages.get(dmMessages.size()-1);
-                        tmp.setViewType(1);
-                        dmMessages.remove(dmMessages.size()-1);
-                        dmMessages.add(tmp);
+//                        DMMessage tmp = dmMessages.get(dmMessages.size()-1);
+//                        tmp.setViewType(1);
+//                        dmMessages.remove(dmMessages.size()-1);
+//                        dmMessages.add(tmp);
                     }
                     viewType = 0;
 
                 }else{
                     //지금 메세지가 남의 메세지라면
-                    if(i == dmsArray.size()-1){
+                    if(i == 0){
                         // 그지역의 첫번째 메세지이면 지금 메세지에 프로필 필요
 
                         viewType = 1;
 
-                    }else if(i!=0 && prev_idx!=sender_idx && prev_idx != myIdx){
+                    }else if(i!=0 && prev_idx!=sender_idx){
                         // 이전사람이 내가 아니고 지금메세지와도 다른 사람의 메세지면 프로필 필요
-                        DMMessage tmp = dmMessages.get(dmMessages.size()-1);
-                        tmp.setViewType(1);
-                        dmMessages.remove(dmMessages.size()-1);
-                        dmMessages.add(tmp);
+//                        DMMessage tmp = dmMessages.get(dmMessages.size()-1);
+//                        tmp.setViewType(1);
+//                        dmMessages.remove(dmMessages.size()-1);
+//                        dmMessages.add(tmp);
 
-                        viewType = 2;
+                        viewType = 1;
                     }else{
                         //
                         viewType = 2;
@@ -839,7 +839,8 @@ public class JsonToObj {
 
         }else{
             //리스폰스에 하자가 있다면
-            Log.e(jsonObject.get("code").toString(), jsonObject.get("message").toString());
+            Log.e("Check", jsonResult);
+            //Log.e(jsonObject.get("code").toString(), jsonObject.get("message").toString());
             return null;
         }
 

@@ -293,6 +293,20 @@ public class Dbhelper extends SQLiteOpenHelper {
     /*
      * 내 avatar 가져오기
      * */
+    public String getMyDescription(){
+        String description = "";
+        SQLiteDatabase db = getReadableDatabase();
+
+        Cursor cursor = db.rawQuery("SELECT * FROM "+ DNAEntry.TABLE_NAME, null);
+        while(cursor.moveToNext()){
+            description = cursor.getString(4);
+        }
+        return description;
+    }
+
+    /*
+     * 내 avatar 가져오기
+     * */
     public String getMyAvatar(){
         String avatar = "";
         SQLiteDatabase db = getReadableDatabase();

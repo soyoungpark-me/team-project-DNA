@@ -48,6 +48,7 @@ public class MyPageActivity extends BaseActivity {
     }
 
     public void init() {
+        Dbhelper dbhelper = new Dbhelper(this);
         menuDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         InitHelpers.initDrawer(this, menuDrawer, 2);
 
@@ -58,6 +59,13 @@ public class MyPageActivity extends BaseActivity {
         myPostList = (ListView) findViewById(R.id.myPostList);
         scrapPostList = (ListView) findViewById(R.id.scrapPostList);
         InitHelpers.setProfile(myPageProfile);
+
+        String myInfo = dbhelper.getMyDescription();
+        if(myInfo.equals("null")){
+            myInfo = "아직 내 정보를 입력하지 않았습니다ㅠㅠ";
+        }
+        myPageInfo.setText(myInfo);
+        dbhelper.close();
 
         myPosts = new ArrayList<Post>();
         scrapPosts = new ArrayList<Post>();
@@ -141,6 +149,13 @@ public class MyPageActivity extends BaseActivity {
                 break;
         }
     }
+
+    @Override
+    protected void onResume() {
+        scrapPostListAdatper.notifyDataSetChanged();
+        myPostListAdatper.notifyDataSetChanged();
+        super.onResume();
+    }
 }
 
 class myPostingAsync extends AsyncTask<Integer, Void, ArrayList<Post>> {
@@ -174,6 +189,7 @@ class myPostingAsync extends AsyncTask<Integer, Void, ArrayList<Post>> {
                 break;
         }
 
+        dbhelper.close();
         Log.v("mypageactivity", "show bookmark httpreq result" + result);
         postings = PostingJsonToObj(result, 1);
 

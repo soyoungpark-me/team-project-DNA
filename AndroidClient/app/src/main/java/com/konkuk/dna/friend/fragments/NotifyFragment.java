@@ -214,6 +214,7 @@ class notifyAsyncTask extends AsyncTask<Integer, Integer, ArrayList<Request>> {
             Log.v("notifyasync", "show user : " + res1);
         }
 
+        dbhelper.close();
         return requests;
     }
 

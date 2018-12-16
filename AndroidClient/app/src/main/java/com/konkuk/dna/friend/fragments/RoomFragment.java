@@ -181,6 +181,7 @@ class DMRoomAsyncTask extends AsyncTask<Double, Integer, ArrayList<DMRoom>> {
 //        rooms.add(new DMRoom(1, 2, "test", null, "마지막 메시지2", TYPE_MESSAGE, "2018-01-23"));
 //        rooms.add(new DMRoom(2, 3, "avatar", null, "마지막 메시지2", TYPE_MESSAGE, "2018-01-22"));
 
+        dbhelper.close();
         return rooms;
     }
 

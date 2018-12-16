@@ -223,6 +223,7 @@ class LoginAsyncTask extends AsyncTask<String, Integer, String> {
                  * */
                 dbhelper = new Dbhelper(context);
                 dbhelper.saveUserInfo(map);
+                dbhelper.close();
 
                 loginDialog.dismiss();
 

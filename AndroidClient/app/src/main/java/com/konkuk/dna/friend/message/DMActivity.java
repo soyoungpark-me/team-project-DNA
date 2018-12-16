@@ -1,6 +1,8 @@
 package com.konkuk.dna.friend.message;
 
+import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -20,6 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.google.gson.JsonObject;
+import com.konkuk.dna.chat.ChatListMapFragment;
 import com.konkuk.dna.post.Post;
 import com.konkuk.dna.post.PostDetailActivity;
 import com.konkuk.dna.utils.EventListener;
@@ -47,6 +50,7 @@ import static com.konkuk.dna.utils.ConvertType.DatetoStr;
 import static com.konkuk.dna.utils.JsonToObj.ChatAllJsonToObj;
 import static com.konkuk.dna.utils.JsonToObj.DMMsgJsonToObj;
 import static com.konkuk.dna.utils.JsonToObj.PostingJsonToObj;
+import static com.konkuk.dna.utils.JsonToObj.getLocationContents;
 import static com.konkuk.dna.utils.ObjToJson.SendDMObjToJson;
 import static com.konkuk.dna.utils.ObjToJson.SendMsgObjToJson;
 
@@ -147,6 +151,12 @@ public class DMActivity extends BaseActivity {
                 switch (clicked_type){
                     case TYPE_LOCATION:
                         //TODO : 지도 위치 보여주기
+                        ArrayList<Double> loc = getLocationContents(clicked_msg.getContents());
+                        if(loc!=null){
+                            FragmentManager fragmentManager = ((Activity) context).getFragmentManager();
+                            ChatListMapFragment chatListMapFragment = ChatListMapFragment.newInstance(loc.get(1), loc.get(0));
+                            chatListMapFragment.show(fragmentManager, "chatListMapFragment");
+                        }
                         break;
 
                     case TYPE_IMAGE:
@@ -221,8 +231,9 @@ public class DMActivity extends BaseActivity {
                 // TODO 현재 주소를 messageEditText에 채워줍니다.
                 if (messageType.equals(TYPE_MESSAGE)) {
                     dmLocationBtn.setTextColor(getResources().getColor(R.color.colorRipple));
-                    dmEditText.setText("서울시 광진구 화양동 1 건국대학교");
+                    dmEditText.setText(dbhelper.getMyAddress());
                     dmEditText.setEnabled(false);
+                    dmEditText.setBackgroundColor(getResources().getColor(R.color.concrete));
                     messageType = TYPE_LOCATION;
                 } else {
                     DialogSimple();
@@ -308,6 +319,7 @@ public class DMActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
+        dbhelper.close();
         EventBus.getDefault().unregister(this);
     }
 }
@@ -359,6 +371,7 @@ class DMSetAsyncTask extends AsyncTask<String, Integer, ArrayList<DMMessage>> {
 
         //내 idx, 상대방 닉네임, 메세지 전문
         dmMessages = DMMsgJsonToObj(dbhelper.getMyIdx(), args[1], repMsgAll);
+        dbhelper.close();
 
         return dmMessages;
     }

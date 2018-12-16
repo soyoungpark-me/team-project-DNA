@@ -132,6 +132,7 @@ class FriendDeleteAsyncTask extends AsyncTask<Integer, Void, Void> {
 
         res = httpReqRes.requestHttpFriendDelete("https://dna.soyoungpark.me:9013/api/friends/" + ints[0], dbhelper.getAccessToken());
 
+        dbhelper.close();
         return null;
     }
 

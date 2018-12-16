@@ -98,6 +98,7 @@ public class ChatListAdapter extends ArrayAdapter<ChatMessage> {
 
         Dbhelper dbhelper = new Dbhelper(context);
         myIdx = dbhelper.getMyIdx();
+        dbhelper.close();
     }
 
     @NonNull

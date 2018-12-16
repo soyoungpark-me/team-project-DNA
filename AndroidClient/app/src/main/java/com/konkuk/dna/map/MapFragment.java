@@ -249,6 +249,7 @@ public class MapFragment extends Fragment
                 Dbhelper dbhelper = new Dbhelper(getActivity());
                 gpsTracker = new GPSTracker(getActivity());
                 updateRadiusCircle(gpsTracker.getLongitude(), gpsTracker.getLatitude(), dbhelper.getMyRadius());
+                dbhelper.close();
 
 //                ArrayList<Post> posts = null;
 //                try {
@@ -355,6 +356,7 @@ public class MapFragment extends Fragment
                 dbhelper.updateAddress(nMapPlacemark.toString());
                 Log.e("LocationListen", nMapPlacemark.toString());
             }
+            dbhelper.close();
 
         }
     };
@@ -533,6 +535,7 @@ class showPostingAll2Async extends AsyncTask<Void, Void, ArrayList<Post>> {
             postings.add(PostingJsonToObj(result1, 2).get(0));
 
         }
+        dbhelper.close();
 //        postings = PostingJsonToObj(result, 2);
 
         return postings;
